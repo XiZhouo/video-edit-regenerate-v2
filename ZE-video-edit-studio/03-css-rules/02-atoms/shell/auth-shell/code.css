@@ -1,0 +1,277 @@
+/*
+ * auth-shell.css — ze-login/ze-project-picker/ze-share 账号面外壳组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:登录 gate(.ze-login*)/ 游客提示条([data-ze-region="guest-banner"])/
+ * 项目选择器(.ze-project-picker*)/ 共享对话框
+ * (.ze-share-*)是框架级账号面 shell chrome(LoginPage / ProjectPicker / ShareButton,
+ * 01-core/04-user-facing/03-authentication 与 header/controls)。含状态化样式 —— 项目行
+ * `.ze-project-picker__row:hover` 切 accent-wash 描边、共享 chip、overlay 模态层(z-modal)——
+ * 这套「状态化 hover + 令牌」与 editor-shell / layout-tree 同类,无法降为 L4 无令牌结构,故整组
+ * 收成 L2 组件原子。视觉 DNA 复用 .ze-card / .ze-dialog(raised 底 + overlay-soft 边 + 浮层阴影),
+ * 输入/按钮用 .ze-input / .ze-button,本族只补账号面自有布局/文字/行/chip。
+ * 原 04-editors/auth.css 迁来(L5 chrome 轮 batch3)。
+ *
+ * 全部走 令牌(var(--ze-*)),禁字面 hex/rgb;主题随 [data-theme=dark] 自动跟随。
+ */
+
+/* ============================================================
+ * § 1 登录 gate(全屏)
+ * ============================================================ */
+
+.ze-login {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ze-space-6) var(--ze-space-4);
+  background: transparent;
+  color: var(--ze-ink-primary);
+  z-index: 1;
+}
+
+/* 登录卡:视觉 DNA 复用 .ze-card(className="ze-card ze-login__card");本类只管布局 */
+.ze-login__card {
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+  gap: var(--ze-space-3);
+  padding: var(--ze-space-7);
+  text-align: center;
+}
+
+.ze-login__title {
+  font-size: var(--ze-fs-xl);
+  font-weight: var(--ze-fw-bold);
+}
+
+.ze-login__hint,
+.ze-login__secondary {
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+}
+
+.ze-login__secondary {
+  color: var(--ze-ink-tertiary);
+  text-align: center;
+}
+
+/* 旧密码输入用 .ze-input、提交用 .ze-button[data-variant="primary"];新飞书登录仅保留提交按钮 */
+
+.ze-login__error {
+  color: var(--ze-semantic-danger);
+  font-size: var(--ze-fs-sm);
+}
+
+.ze-login__switch {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-sm);
+}
+
+/* 游客提示条:账号态 shell chrome,外侧节奏跟 header/main/footer 的 workspace gutter 对齐。 */
+[data-ze-region="guest-banner"] {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: var(--ze-z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ze-space-1);
+  min-height: var(--ze-row-h);
+  margin: var(--ze-workspace-gutter) var(--ze-workspace-gutter) 0;
+  padding: 0 var(--ze-workspace-gutter);
+}
+
+/* ============================================================
+ * § 2 项目选择器(登录后空态中区)
+ * ============================================================ */
+
+.ze-project-picker {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-4);
+  padding: var(--ze-space-7);
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ze-project-picker__title {
+  font-size: var(--ze-fs-xl);
+  font-weight: var(--ze-fw-bold);
+}
+
+.ze-project-picker__new {
+  display: flex;
+  gap: var(--ze-space-2);
+  align-items: center;
+}
+
+/* 新建输入用 .ze-input(flex:1 内联);新建按钮用 .ze-button[data-variant="primary"];不再自造 */
+
+.ze-project-picker__error { color: var(--ze-semantic-danger); font-size: var(--ze-fs-sm); }
+.ze-project-picker__hint { color: var(--ze-ink-secondary); }
+
+.ze-project-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+}
+
+.ze-project-picker__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ze-space-3);
+  padding: var(--ze-space-3) var(--ze-space-3);
+  border-radius: var(--ze-radius-lg);
+  cursor: pointer;
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+}
+.ze-project-picker__row:hover { border-color: var(--ze-overlay-accent-wash); }
+
+.ze-project-picker__row-name {
+  font-weight: var(--ze-fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ze-project-picker__row-meta { font-size: var(--ze-fs-xs); color: var(--ze-ink-secondary); }
+.ze-project-picker__row-open { font-size: var(--ze-fs-sm); color: var(--ze-accent-500); }
+
+/* 示例场景区(一等文件系统能力:多模板示例卡;点击 = 打开/重置,无 rename/delete)*/
+.ze-project-picker__demos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+}
+.ze-project-picker__section-label {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  letter-spacing: 0;
+}
+.ze-project-picker__demo-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--ze-space-2);
+}
+.ze-project-picker__demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  padding: var(--ze-space-3);
+  border-radius: var(--ze-radius-lg);
+  text-align: left;
+  cursor: pointer;
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-accent-wash);
+  color: inherit;
+}
+.ze-project-picker__demo:hover { border-color: var(--ze-accent-500); }
+.ze-project-picker__demo:disabled { opacity: 0.6; cursor: default; }
+.ze-project-picker__demo-name {
+  font-weight: var(--ze-fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ze-project-picker__demo-desc { font-size: var(--ze-fs-sm); color: var(--ze-ink-secondary); }
+.ze-project-picker__demo-scene { font-size: var(--ze-fs-xs); color: var(--ze-accent-500); }
+
+/* 进门页双栏(工具有真操作说明片段时):左示例/项目栏 + 右说明全文,各自软滚动。
+ * 外框硬 viewport(overflow hidden,不参与软滚动);左栏复用 .ze-project-picker(自带软滚动+渐变),
+ * 右栏 __manual 软滚动叠 ze-scroll-fade-y。宽度用 clamp 内在响应(无 @media)。 */
+.ze-project-picker-split {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+  gap: var(--ze-space-6);
+}
+.ze-project-picker-split > .ze-project-picker {
+  flex: 0 0 clamp(260px, 32%, 400px);
+  max-width: none;
+  margin: 0;
+}
+.ze-project-picker__manual {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: var(--ze-space-7);
+  border-inline-start: 1px solid var(--ze-overlay-soft);
+}
+
+/* ============================================================
+ * § 3 共享对话框(header 共享按钮触发)
+ * ============================================================ */
+
+.ze-share-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ze-overlay-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--ze-z-modal);
+}
+
+/* 共享卡:视觉 DNA 复用 .ze-card(className="ze-card ze-share-card");本类只管布局 */
+.ze-share-card {
+  width: 100%;
+  max-width: 420px;
+  gap: var(--ze-space-3);
+  padding: var(--ze-space-6);
+}
+
+/* 标题用 .ze-card__title;描述用 .ze-card__body + 本类微调次级色;输入/按钮用 .ze-input/.ze-button */
+.ze-share-card__desc { font-size: var(--ze-fs-sm); color: var(--ze-ink-secondary); }
+.ze-share-card__add-row { display: flex; gap: var(--ze-space-2); }
+
+.ze-share-card__error { color: var(--ze-semantic-danger); font-size: var(--ze-fs-sm); }
+.ze-share-card__empty { font-size: var(--ze-fs-sm); color: var(--ze-ink-secondary); }
+
+.ze-share-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+  max-height: 240px;
+  overflow: auto;
+}
+
+.ze-share-card__chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ze-space-2) var(--ze-space-2);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-overlay-soft);
+}
+.ze-share-card__chip-name { font-size: var(--ze-fs-sm); }
+.ze-share-card__chip-remove {
+  background: none;
+  border: none;
+  color: var(--ze-semantic-danger);
+  cursor: pointer;
+  font-size: var(--ze-fs-sm);
+}
+.ze-share-card__footer { display: flex; justify-content: flex-end; }
+
+/* header 共享按钮上的协作者计数(按钮本体复用 .ze-header__menu-trigger 基类)*/
+.ze-share-count {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  margin-left: var(--ze-space-0-5);
+  font-weight: var(--ze-fw-regular);
+}

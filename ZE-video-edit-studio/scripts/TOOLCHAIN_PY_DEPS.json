@@ -1,0 +1,8 @@
+{
+  "schema": "ze.toolchain-py-deps.v1",
+  "requires": [
+    "cryptography>=42",
+    "jsonschema>=4.23"
+  ],
+  "purpose": "Python packages required by managed Build validation, artifact signing, and strict JSON Schema checks."
+}

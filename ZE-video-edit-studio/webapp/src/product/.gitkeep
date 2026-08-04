@@ -1,0 +1,10 @@
+# 目标层(target-owned)产品目录占位。
+#
+# 为什么需要这个文件:ZE_SURFACE.json 的 web.product_dir 声明了本目录,surface-profile
+# 门要求它在磁盘上存在;而 git 不跟踪空目录 —— 没有占位文件时,fresh checkout 出来的
+# 工作树里本目录消失,surface-profile / skill_sync 相关门会红(部署实例里目录存在,
+# 所以只在干净检出时暴露)。
+#
+# 本目录归目标(部署实例)所有,受管层 sync 永不覆盖它。放产品前端 shell
+# (architecture.ts / command-interface.ts / executor-registry.ts / operation-manual.zh.json)
+# 时直接加文件即可,本占位可留可删(有真文件后目录自然被 git 跟踪)。

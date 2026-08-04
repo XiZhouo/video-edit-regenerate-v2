@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频四件套 P0/P1 · 反哺标准 skill 说明</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1c22; --muted:#5c6270; --line:#e3e6ec; --card:#f7f8fa;
+    --accent:#2f6df6; --warn:#b26a00; --warn-bg:#fff6e6; --ok:#1f7a45; --code-bg:#f2f3f6;
+    --chip:#eef1f6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14161b; --fg:#e6e8ee; --muted:#9aa2b1; --line:#2a2e37; --card:#1b1e25;
+      --accent:#6ea0ff; --warn:#e0a94a; --warn-bg:#2a2313; --ok:#5fce8f; --code-bg:#1f232b; --chip:#232732; }
+  }
+  :root[data-theme="dark"]{ --bg:#14161b; --fg:#e6e8ee; --muted:#9aa2b1; --line:#2a2e37; --card:#1b1e25;
+      --accent:#6ea0ff; --warn:#e0a94a; --warn-bg:#2a2313; --ok:#5fce8f; --code-bg:#1f232b; --chip:#232732; }
+  :root[data-theme="light"]{ --bg:#ffffff; --fg:#1a1c22; --muted:#5c6270; --line:#e3e6ec; --card:#f7f8fa;
+      --accent:#2f6df6; --warn:#b26a00; --warn-bg:#fff6e6; --ok:#1f7a45; --code-bg:#f2f3f6; --chip:#eef1f6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB",sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 96px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:-.01em}
+  h2{font-size:19px;margin:40px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+  h3{font-size:15px;margin:20px 0 6px;color:var(--accent)}
+  .sub{color:var(--muted);margin:0 0 4px}
+  p{margin:9px 0}
+  code{background:var(--code-bg);padding:1px 6px;border-radius:5px;font-size:.9em;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+  pre{background:var(--code-bg);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:13px;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;line-height:1.5}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px;display:block;overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card);font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+  .chip{display:inline-block;background:var(--chip);border-radius:999px;padding:1px 10px;font-size:12px;color:var(--muted);margin-right:6px}
+  .tag-build{color:#fff;background:var(--accent)}
+  .tag-design{color:#fff;background:#7a52d6}
+  .tag-deploy{color:#fff;background:#1f9b8e}
+  .tag-system{color:#fff;background:#c0562f}
+  .tag-work{color:var(--muted);background:var(--chip)}
+  .pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:12px;font-weight:600;color:#fff}
+  .warn{background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin:12px 0;color:var(--fg)}
+  .warn b{color:var(--warn)}
+  .why{border-left:3px solid var(--accent);padding-left:12px;margin:8px 0}
+  .assume{border-left:3px solid var(--ok);padding-left:12px;margin:8px 0}
+  .assume b{color:var(--ok)}
+  ul{margin:8px 0;padding-left:22px} li{margin:4px 0}
+  .meta{color:var(--muted);font-size:13px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>视频四件套 P0/P1 · 反哺标准 skill 说明</h1>
+<p class="sub">分支 <code>feat/ze-video-quartet-p0p1</code> · 生成于 2026-07-24 会话 · 作者:Claude(自主执行)</p>
+
+<div class="card">
+<p><b>为什么有这份文档。</b>本轮按用户指令「假设已经反哺标准 skill 的情况下开发,需要反哺的细节写成清晰的 HTML 留下来」。
+四标准 skill(System / Design / Build / Deploy)是 <span class="pill" style="background:var(--muted)">hands-off</span>
+硬令保护对象——本轮<b>没有</b>改动它们的本体。但从 0 造 <code>ZE-video-timeline-domain</code>(P0)与
+<code>ZE-video-edit-studio</code>(P1)的过程,暴露了标准 skill 需要正式吸收的能力与契约。下面逐条给出
+<b>什么(what) / 为什么(why) / 具体改哪里(where) / 我如何假设已反哺后开发的(how)</b>,供你决定何时把它们真正落进标准 skill。</p>
+</div>
+
+<h2>总览:六条反哺项</h2>
+<table>
+<thead><tr><th>#</th><th>反哺到</th><th>一句话</th><th>紧要度</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><span class="pill tag-build">Build</span></td><td>正式吸收「mod 级跨 skill 共享域层」受管模式(sync SOP + <code>_domain</code> lock gate + drift 覆盖)</td><td>高(P0 的地基)</td></tr>
+<tr><td>2</td><td><span class="pill tag-build">Build</span></td><td>把两条隐性字段契约写进文档:<code>enum</code> 仅限 string 类型;typed string 字段拒 <code>None</code>(须省略)</td><td>中(踩坑两次)</td></tr>
+<tr><td>3</td><td><span class="pill tag-design">Design</span></td><td>intake 原型库新增「时空标注→AI 候选→机检→采纳」媒体编辑原型</td><td>中</td></tr>
+<tr><td>4</td><td><span class="pill tag-deploy">Deploy</span></td><td>正式化退役流程:<code>lifecycle=retired</code>(留审计不删)+ 服务下线 + catalog 刷新</td><td>中(7 工具待退役)</td></tr>
+<tr><td>5</td><td><span class="pill tag-system">System</span></td><td>registry 增「共享域源仓」类目,让 <code>ZE-video-timeline-domain</code> 可被发现与治理</td><td>中</td></tr>
+<tr><td>6</td><td><span class="pill tag-work">Work skill</span></td><td>gen-timeline SKILL 口径改指编辑台;video-gen 能力矩阵作 <code>capability_matrix.py</code> 的唯一上游</td><td>低(协调项)</td></tr>
+</tbody>
+</table>
+
+<!-- ========================================================= -->
+<h2>1 · Build:mod 级跨 skill 共享域层受管模式 <span class="pill tag-build">Build</span></h2>
+
+<h3>What</h3>
+<p>P0 建了独立源仓 <code>ZE-video-timeline-domain</code>,用 <code>sync_domain.py</code> 把 <code>src/ze_video_domain/</code>
+分发进三个消费 skill 的 <code>02-mod/05-code/_domain/</code>,并在投影里写版本锁 <code>_DOMAIN_LOCK.json</code>、
+在源仓登记消费方 <code>domain_lock.json</code>,提供 <code>--verify</code> 判 <code>OK/BEHIND/DRIFT/MISSING</code>。</p>
+
+<h3 class="why">Why</h3>
+<div class="why">
+<p>build-v3 现有受管层全是 <b>framework → mod 的纵向层</b>:<code>01-core</code> / <code>sdk</code> / <code>04-ops</code> /
+<code>05-i18n</code> / <code>03-css-rules</code>,由 <code>skill_sync.py</code> 按 <code>_locks/*.lock.json</code> 的
+interface_version + checksum 判 same / compat_bump / incompat。</p>
+<p>而视频四件套需要的是一个 <b>mod 级、跨兄弟 skill 的横向共享域层</b>:①②③ 各自 <code>02-mod/05-code/_domain/</code>
+装同一份引擎(schema / clip_math / ffmpeg_ops / send_compiler / candidate_flow / strategy),避免「第三套 schema 让分裂变三份」。
+这是 build-v3 受管层体系里<b>没有的第四种形态</b>。当前我在域仓里自造了一套等价机制(源→投影、版本锁、checksum drift、回流纪律),
+但它游离在 build-v3 的 <code>verify_all</code> / <code>managed_drift_check</code> 治理之外。</p>
+</div>
+
+<h3>Where(具体改哪里)</h3>
+<ul>
+<li><code>ZE-skill-build/scripts/skill_sync.py</code>:新增 <code>_domain</code> 作为可识别的 mod 级受管层类型;
+或提供一个 <code>domain_sync</code> 姐妹脚本被 build-v3 收编,统一 lock 语义(<code>ze.video_domain_lock.v1</code> ↔ <code>ze.interface_lock.v2</code>)。</li>
+<li><code>ZE-skill-build/scripts/managed_drift_check.py</code>:把 <code>02-mod/05-code/_domain/</code> 纳入 drift 检查
+——它虽在 <code>02-mod</code>(作者层,sync 不碰),但对<b>域仓</b>而言是投影,私改必须被咬(检出 DRIFT → 回流)。</li>
+<li><code>ZE-skill-build/scripts/verify_all.py</code>:增一个软门 <code>domain-lock-consistency</code>,校验消费 skill 的
+<code>_DOMAIN_LOCK.json</code> 与其声明的源仓版本一致(缺源仓时软跳过,像 upstream-only 门那样)。</li>
+<li>文档:<code>ZE-skill-build/EXTENSION-RULES.md</code> 加一节「跨 skill 共享域层」,写明<b>受管层必回流上游</b>纪律与
+「sync 前必跑消费方 <code>verify_all</code> 防 clobber」硬令(与 <code>ZE-video-timeline-domain/_MANAGED_LAYER.md</code> 对齐)。</li>
+</ul>
+
+<h3 class="assume">How(我如何假设已反哺后开发)</h3>
+<div class="assume">
+<p>我把域仓当作「build-v3 已经正式支持共享域层」来写:</p>
+<ul>
+<li>投影里放 <code>_DOMAIN_LOCK.json</code>(schema <code>ze.video_domain_lock.v1</code>),形态对齐 build-v3 的 <code>_locks/*.lock.json</code>;</li>
+<li><code>_MANAGED_LAYER.md</code> 明写三条纪律(必回流 / sync 前跑门禁 / 版本锁登记),即 build-v3 收编后应强制的规则;</li>
+<li><code>_domain/</code> 用相对导入的独立包,可原样搬进任意 skill 的 05-code —— 已实证 <code>from _domain import schema</code> 在 mod-code 路径下正常。</li>
+</ul>
+<p><b>未做(有意):</b>把 <code>_domain</code> 挂进 <b>②③</b> 并证明「行为零变化」(既有 e2e 原样过)——规划里这步有<b>人工 schema 评审门</b>,
+不在无人值守夜间执行。① 已作为首个消费方接线并验证。</p>
+</div>
+
+<!-- ========================================================= -->
+<h2>2 · Build:两条隐性字段契约 <span class="pill tag-build">Build</span></h2>
+
+<h3>What</h3>
+<p>造 ① 的 <code>document_register.py</code> 时,踩到两条 build-v3 字段类型系统的隐性契约,文档/脚手架都没显著提示:</p>
+<table>
+<thead><tr><th>契约</th><th>现象</th><th>正确写法</th></tr></thead>
+<tbody>
+<tr><td><code>enum</code> 仅限 string 类型字段</td><td><code>{"type":"number","enum":[1,2,3]}</code> → <code>framework validator schema is malformed</code>(<code>field_types.py:554</code>,<code>enum</code> ∈ <code>_STRING_KEYWORDS</code>)</td><td>数值枚举改用 <code>minimum/maximum</code>,或把值改成 string enum</td></tr>
+<tr><td>typed string 字段拒 <code>None</code></td><td>data 里把可选 string 设成 <code>None</code> → <code>expected string (got None)</code>(<code>field_types.py</code> 对<b>存在</b>的字段严格校验)</td><td>可选字段<b>省略键</b>而非置 <code>None</code>(本轮加了 <code>_compact()</code> helper)</td></tr>
+</tbody>
+</table>
+
+<h3 class="why">Why</h3>
+<div class="why"><p>这两条都是「本可从文档一眼避免」的坑,却要靠 bootstrap 时的运行期报错才发现。config 的 <code>kind</code> 同类:
+必须是 <code>bool/float/enum/text</code> 而非直觉的 <code>boolean/number/string</code>(<code>config_schema.py</code> <code>VALID_KINDS</code>)。
+对「让任何档位的人讲清业务就能造工具」的 System 目标而言,这类隐性契约应前置到文档与脚手架注释,减少 AI/人反复试错。</p></div>
+
+<h3>Where</h3>
+<ul>
+<li><code>ZE-skill-build</code> 的字段类型文档(<code>01-core/01-data-structure/04-field-types/</code> 附近的 README 或 <code>TYPE-REGISTRY.md</code>):
+显式列出「<code>enum</code> 仅 string」「typed string 字段省略 ≠ 置 None」「config kind 白名单」三条。</li>
+<li>可选增强:放宽 <code>field_types</code> 允许数值 <code>enum</code>(若产品需要数值下拉),但这是行为变更,需谨慎;先补文档成本最低。</li>
+<li><code>skill_scaffold.py</code> 生成的 <code>document_register.py</code> 占位注释里加一行提示这三条契约。</li>
+</ul>
+
+<h3 class="assume">How</h3>
+<div class="assume"><p>我按「已知这三条契约」写代码:数值 <code>mode</code> 用 <code>minimum/maximum</code>;可选字段一律经
+<code>_compact()</code> 省略 <code>None</code>;config 用 <code>bool/float/enum/text</code>。当前 ① 的 21 个 mod 单测全绿即证明这套写法成立。</p></div>
+
+<h3>附:scaffold 的 recipe-v3 → artifact-variant 签名缺口(Build ↔ Deploy)</h3>
+<div class="warn">
+<p><b>现象。</b>scaffold 生成的 <code>deploy.json</code> 是 <code>ze.deploy-recipe.v3</code>(portable delivery_modes:
+local-full / self-hosted-full),<code>artifact-variant</code> 门因此<b>要求</b>一份已签名的 <code>ZE_ARTIFACT_VARIANT.json</code>
+(Ed25519 detached signature)。但 scaffold <b>不生成</b>它,且生成它(<code>release_builder.py</code>)需要:
+① 一份 <b>ready(依赖锁定)</b>的 <code>ZE_DEPENDENCIES.json</code>;② 一把<b>必须放在 skill 根之外</b>的签名私钥。
+两者都是 Deploy/release 阶段的产物 —— 一个刚 scaffold 出来的 skill<b>无法自行通过</b> <code>artifact-variant</code>。</p>
+<p><b>本轮处置(已改为可部署)。</b>①②③④ 全部代码质量门已绿。为满足「能部署」,① 的 <code>deploy.json</code>
+已从 scaffold 的 recipe-v3 <b>改为 legacy 形态</b>(与现役生产 v3 skill 如 image-prompt-studio-v3 一致:
+<code>{skill,port,bind_host,start,install,healthcheck_path,rsync_exclude,name}</code>),并移除随之无意义的
+<code>ZE_ARTIFACT_BUILD.json</code>。这样 <code>artifact-variant</code>/<code>artifact-build</code>/<code>deployment-profile</code>
+全绿、无需签名即可 <code>verify_all</code> 通过并写 <code>ZE_BUILD_EVIDENCE.json</code>。<b>recipe-v3 + Ed25519 签名</b>仍是
+更现代的目标态,但它需要组织发布私钥(Deploy 阶段),未在无人值守夜间用临时 dev key 伪造(no-fake-artifacts 硬令)。</p>
+<p><b>反哺建议。</b>要么 scaffold 生成 legacy <code>deploy.json</code>(现役生产 v3 skill 如 image-prompt-studio-v3 正是
+legacy 形态、不带 artifact-* 文件、full verify 绿),要么在文档里写明「recipe-v3 新 skill 的 <code>artifact-variant</code>
+是 Deploy 签名门,scaffold 阶段预期红,须 Deploy 锁依赖+签名后转绿」,避免把「未签名」误读成「构建缺陷」。</p>
+</div>
+
+<!-- ========================================================= -->
+<h2>3 · Design:媒体编辑候选原型 <span class="pill tag-design">Design</span></h2>
+
+<h3>What & Why</h3>
+<div class="why"><p>① 是一个可复用的<b>新原型</b>:<b>时空标注(空间 bbox × 时间区间)→ 确定性编译提示词 → AI 产候选(不覆盖正本)→ 机检红黄绿 → 人采纳/回贴</b>。
+这条「候选制 + 机检门 + 判断权保留」的媒体编辑骨架,不止视频,图像/音频编辑同构(S2D 就是它的图像版)。design skill 的 intake 原型库
+(<code>ZE-skill-design/references/intake-*.md</code> 的 archetype-library)目前没有这个原型,下一个做类似工具的人得从头推。</p></div>
+
+<h3>Where</h3>
+<ul>
+<li><code>ZE-skill-design</code> intake archetype 库新增 <code>media-edit-candidate</code> 原型:声明其判断点(该改什么 / 行不行 / 接不接得上)、
+机器自动项(编译 / 机检 / 回贴)与人拍板项(采纳 / 重生成),并给出 candidate + verify_report + send_job 的信息对象模板。</li>
+<li>把「结果本体决定 UI」在此原型的落法写清:视频结果有家(时间线/画布)→ 落时间线;无家才候选画廊(与既有 <code>result-ontology-decides-ui</code> 纪律一致)。</li>
+</ul>
+
+<h3 class="assume">How</h3>
+<div class="assume"><p>P0/P1 的 candidate/verify_report/send_job 三实体 + <code>candidate_flow</code>(stale 拒采 / 空段自动采纳)已把这个原型的语义内核实现出来,
+可直接抽象成 design 的原型模板;本轮按此内核开发,未回填进 design 文档。</p></div>
+
+<!-- ========================================================= -->
+<h2>4 · Deploy:退役流程正式化 <span class="pill tag-deploy">Deploy</span></h2>
+
+<h3>What & Why</h3>
+<div class="why"><p>退役盘点(<code>01-现有视频工具退役盘点.md</code>)结论:四件套整合掉一条 v2 老链,需退役 7 工具(A 旧版重复 2 + B 空壳 1 + C 被取代 4)。
+但退役目前只是一份<b>散文 SOP</b>:查下游硬引用 → registry 标 <code>retired</code>(不删,留审计)→ 服务下线 → 归档不物理删 → catalog 刷新。
+Deploy 缺一条正式的 <b>Retire 命令流</b>把这几步变成可审计、可回滚、幂等的操作。</p></div>
+
+<h3>Where</h3>
+<ul>
+<li><code>ZE-skill-deploy</code> 增 <code>Retire.*</code> 命令族:<code>Retire.Preflight</code>(grep 全库硬引用/handoff/端口)→ <code>Retire.Mark</code>
+(registry <code>status/lifecycle=retired</code>,<code>runtime_status</code> 置停,保留数组条目)→ <code>Retire.Teardown</code>(停端口 + 清 keepalive 复活者,顺序按 <code>deploy-identity-audit-traps</code> 纪律)→ <code>Retire.Archive</code>(移归档区,no-delete)。</li>
+<li><code>ZE-skill-system/registry/registry.json</code> 的 work_skill schema 增 <code>lifecycle</code> 枚举(<code>active|retired</code>)与 <code>retired_at</code> / <code>superseded_by</code>,让 catalog 投影能显示「已退役,被 X 取代」而非静默消失。</li>
+</ul>
+
+<h3 class="assume">How</h3>
+<div class="assume"><p>本轮<b>不执行任何退役</b>(no-delete 硬令 + 每步人确认 + C 类绑 P4 验收后才退)。这里只把退役需要 Deploy/System 提供的机制列清,
+供正式做退役时先补齐 Deploy 能力,再照 SOP 执行。</p></div>
+
+<!-- ========================================================= -->
+<h2>5 · System:共享域源仓类目 <span class="pill tag-system">System</span></h2>
+
+<h3>What & Why</h3>
+<div class="why"><p><code>ZE-video-timeline-domain</code> 是一种<b>新的制品类型</b>:既不是 work skill(不部署、无 surface),也不是四标准 skill,
+而是一个<b>被多个 work skill 消费的共享受管源仓</b>。System 的 registry 三数组(standard/support/work)没有它的位置,
+于是它现在对目录与治理是<b>不可见</b>的——没人能从 catalog 发现「有这么一个共享域层、谁在消费它、版本几何」。</p></div>
+
+<h3>Where</h3>
+<ul>
+<li><code>ZE-skill-system/registry/registry.json</code> 增第四类 <code>shared_sources</code>(或给 support 数组加 <code>kind=shared_domain</code>),
+登记 <code>ZE-video-timeline-domain</code> 的版本、消费方列表(镜像 <code>domain_lock.json</code>)、schema 契约 id(<code>ze.video_project.v1</code>)。</li>
+<li>System Console 目录投影增「共享域层」视图,显示消费方与各自 <code>OK/BEHIND/DRIFT</code> 同步态(数据来自 <code>sync_domain.py --list</code> 与各投影的 lock)。</li>
+</ul>
+
+<h3 class="assume">How</h3>
+<div class="assume"><p>域仓自带 <code>domain_lock.json</code>(schema <code>ze.video_domain_registry.v1</code>)已是这份治理数据的<b>机器真源</b>,
+System 收编时直接读它即可,无需重造。本轮按「System 已能登记共享源仓」假设,把治理数据落在域仓内。</p></div>
+
+<!-- ========================================================= -->
+<h2>6 · Work skill 口径与上游 <span class="pill tag-work">Work</span></h2>
+<p class="meta">(严格说这不是「标准 skill」反哺,是相邻 work skill 的协调项,但同属本轮开发暴露的欠账,一并记录。)</p>
+<ul>
+<li><b>gen-timeline SKILL 口径</b>:<code>ZE-video-generation-timeline/SKILL.md</code>(及其关联清单)把「单镜头精修归 video-generation-studio / segment-generate-v3」的旧口径,改指
+<b>ZE-video-edit-studio</b>(确认项 #1)。本轮未改 gen-timeline(它是 ② 的既有部署,改 SKILL 口径属 ② 的 P0 范围,待 ②③ 接线时一并做)。</li>
+<li><b>video-gen 能力矩阵是唯一上游</b>:域层 <code>capability_matrix.py</code>(11 模型能力 + 五族引用语法)是从 <code>video-gen/SKILL.md</code>
+<b>誊抄</b>的快照。二者若漂移即是 bug。建议:要么让 <code>capability_matrix.py</code> 从 <code>video-gen/SKILL.md</code> 的表<b>生成</b>,
+要么加一个对拍测试锁住二者一致。实验已发现的两条(Omni 拦真人名 / 即梦系无 edit)据规划已并入 <code>video-gen/SKILL.md</code>。</li>
+</ul>
+
+<div class="warn">
+<p><b>边界重申。</b>以上六条全是<b>建议 + 我开发时所假设的目标态</b>,本轮<b>未</b>改动任何标准 skill 本体(hands-off 硬令),
+也<b>未</b>执行退役、<b>未</b>把 <code>_domain</code> 挂进 ②③(有人工 schema 评审门)。真正落地时机与顺序由你拍板。</p>
+</div>
+
+<h2>附:本轮已交付(P0 + P1)</h2>
+<ul>
+<li><b>P0 <code>ZE-video-timeline-domain</code></b>:统一 schema <code>ze.video_project.v1</code> 九实体 + 引擎(clip_math / ffmpeg_ops 含 mask_merge / candidate_flow / verify_report)
++ send-compiler(能力路由 / 命名指代→语法 / 引用 lint / 安全改写 / 模板)+ 策略层(general-v1 / ad-short + provider 链)+ 持久化(原子写 + 重启恢复)+ sync 工具。<b>57 单测绿。</b></li>
+<li><b>P1 <code>ZE-video-edit-studio</code></b>(build-v3 新 skill):9 实体 + 命令(annotation.add/remove、asset.import、send.compile、send.dispatch[stage]、candidate.adopt、candidate.verify、composite.mask_merge)
++ 布局 / i18n / config / ai_flow + <code>_domain</code> 受管层同步。<b>21 mod 单测绿</b>,CLI 镜像 <code>send.compile</code> 实测提交操作成功。
+外部视频/ffmpeg 缺位处一律 <code>requires_runtime</code> 结构化降级。</li>
+<li><b>待 P1 完整验收</b>(需活服务,夜间无法自测):拿实验原视频跑通 omni edit 全链(2→3 稳定 / 标注移除 / 机检 / 候选回拼)。
+send.dispatch 的分类逻辑已用依赖注入单测覆盖(transport→requires_runtime / failed / 成功+自动采纳)。</li>
+</ul>
+
+
+<h2>附:2026-07-25 穷尽审查新增反哺项(B8–B13)</h2>
+<div class="card">
+<p>8 视角对抗审查暴露的<b>框架摩擦</b>(非本工具 bug,是框架让「做对」变难的地方)。完整现象+证据见
+规划档案 <code>05-不是我的问题-既存与上游冲突.md</code> 第三节。</p>
+<ul>
+<li><b>B8【高】声明了但无消费方 → 必须报警,不能静默忽略。</b>本轮<b>四次同源</b>:GalleryAction 缺必填
+<code>scope</code>、<code>actions</code> 挂 table 槽、<code>withParams</code> 挂 FormAction、
+<code>renameField</code> 挂 cardlist —— 全部静默忽略:单测/门禁/tsc/build 全绿但用户点不到按钮。
+建议扩 <code>mod-renderer</code> 门:校验每个 slot 的 view_state 键与 actions 形状是否被该
+editor_class 真实消费,未消费即 FAIL 并指名;或给每种 editor_class 独立 view_state 类型让 tsc 咬住。</li>
+<li><b>B9【高】stage 输出无法跨实体 patch,且契约外键被静默丢弃。</b>supervisor 只认
+patches/created_entities/name/ai_provenance;我用自造键 <code>adopt_clip</code> 表达「把结果采纳到目标 clip」
+→ 被静默丢弃,导致上一轮的 CRITICAL 修复本身无效(测试还绿)。建议给 stage 一个显式跨实体通道
+(<code>entity_patches</code>,仍走命令通道保 undo/CAS),<b>并且未知键应报错</b>。</li>
+<li><b>B10【中】FormAction 缺 withParams;cardlist 缺 renameField。</b>「需用户补参数的实体级命令」
+(②跨段重生成)与「画廊内实体改名」(④命名素材的名字就是指代 token)现在无处安放。</li>
+<li><b>B11【高】usability 门不覆盖 stage 命令。</b>必测集是 <code>kind=="native"</code>,而<b>真正花钱的
+命令全是 stage</b>(send.dispatch / span.regenerate / items.generate / prompt.optimize)。AI 空参调用
+不该真开一次付费 run。</li>
+<li><b>B12【高】ProviderHub 无 video 域与视频能力词。</b>sdk/hub 已是模型真相唯一来源但只有
+LLM/IMAGE/AGENT/EMBEDDING/FILE;于是域层只能手抄 11 模型 × 五族引用语法 → 必然漂移。
+建议增 DOMAIN_VIDEO + t2v/i2v/kf2v/reference/edit + 语法族。</li>
+<li><b>B13【中】测试基建两处摩擦。</b>老 skill 凭据库版本错位需手动隔离
+<code>ZE_SYSTEM_AUTH_DIR</code>;bootstrap 用 importlib 把 mod 载成不在 <code>sys.modules</code>
+的独立实例 → 无法 monkeypatch 依赖 seam(只能改用轻量 harness)。</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

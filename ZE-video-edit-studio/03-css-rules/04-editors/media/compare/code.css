@@ -1,0 +1,53 @@
+/*
+ * compare.css — A/B 前后对比图元结构 (04-editors)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ * 消费: CompareFrame primitive(.ze-compare*);三态 并排 / 滑块 / 叠加。
+ *       纯几何逻辑在 03-editor/primitives/compareGeometry.ts。
+ *
+ * 绝对严格分层(P4):本层零 var(--ze-*)。所有令牌视觉(底色/倒角/边框色/字号/内距/尺寸/偏移)
+ * 由 React 贴 L2 原子(.ze-row/.ze-grid/.ze-stack/.ze-pad/.ze-edge/.ze-surface/.ze-round/
+ * .ze-size/.ze-inset/.ze-elevate/.ze-text)承接;本文件只留无令牌结构(flex/定位/层叠/overflow)。
+ * 描边强调色走 currentColor(由 .ze-text[data-tone=accent] 给色),不在本层写 accent 令牌。
+ */
+.ze-compare {
+  display: flex; flex-direction: column;
+  width: 100%; height: 100%; min-height: 0;
+}
+/* CompareEditor 内容区(一等 compare 编辑器 body):填满编辑器内容区,给 CompareFrame 撑高。
+ * 竖排/间距/内距走 .ze-stack+.ze-pad(本层零令牌)。 */
+.ze-compare__body { flex: 1; min-height: 0; }
+/* 操作条:作为 .ze-compare 列流的固定项(display/对齐/间距/内距/分隔线走 .ze-row+.ze-pad+.ze-edge)*/
+.ze-compare__toolbar { flex: none; }
+.ze-compare__opacity { display: inline-flex; align-items: center; min-width: 0; }  /* gap 走 .ze-gap */
+.ze-compare__opacity-label { white-space: nowrap; }  /* 字号/色走 .ze-text */
+
+/* ---- 并排 ---- */
+.ze-compare__pair {
+  flex: 1; min-height: 0;
+  overflow: auto;  /* grid/列/间距/内距走 .ze-grid+.ze-pad */
+}
+.ze-compare__cell { margin: 0; }  /* 竖排/居中/间距走 .ze-stack;figure 去默认外距 */
+.ze-compare__img { display: block; max-width: 100%; height: auto; }  /* 底色走 .ze-surface */
+
+/* ---- 滑块 / 叠加:层叠 ---- */
+.ze-compare__stage {
+  position: relative; flex: 1; min-height: 0;
+  overflow: hidden;
+  display: grid; place-items: center;  /* 底色走 .ze-surface */
+}
+.ze-compare__layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; user-select: none; }
+.ze-compare__layer--after { will-change: clip-path, opacity; }
+.ze-compare__divider {
+  position: absolute; top: 0; bottom: 0; width: 0;
+  border-left: 2px solid currentColor;  /* 色由 .ze-text[data-tone=accent] 给 */
+  cursor: ew-resize; touch-action: none;
+}
+.ze-compare__handle {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  border: 2px solid currentColor;  /* 色随 divider 的 currentColor=accent;尺寸/倒角/底色/阴影走原子 */
+}
+.ze-compare__tag {
+  position: absolute;
+  pointer-events: none;  /* 偏移/内距/字号/色/底色/倒角走 .ze-inset+.ze-pad+.ze-text+.ze-surface+.ze-round */
+}

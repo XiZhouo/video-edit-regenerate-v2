@@ -1,0 +1,76 @@
+/*
+ * select.css — ze-select 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 结构: 外层 .ze-select(放 caret)包原生 <select class="ze-select__control">。
+ *   原生 select 不能挂 ::after,故 caret 由 wrapper 的 ::after 画(token 可着色,无 SVG 字面量)。
+ *   下拉 option 列表由 OS 渲染、CSS 管不到 —— 自定义 listbox 归 React 交互层 / menu-item,本批不做。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-select {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.ze-select__control {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-height: var(--ze-space-7);                 /* md = 28px */
+  padding: var(--ze-space-1) var(--ze-space-6) var(--ze-space-1) var(--ze-space-2); /* 右留 caret 位 */
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  color: var(--ze-ink-primary);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-snug);
+  cursor: pointer;
+  transition:
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    box-shadow var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-select__control:hover { border-color: color-mix(in oklab, var(--ze-ink-tertiary) 30%, transparent); }
+.ze-select__control:focus,
+.ze-select__control:focus-visible {
+  outline: none;
+  border-color: var(--ze-accent-500);
+  box-shadow: 0 0 0 2px var(--ze-overlay-accent-wash);
+}
+.ze-select__control:disabled {
+  color: var(--ze-ink-disabled);
+  background: var(--ze-surface-canvas);
+  cursor: not-allowed;
+}
+
+.ze-select::after {
+  content: "▾";
+  position: absolute;
+  top: 50%;
+  right: var(--ze-space-2);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  line-height: 1;
+}
+
+.ze-select[aria-invalid="true"] .ze-select__control { border-color: var(--ze-semantic-danger); }
+
+/* ---- 尺寸 ---- */
+.ze-select[data-size="sm"] .ze-select__control {
+  min-height: 0;
+  padding: var(--ze-space-0-5) var(--ze-space-6) var(--ze-space-0-5) var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+}
+.ze-select[data-size="lg"] .ze-select__control {
+  min-height: 0;
+  padding: var(--ze-space-2) var(--ze-space-7) var(--ze-space-2) var(--ze-space-3);
+  font-size: var(--ze-fs-sm);
+}

@@ -1,0 +1,31 @@
+{
+  "_comment": "mod 自定义渲染器的类型检查。webapp/tsconfig.json 只 include src,而 renderers 是被 import.meta.glob 动态吃进去的 —— tsc 追不进来,于是这几个文件从来没被类型检查过(vite 用 esbuild 只剥类型不校验)。这份配置把它们补上。跑法(在 webapp 目录):npx tsc -p ../02-mod/05-code/renderers --noEmit",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "baseUrl": "../../../webapp",
+    "paths": {
+      "@ze/core/*": ["../01-core/*"],
+      "@ze/css/*": ["../03-css-rules/*"],
+      "@ze/i18n": ["../05-i18n/index.ts"],
+      "@mod/*": ["../02-mod/*"],
+      "dompurify": ["./node_modules/dompurify"],
+      "react": ["./node_modules/@types/react"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime"],
+      "react-dom": ["./node_modules/@types/react-dom"]
+    },
+    "typeRoots": ["../../../webapp/node_modules/@types"]
+  },
+  "include": ["*.ts", "*.tsx", "__fixtures__/*.json"],
+  "exclude": ["*.test.ts", "vitest.config.ts"]
+}

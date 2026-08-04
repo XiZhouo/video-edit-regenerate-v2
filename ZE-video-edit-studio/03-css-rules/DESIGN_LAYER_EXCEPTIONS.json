@@ -1,0 +1,261 @@
+{
+  "schema": "ze.design_layer_exceptions.v1",
+  "rules": {
+    "LAYER_SKIP_IMPORT": {
+      "reason": "Historical L4 editors still contain direct primitive imports / L2 atom classes while zone-ization proceeds. This file is a ratchet baseline, not permission for new usage.",
+      "allowed_primitive_imports": [
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/asset/AssetEditor.tsx",
+          "source": "../../primitives/CanvasViewport",
+          "import": "{ CanvasViewport }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/asset/AssetEditor.tsx",
+          "source": "../../primitives/InspectorSection",
+          "import": "{ InfoField }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/asset/AssetEditor.tsx",
+          "source": "../../primitives/ContextMenu",
+          "import": "{ ContextMenu, type ContextMenuItem }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/asset/AssetEditor.tsx",
+          "source": "../../primitives/useContextMenu",
+          "import": "{ useContextMenu }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/CanvasViewport",
+          "import": "{ CanvasViewport }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/MaskCanvas",
+          "import": "{ MaskCanvas }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/useMaskEditor",
+          "import": "{ useMaskEditor }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/Canvas2dSpatial",
+          "import": "{ Canvas2dSpatial }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/Canvas2dLayerStage",
+          "import": "{ Canvas2dLayerStage }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/spatialTypes",
+          "import": "{ DEFAULT_CONSTRAINTS, type GeometryFieldMap, type GizmoConstraints }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/canvasTools",
+          "import": "type { ToolId, StrokeRecord }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/canvas2d/Canvas2dEditor.tsx",
+          "source": "../../primitives/canvas2dModel",
+          "import": "{ readLayerEntities, resolveCanvas2dPreset, resolveCanvas2dSourceKind, type Canvas2dFeatureFlags, type Canvas2dLayer, type Canvas2dPreset, }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/compare/CompareEditor.tsx",
+          "source": "../../primitives/CompareFrame",
+          "import": "{ CompareFrame }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/compare/CompareEditor.tsx",
+          "source": "../../primitives/compareGeometry",
+          "import": "type { CompareMode }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+          "source": "../../primitives/ParamPanel",
+          "import": "{ ParamPanel }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+          "source": "../../primitives/ThumbnailGrid",
+          "import": "type { ThumbnailLayoutMode }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "source": "../../primitives/ParamPanel",
+          "import": "{ ParamPanel }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "source": "../../primitives/ThumbnailGrid",
+          "import": "{ ThumbnailGrid, type ThumbItem }",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/review/ReviewEditor.tsx",
+          "source": "../../primitives/compareGeometry",
+          "import": "type { CompareMode }",
+          "max_count": 1
+        }
+      ],
+      "allowed_atom_class_counts": [
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/asset/AssetEditor.tsx",
+          "class": "ze-button",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/asset/AssetEditor.tsx",
+          "class": "ze-icon-button",
+          "max_count": 3
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/dialog/DialogEditor.tsx",
+          "class": "ze-button",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/dialog/DialogEditor.tsx",
+          "class": "ze-textarea",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/document/DocumentEditor.tsx",
+          "class": "ze-button",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/document/DocumentEditor.tsx",
+          "class": "ze-textarea",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/form/FormEditor.tsx",
+          "class": "ze-badge",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/form/FormEditor.tsx",
+          "class": "ze-spinner",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+          "class": "ze-badge",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+          "class": "ze-button",
+          "max_count": 7
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+          "class": "ze-callout",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+          "class": "ze-spinner",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-badge",
+          "max_count": 7
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-button",
+          "max_count": 11
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-callout",
+          "max_count": 5
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-disclosure",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-kv-list",
+          "max_count": 3
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-progress",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+          "class": "ze-select",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/review/ReviewEditor.tsx",
+          "class": "ze-badge",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/review/ReviewEditor.tsx",
+          "class": "ze-button",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/review/ReviewEditor.tsx",
+          "class": "ze-textarea",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/scene3d/Scene3dEditor.tsx",
+          "class": "ze-button",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/scene3d/Scene3dEditor.tsx",
+          "class": "ze-select",
+          "max_count": 1
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/task/TaskEditor.tsx",
+          "class": "ze-button",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/timeline/TimelineEditor.tsx",
+          "class": "ze-button",
+          "max_count": 2
+        },
+        {
+          "file": "01-core/04-user-facing/01-layout/03-editor/editors/dialog/DialogEditor.tsx",
+          "class": "ze-badge",
+          "max_count": 1
+        }
+      ]
+    }
+  }
+}

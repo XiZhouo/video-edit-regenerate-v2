@@ -1,0 +1,53 @@
+/*
+ * badge.css — ze-badge 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: pill 小标签。对齐 v3 footer 的 count badge(md 16px / sm 14px / fs-2xs 字)。
+ *   语义变体用 color-mix wash 底;data-emphasis="solid" 给高强调实底(如错误计数)。
+ *   16/14/8px 几何字面量对齐 footer count badge 先例(令牌层无此尺寸 token)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-0-5);
+  height: 16px;
+  padding: 0 var(--ze-space-2);
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ---- 语义变体(wash 底)---- */
+.ze-badge[data-variant="accent"] { background: var(--ze-overlay-accent-wash); color: var(--ze-accent-500); }
+.ze-badge[data-variant="success"] { background: color-mix(in oklab, var(--ze-semantic-success) 14%, transparent); color: var(--ze-semantic-success); }
+.ze-badge[data-variant="info"] { background: color-mix(in oklab, var(--ze-semantic-info) 14%, transparent); color: var(--ze-semantic-info); }
+.ze-badge[data-variant="warn"] { background: color-mix(in oklab, var(--ze-semantic-warn) 16%, transparent); color: var(--ze-semantic-warn); }
+.ze-badge[data-variant="danger"] { background: color-mix(in oklab, var(--ze-semantic-danger) 14%, transparent); color: var(--ze-semantic-danger); }
+
+/* ---- solid 高强调(填充实底)---- */
+.ze-badge[data-emphasis="solid"][data-variant="accent"] { background: var(--ze-accent-500); color: var(--ze-ink-inverse); }
+.ze-badge[data-emphasis="solid"][data-variant="danger"] { background: var(--ze-semantic-danger); color: var(--ze-ink-inverse); }
+.ze-badge[data-emphasis="solid"][data-variant="success"] { background: var(--ze-semantic-success); color: var(--ze-ink-inverse); }
+
+/* ---- dot(纯圆点,无文字)---- */
+.ze-badge[data-variant="dot"] { width: 8px; height: 8px; padding: 0; background: var(--ze-semantic-success); }
+
+/* ---- 尺寸 ---- */
+/* sm 的 fs-2xs 只给微标签/count;14/8px 同属图标几何字面量豁免。 */
+.ze-badge[data-size="sm"] { height: 14px; padding: 0 var(--ze-space-1); font-size: var(--ze-fs-2xs); }
+.ze-badge[data-size="lg"] { height: 20px; padding: 0 var(--ze-space-2); font-size: var(--ze-fs-sm); }
+
+
+/* [v4 · 精密瓷釉] 语义 wash 接管徽章底(wash 即令牌,不再现场 color-mix) */
+.ze-badge[data-variant="success"] { background: var(--ze-semantic-success-wash); }
+.ze-badge[data-variant="info"]    { background: var(--ze-semantic-info-wash); }
+.ze-badge[data-variant="warn"]    { background: var(--ze-semantic-warn-wash); }
+.ze-badge[data-variant="danger"]  { background: var(--ze-semantic-danger-wash); }

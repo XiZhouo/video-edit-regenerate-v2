@@ -1,0 +1,119 @@
+/*
+ * dialog.css — ze-dialog 组件视觉 (02-atoms) — CSS-only shell
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: 对齐 v3 overlay 阴影 + raised 底 + header/body/footer 三段。
+ *   两条路径:① 原生 <dialog class="ze-dialog"> + ::backdrop;② 非原生用
+ *   [data-open="true"] + 同级 .ze-dialog__backdrop 兜底。
+ *   **定位/开合时机/进出动画 = React 交互层(运行时),本批只给静态视觉 + 默认显隐**。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-dialog {
+  margin: auto;
+  width: 100%;
+  max-width: min(92vw, 480px);
+  padding: 0;
+  /* [浮层瓷盘] 模态实底(R-FLOAT):最高海拔靠 shadow-overlay,不靠透明;遮罩雾化保留(遮罩该透) */
+  background: var(--ze-surface-float);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-lg);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-overlay);
+  color: var(--ze-ink-primary);
+}
+
+/* 默认隐藏(原生 <dialog> 未 open / 非原生未 data-open)*/
+.ze-dialog:not([open]):not([data-open="true"]) { display: none; }
+
+/* 原生 <dialog> 背景遮罩(轻雾化:遮罩也带一点模糊,玻璃世界的景深)*/
+.ze-dialog::backdrop {
+  background: var(--ze-overlay-strong);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* 非原生:同级遮罩 + 居中定位(React 交互层接管真定位前的兜底)*/
+.ze-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--ze-overlay-strong);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  z-index: var(--ze-z-modal);
+}
+.ze-dialog[data-open="true"] {
+  position: fixed;
+  /* content-sized 面板:两轴都用 transform 居中。
+   * 不可用 inset:0 + margin:auto —— 面板没有显式高度时,CSS 过约束规则
+   * (top:0 与 bottom:0 同时为 0 且 height:auto)会把 auto 外边距清零、把面板
+   * 拉伸到满屏高(header 顶到顶、footer 沉到底),即"弹窗上下顶到头"。
+   * 改 left/top 50% + translate(-50%,-50%):面板按内容高,水平垂直都真正居中。 */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  z-index: calc(var(--ze-z-modal) + 1);
+}
+
+/* ---- 尺寸 ---- */
+.ze-dialog[data-size="sm"] { max-width: min(92vw, 360px); }
+.ze-dialog[data-size="lg"] { max-width: min(94vw, 640px); }
+
+/* ---- parts ---- */
+.ze-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ze-space-3);
+  padding: var(--ze-space-3) var(--ze-space-4);
+  border-bottom: 1px solid var(--ze-overlay-soft);
+}
+.ze-dialog__title { font-size: var(--ze-fs-lg); font-weight: var(--ze-fw-semibold); color: var(--ze-ink-primary); }
+.ze-dialog__body {
+  padding: var(--ze-space-4);
+  max-height: 70vh;
+  overflow: auto;
+  /* 滚动淡出由 .ze-scroll-fade-y 工具类承接(状态化,见 useScrollAffordance);
+   * 此处不再自画无条件 mask —— 否则与工具类双层、且对话框没满/滚到底仍淡出。 */
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-secondary);
+  line-height: var(--ze-lh-normal);
+}
+.ze-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-3) var(--ze-space-4);
+  border-top: 1px solid var(--ze-overlay-soft);
+}
+
+/* ---- Image lightbox(全局图片放大浮层:portal 到 body,压过 modal)---- */
+.ze-image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--ze-z-modal) + 2);
+  display: grid;
+  place-items: center;
+  padding: var(--ze-space-6);
+  background: var(--ze-overlay-strong);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  cursor: zoom-out;
+}
+.ze-image-lightbox__img {
+  max-width: min(96vw, 1440px);
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-overlay);
+  cursor: default;
+}
+.ze-image-lightbox__close {
+  position: fixed;
+  top: var(--ze-space-4);
+  right: var(--ze-space-4);
+  background: var(--ze-surface-float);
+  box-shadow: var(--ze-shadow-overlay);
+}

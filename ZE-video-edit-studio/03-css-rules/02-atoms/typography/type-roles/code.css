@@ -1,0 +1,20 @@
+/*
+ * type-roles — T1 排版角色矩阵(data-ty 契约,8+1 角色;css 19.9.0,美学批1)。
+ *
+ * 层级从「拼装」变「选举」:每个角色 = 字号×字重×行高×墨色×字距的完整固定组合,
+ * 选角色即合规,漂移在物理上不可能发生。9px(micro/caps)只用于冗余辅助信息——
+ * 唯一信息通道 ≥10.5px(meta),关键解释 ≥12px(body);与苍蝇字门禁衔接。
+ * caps = 分组锚点(iOS 组头模式):uppercase + 唯一字距例外 --ze-tracking-caps。
+ * num 修饰(data-num 亦可):mono + tabular-nums,一切数值不跳动(T10)。
+ * 闭集门禁(data-ty 词表校验 + tsx 内联 fontSize 判红)随美学批2 一次 toolchain 落。
+ */
+[data-ty="display"] { font: var(--ze-fw-semibold) var(--ze-fs-2xl)/var(--ze-lh-tight) var(--ze-font-sans); color: var(--ze-ink-primary); }
+[data-ty="title"]   { font: var(--ze-fw-semibold) var(--ze-fs-lg)/var(--ze-lh-tight) var(--ze-font-sans);  color: var(--ze-ink-primary); }
+[data-ty="panel"]   { font: var(--ze-fw-semibold) var(--ze-fs-sm)/var(--ze-lh-tight) var(--ze-font-sans);  color: var(--ze-ink-primary); }
+[data-ty="body"]    { font: var(--ze-fw-regular) var(--ze-fs-sm)/var(--ze-lh-normal) var(--ze-font-sans);  color: var(--ze-ink-primary); }
+[data-ty="label"]   { font: var(--ze-fw-medium)  var(--ze-fs-sm)/var(--ze-lh-tight) var(--ze-font-sans);   color: var(--ze-ink-secondary); }
+[data-ty="meta"]    { font: var(--ze-fw-regular) var(--ze-fs-xs)/var(--ze-lh-snug) var(--ze-font-sans);    color: var(--ze-ink-secondary); }
+[data-ty="micro"]   { font: var(--ze-fw-medium)  var(--ze-fs-2xs)/var(--ze-lh-snug) var(--ze-font-sans);   color: var(--ze-ink-tertiary); }
+[data-ty="caps"]    { font: var(--ze-fw-semibold) var(--ze-fs-2xs)/var(--ze-lh-snug) var(--ze-font-sans);  color: var(--ze-ink-tertiary); text-transform: uppercase; letter-spacing: 0; /* 拍板2:0.06em 待批3 门禁 R3 按角色放行后启用(--ze-tracking-caps 已备) */ }
+[data-ty="num"],
+[data-num]          { font-family: var(--ze-font-mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }

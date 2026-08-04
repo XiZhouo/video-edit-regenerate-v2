@@ -1,0 +1,15 @@
+/*
+ * editor.css — 03-editor 中区渲染单元【基座】(04-editors · 已迁空 stub)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ *
+ * 绝对严格分层(P4 batch13):编辑器共享外壳 chrome(.ze-editor 根 + toolbar/title/count/
+ * toolbar-actions/search/empty/loading/statusbar/canvas-body 等子件脚手架)是全 15 编辑器共享
+ * 的 shell 组件(EditorFrame 统一组装),令牌视觉(底色/墨色/字体/内距/分隔线/状态条)+ 后代/状态
+ * 选择器无法降为 L4 无令牌结构,已整组上移 L2 组件原子 → 见 03-css-rules/02-atoms/editor-shell.css
+ * (经 index.css @import)。
+ *
+ * 本文件无任何单一编辑器类型专属画法残留(各类型画法在 table/form/gallery/... 各自文件),故清空
+ * 为指针 stub:零规则、零 var(--ze-*)。保留文件 + 03-editor/index.tsx 的 import 以免改动牵连;
+ * 类名/消费方无变化。各类型文件的 @container 仍由 .ze-editor(L2)的 container-type 提供查询上下文。
+ */

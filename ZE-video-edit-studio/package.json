@@ -1,0 +1,6 @@
+{
+  "name": "ze-video-edit-studio",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ZE-video-edit-studio — ZE 框架定义 skill。前端 webapp 见 ./webapp/。"
+}

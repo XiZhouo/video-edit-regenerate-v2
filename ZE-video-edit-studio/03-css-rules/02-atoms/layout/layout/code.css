@@ -1,0 +1,140 @@
+/*
+ * layout.css — ze-* 布局原子 (02-atoms / L2 布局原子族)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2 布局原子)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么有这一族:绝对严格分层后,L3 功能区 / L4 编辑器的 CSS 不准再直接用 var(--ze-space-*)
+ * 排版(那是 L1 令牌)。布局原子把"间距 / 方向 / 对齐 / 网格 / 条 / 撑满"这些排版动作
+ * 封成可贴 class 的 L2 积木 —— 上层只组合 .ze-stack/.ze-row/...,把令牌消费收敛在本层。
+ *
+ * 参数全走 data-* 属性(对齐视觉原子的 data-variant 约定),不用 BEM 修饰符。
+ * data-gap 的取值 = 空间令牌的档位 key(1|2|3|4|6|8 ⇒ var(--ze-space-N)),省一层心智映射。
+ * 全部值引 令牌(var(--ze-*)),禁字面量 —— 本层是唯一直接消费 L1 的层,合法。
+ *
+ * 扩展规则:新增方向/对齐枚举只在本文件加 data-* 分支(闭集);上层禁止为排版再写裸 var()。
+ */
+
+/* ── .ze-stack:竖排堆叠(默认垂直流,子项间统一 gap)──────────────────── */
+.ze-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);      /* 默认 8px(最高频)*/
+  min-width: 0;                /* 容器契约:flex 子项可收缩,防溢出 */
+}
+
+/* ── .ze-row:横排(默认竖直居中)─────────────────────────────────── */
+.ze-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ze-space-2);
+  min-width: 0;
+}
+
+/* ── .ze-cluster:成组横排 + 自动换行(一排标签 / 按钮 / chip)────────── */
+.ze-cluster {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ze-space-2);
+}
+
+/* ── .ze-grid:等宽网格(data-cols 列数;data-gap 同步)─────────────── */
+.ze-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));  /* 默认 2 列 */
+  gap: var(--ze-space-2);
+  min-width: 0;
+}
+
+/* ── .ze-bar:顶/底功能条(操作区 / 状态条的骨架容器)──────────────── */
+.ze-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ze-space-2);
+  min-height: var(--ze-row-h);                       /* 容控件标准高 */
+  padding: var(--ze-space-1) var(--ze-space-2);
+  min-width: 0;
+}
+.ze-bar[data-edge="top"]    { border-bottom: 1px solid var(--ze-overlay-soft); }
+.ze-bar[data-edge="bottom"] { border-top: 1px solid var(--ze-overlay-soft); }
+
+/* ── .ze-spacer:弹性占位(把同排两侧推开)/ .ze-fill:撑满剩余 + 可滚 ── */
+.ze-spacer { flex: 1 1 auto; }
+.ze-fill {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;               /* 容器契约:作为滚动归属点时纵向也可收缩 */
+}
+
+/* ── .ze-scroll:滚动归属点(配合 .ze-fill / .ze-stack 使用)──────────────
+ * 上层只声明哪个盒子负责滚动,不再在 mod/editor 里写 overflow。 */
+.ze-scroll { overflow: auto; }
+.ze-scroll[data-fade="vertical"] {
+  scrollbar-gutter: stable;
+}
+
+/* ── 共享参数:data-gap 档位(值 = 空间令牌 key)──────────────────────
+ * 适用于 .ze-stack / .ze-row / .ze-cluster / .ze-grid。闭集,新增档位只在此加。 */
+.ze-stack[data-gap="0-5"], .ze-row[data-gap="0-5"], .ze-cluster[data-gap="0-5"], .ze-grid[data-gap="0-5"] { gap: var(--ze-space-0-5); }
+.ze-stack[data-gap="1"],   .ze-row[data-gap="1"],   .ze-cluster[data-gap="1"],   .ze-grid[data-gap="1"]   { gap: var(--ze-space-1); }
+.ze-stack[data-gap="2"],   .ze-row[data-gap="2"],   .ze-cluster[data-gap="2"],   .ze-grid[data-gap="2"]   { gap: var(--ze-space-2); }
+.ze-stack[data-gap="3"],   .ze-row[data-gap="3"],   .ze-cluster[data-gap="3"],   .ze-grid[data-gap="3"]   { gap: var(--ze-space-3); }
+.ze-stack[data-gap="4"],   .ze-row[data-gap="4"],   .ze-cluster[data-gap="4"],   .ze-grid[data-gap="4"]   { gap: var(--ze-space-4); }
+.ze-stack[data-gap="6"],   .ze-row[data-gap="6"],   .ze-cluster[data-gap="6"],   .ze-grid[data-gap="6"]   { gap: var(--ze-space-6); }
+.ze-stack[data-gap="8"],   .ze-row[data-gap="8"],   .ze-cluster[data-gap="8"],   .ze-grid[data-gap="8"]   { gap: var(--ze-space-8); }
+
+/* ── 共享参数:data-pad 容器内距(stack/row/grid;值 = 空间令牌档 key)──────
+ * 让"面板 / 参数栈 / 大纲"这类容器有内距,而不必在 L3/L4 自己写 var(padding)。 */
+.ze-stack[data-pad="1"], .ze-row[data-pad="1"], .ze-grid[data-pad="1"] { padding: var(--ze-space-1); }
+.ze-stack[data-pad="2"], .ze-row[data-pad="2"], .ze-grid[data-pad="2"] { padding: var(--ze-space-2); }
+.ze-stack[data-pad="3"], .ze-row[data-pad="3"], .ze-grid[data-pad="3"] { padding: var(--ze-space-3); }
+.ze-stack[data-pad="4"], .ze-row[data-pad="4"], .ze-grid[data-pad="4"] { padding: var(--ze-space-4); }
+
+/* ── 共享参数:data-align 交叉轴对齐(stack/row/cluster)──────────────── */
+.ze-stack[data-align="start"],  .ze-row[data-align="start"],  .ze-cluster[data-align="start"]  { align-items: flex-start; }
+.ze-stack[data-align="center"], .ze-row[data-align="center"], .ze-cluster[data-align="center"] { align-items: center; }
+.ze-stack[data-align="end"],    .ze-row[data-align="end"],    .ze-cluster[data-align="end"]    { align-items: flex-end; }
+.ze-stack[data-align="stretch"],.ze-row[data-align="stretch"],.ze-cluster[data-align="stretch"]{ align-items: stretch; }
+.ze-row[data-align="baseline"], .ze-cluster[data-align="baseline"] { align-items: baseline; }
+
+/* ── 共享参数:data-justify 主轴分布(row/bar)────────────────────────── */
+.ze-row[data-justify="start"],   .ze-bar[data-justify="start"]   { justify-content: flex-start; }
+.ze-row[data-justify="center"],  .ze-bar[data-justify="center"]  { justify-content: center; }
+.ze-row[data-justify="end"],     .ze-bar[data-justify="end"]     { justify-content: flex-end; }
+.ze-row[data-justify="between"], .ze-bar[data-justify="between"] { justify-content: space-between; }
+.ze-row[data-justify="around"],  .ze-bar[data-justify="around"]  { justify-content: space-around; }
+
+/* ── .ze-row 换行开关(默认不换行;cluster 才默认换行)──────────────── */
+.ze-row[data-wrap="true"] { flex-wrap: wrap; }
+/* 换行排里独占一行的项。光有 data-wrap 不够:能收缩的项(如 width:100% 的 select)会一直
+ * 被压窄而不换行 —— 实测窄栏里 select 被挤到 110px、模型名从中间截断。data-line="full"
+ * 给它 flex-basis:100%,它才会真的换到自己一行。只在换行排内生效,不影响普通横排。 */
+.ze-row[data-wrap="true"] > [data-line="full"] { flex-basis: 100%; }
+
+/* ── 共享参数:data-surface 容器底色(stack/row/bar/grid 可加)──────────
+ * 让"功能条 / 面板 / 大纲"这类容器拿到底色,而不必在 L3/L4 自己写 var(背景)。
+ * 闭集:raised(升起层,chrome 默认)/ sunken(凹陷,画布/输入)/ canvas(最底)。 */
+.ze-stack[data-surface="raised"], .ze-row[data-surface="raised"], .ze-bar[data-surface="raised"], .ze-grid[data-surface="raised"] { background: var(--ze-surface-raised); }
+.ze-stack[data-surface="sunken"], .ze-row[data-surface="sunken"], .ze-bar[data-surface="sunken"], .ze-grid[data-surface="sunken"] { background: var(--ze-surface-sunken); }
+.ze-stack[data-surface="canvas"], .ze-row[data-surface="canvas"], .ze-bar[data-surface="canvas"], .ze-grid[data-surface="canvas"] { background: var(--ze-surface-canvas); }
+
+/* ── .ze-grid 列数(闭集:2/3/4/auto;auto = 自适应填充)──────────────── */
+.ze-grid[data-cols="1"] { grid-template-columns: minmax(0, 1fr); }
+.ze-grid[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ze-grid[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ze-grid[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ze-grid[data-cols="auto"] { grid-template-columns: repeat(auto-fill, minmax(var(--ze-size-panel-w), 1fr)); }
+
+/* 窄容器下固定列数网格退成单列。表单/属性单元经常把两列字段放进 editor pane,
+ * 当 pane 被移动端/窄分屏压缩时,字段应该上下排,而不是把 label/value 挤成碎片。 */
+@container (max-width: 480px) {
+  .ze-grid[data-cols="2"],
+  .ze-grid[data-cols="3"],
+  .ze-grid[data-cols="4"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

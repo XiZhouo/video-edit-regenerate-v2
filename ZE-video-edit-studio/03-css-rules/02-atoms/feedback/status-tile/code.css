@@ -1,0 +1,64 @@
+/*
+ * status-tile.css — ze-status-tile 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 状态格:小圆点 + 标签(+ 可选值)。对齐 v2 .ze-status-tile / footer 的状态 segment。
+ *   data-state 决定圆点色;loading 态走呼吸动画。用于 footer / dashboard 状态条。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-status-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  height: var(--ze-space-6);                /* 24px */
+  padding: 0 var(--ze-space-2);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-xs);
+  white-space: nowrap;
+}
+.ze-status-tile[data-variant="inline"] {
+  height: var(--ze-space-6);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.ze-status-tile__dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-ink-tertiary);
+}
+.ze-status-tile[data-state="good"]    .ze-status-tile__dot { background: var(--ze-semantic-success); }
+.ze-status-tile[data-state="info"]    .ze-status-tile__dot { background: var(--ze-semantic-info); }
+.ze-status-tile[data-state="warn"]    .ze-status-tile__dot { background: var(--ze-semantic-warn); }
+.ze-status-tile[data-state="danger"]  .ze-status-tile__dot { background: var(--ze-semantic-danger); }
+.ze-status-tile[data-state="muted"]   .ze-status-tile__dot { background: var(--ze-ink-disabled); }
+.ze-status-tile[data-state="loading"] .ze-status-tile__dot {
+  background: var(--ze-semantic-info);
+  animation: ze-status-pulse var(--ze-dur-slow) infinite;
+}
+
+@keyframes ze-status-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+.ze-status-tile__label { color: var(--ze-ink-secondary); }
+.ze-status-tile__value { color: var(--ze-ink-primary); font-weight: var(--ze-fw-medium); }
+
+/* 语义态时值跟随 */
+.ze-status-tile[data-state="warn"]   .ze-status-tile__value { color: var(--ze-semantic-warn); }
+.ze-status-tile[data-state="danger"] .ze-status-tile__value { color: var(--ze-semantic-danger); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ze-status-tile[data-state="loading"] .ze-status-tile__dot { animation: none; }
+}

@@ -1,0 +1,70 @@
+/*
+ * menu-item.css — ze-menu-item 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 通用菜单项(给 popover / dropdown / context-menu 内用):24px 行高 + overlay-soft hover +
+ *   accent active + kbd 快捷键 + danger 变体 + ▸ 子菜单标记。Header 的 MenuItem 组件即用本类。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-menu-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--ze-space-4);
+  align-items: center;
+  width: 100%;
+  height: var(--ze-space-6);                /* 24px */
+  padding: 0 var(--ze-space-2);
+  border: 0;
+  border-radius: var(--ze-radius-sm);
+  background: transparent;
+  color: var(--ze-ink-secondary);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard),
+              color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-menu-item:hover:not([data-disabled="true"]) { background: var(--ze-overlay-soft); color: var(--ze-ink-primary); }
+.ze-menu-item:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: -2px; }
+
+.ze-menu-item[data-active="true"] { color: var(--ze-accent-500); background: var(--ze-overlay-accent-wash); }
+.ze-menu-item[data-variant="danger"] { color: var(--ze-semantic-danger); }
+.ze-menu-item[data-disabled="true"] { color: var(--ze-ink-disabled); cursor: not-allowed; }
+
+.ze-menu-item[data-has-submenu="true"]::after {
+  content: "▸";
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-2xs);
+  line-height: 1;
+}
+
+/* parts */
+.ze-menu-item__shortcut {
+  color: var(--ze-ink-tertiary);
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-regular);
+}
+.ze-menu-item__icon { display: inline-flex; align-items: center; width: 14px; height: 14px; margin-right: var(--ze-space-1); }
+
+/* 分组分隔(相邻 group 间自动出线)*/
+.ze-menu-group { padding-block: var(--ze-space-0-5); }
+.ze-menu-group + .ze-menu-group {
+  border-top: 1px solid var(--ze-line-soft);
+  margin-top: var(--ze-space-0-5);
+  padding-top: var(--ze-space-1);
+}
+.ze-menu-section-header {
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-weight: var(--ze-fw-medium);
+}

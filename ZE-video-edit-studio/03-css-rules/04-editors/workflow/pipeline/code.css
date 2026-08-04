@@ -1,0 +1,439 @@
+.ze-pipeline {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+}
+
+.ze-pipeline__summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.ze-pipeline__entity {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ze-pipeline__entity-main {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ze-pipeline__entity-main strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ze-pipeline__entity-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+}
+
+.ze-pipeline__entity[data-phase="running"][data-animation="thumbnail-pulse"] .ze-pipeline__entity-thumb,
+.ze-pipeline__matrix-row[data-phase="running"][data-animation="thumbnail-pulse"] button:first-child,
+.ze-pipeline__group[data-run-phase="running"][data-animation="thumbnail-pulse"] .ze-pipeline__object-preview {
+  animation: ze-pipeline-pulse 1.4s ease-in-out infinite;
+}
+
+.ze-pipeline__entity[data-phase="running"][data-animation="progress-outline"],
+.ze-pipeline__matrix-row[data-phase="running"][data-animation="progress-outline"] button:first-child,
+.ze-pipeline__group[data-run-phase="running"][data-animation="progress-outline"] {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+.ze-pipeline__entity[data-phase="running"][data-animation="soft-veil"],
+.ze-pipeline__matrix-row[data-phase="running"][data-animation="soft-veil"] button:first-child,
+.ze-pipeline__group[data-run-phase="running"][data-animation="soft-veil"] {
+  opacity: 0.72;
+}
+
+.ze-pipeline__entity[data-phase="running"][data-animation="scanline"],
+.ze-pipeline__matrix-row[data-phase="running"][data-animation="scanline"] button:first-child,
+.ze-pipeline__group[data-run-phase="running"][data-animation="scanline"] {
+  background-image: linear-gradient(90deg, transparent, currentColor, transparent);
+  background-size: 220% 100%;
+  animation: ze-pipeline-scanline 1.8s linear infinite;
+}
+
+.ze-pipeline__matrix {
+  display: grid;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.ze-pipeline__matrix-head,
+.ze-pipeline__matrix-row {
+  display: grid;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.ze-pipeline__matrix-head span,
+.ze-pipeline__matrix-row button {
+  min-height: 28px;
+  padding: 4px 6px;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  background: transparent;
+  text-align: left;
+}
+
+.ze-pipeline__matrix-row button[data-phase="done"],
+.ze-pipeline__badge[data-phase="done"] {
+  opacity: 0.72;
+}
+
+.ze-pipeline__matrix-row button[data-phase="running"],
+.ze-pipeline__badge[data-phase="running"] {
+  /* 执行中格子要有运动感(行标签的 4 个 variant 之外,格子本身复用同一 pulse) */
+  animation: ze-pipeline-pulse 1.4s ease-in-out infinite;
+}
+
+.ze-pipeline__matrix-row button[data-phase="interrupted"],
+.ze-pipeline__matrix-row button[data-phase="stale"],
+.ze-pipeline__badge[data-phase="interrupted"],
+.ze-pipeline__badge[data-phase="stale"] {
+  font-style: italic;
+}
+
+.ze-pipeline__cells {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 合并格(MergedCell)输入→输出布局:两列图 + 中间箭头。纯几何 + currentColor 边(L4 既有写法,同
+ * __entity-thumb/__port);块色/字色从 L2 原子 .ze-editor__unit / .ze-text / .ze-badge 来。 */
+.ze-pipeline__io {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 8px;
+}
+.ze-pipeline__io-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.ze-pipeline__io-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+}
+.ze-pipeline__io-img,
+.ze-pipeline__io-empty {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+}
+.ze-pipeline__io-img { object-fit: contain; }
+.ze-pipeline__io-empty {
+  display: grid;
+  place-items: center;
+}
+.ze-pipeline__io-arrow {
+  align-self: center;
+  padding-top: 32px;
+}
+
+/* cell = 信息+控制单元(.ze-pipeline__cell.ze-editor__unit):块配方(raised 乳釉 / line-mid 边 /
+ * radius-sm / overflow)由 L2 .ze-editor__unit 统一给 —— 收编原 currentColor 裸色自画 + 8px 硬编码
+ * + 双类 border-bottom 重画。折叠 cell 也挂 .ze-editor__unit(见 PipelineEditor)取同款块,故本层
+ * 不再写任何 cell 视觉(04-editors 禁 var(--ze-*)/禁裸色,块色一律从 L2 原子来,门禁 LAYER_TOKEN_ABOVE_L2
+ * / LAYER_RAW_VISUAL)。cell 间距靠 .ze-pipeline__cells gap(px 几何字面量放行);内距由 __unit-info(L2)
+ * + __cell-actions 各自承担。 */
+
+/* 操作台 cell(StartConsole,Jupyter 第一 cell):常驻 .ze-pipeline 顶部,不抢滚动列高度 */
+.ze-pipeline__cell[data-cell="console"] {
+  flex: none;
+}
+
+/* 折叠 cell(step-collapse):只剩 disclosure 头行(无 __unit 包裹),自带内距 */
+.ze-pipeline__cell[data-collapsed="true"] {
+  padding: 8px;
+}
+
+.ze-pipeline__cell[data-phase="running"] {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+.ze-pipeline__cell-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 骨架 cell 头行:badge + stage 名成组靠左(无 disclosure 按钮的非交互态;纯几何布局)。 */
+.ze-pipeline__cell-headline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 信息区竖流:沿用 cell 内各 section 的纵向间距(L2 __unit-info 给基础内距) */
+.ze-pipeline__cell .ze-editor__unit-info {
+  gap: 8px;
+}
+
+/* 控制区(step 生命周期钮组 / 操作台 Run):__cell-actions 与 __unit-control 同元素,
+ * border-top(L2)作信息↔控制二分边界,这里只补钮组排布与内距 */
+.ze-pipeline__cell-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 8px;
+}
+
+/* badge 视觉(pill 底/边/语义色)归 L2 .ze-badge[data-variant];此处只留 pipeline 专属布局:
+ * 72px 定宽对齐(各相位标签等宽不跳)+ 右间距 + 大写。语义色经 data-variant 补回、可主题化。 */
+.ze-pipeline__badge {
+  min-width: 72px;
+  margin-right: 8px;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.ze-pipeline__meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  opacity: 0.72;
+}
+
+.ze-pipeline__desc {
+  margin: 0;
+  opacity: 0.78;
+}
+
+.ze-pipeline__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ze-pipeline__section h4 {
+  margin: 0;
+}
+
+.ze-pipeline__ports {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 6px;
+}
+
+/* port/kv/logs 结构盒(currentColor 细边 + 内距):cell 输出快照容器。kv 标量聚合进单
+ * .ze-kv-list、port 卡化留待 P4 entity/port 重构(同区域)一并做;此处暂留细边盒(无令牌、
+ * 无裸色,门禁安全)。__error 已迁 .ze-callout[danger]。 */
+.ze-pipeline__port,
+.ze-pipeline__kv,
+.ze-pipeline__logs {
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  padding: 6px;
+}
+
+.ze-pipeline__port-head,
+.ze-pipeline__kv,
+.ze-pipeline__log {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.ze-pipeline__port-actions {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.ze-pipeline__image {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+}
+
+.ze-pipeline__json {
+  max-height: 240px;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ze-pipeline__logs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.ze-pipeline__log {
+  justify-content: flex-start;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.ze-pipeline__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* chips 内 operation_ids 已迁 .ze-badge;empty 文案已迁 .ze-text[tertiary]。
+ * .ze-pipeline__chips 仅留 flex 容器(上方)。 */
+
+@keyframes ze-pipeline-pulse {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ze-pipeline-scanline {
+  from {
+    background-position: 220% 0;
+  }
+  to {
+    background-position: -220% 0;
+  }
+}
+
+/* ============================================================
+ * 链路主视图(对象组 → command → 对象组)。view_state.chain 有效时取代 notebook 作默认主视图。
+ * 纯几何 + currentColor 连线;块视觉一律从 L2 来(command 块=.ze-editor__unit、字段=.ze-kv-list、
+ * 相位=.ze-badge、预览=既有 preview),本层不自画对象黑边卡片(门禁 LAYER_TOKEN_ABOVE_L2 / LAYER_RAW_VISUAL)。
+ * 私有 currentColor 细边(__port/__kv/__logs/__io-img/__cell outline/matrix)只随 legacy/详情 notebook
+ * 出现(不同类名),不进默认主链路。
+ * ============================================================ */
+
+.ze-pipeline__chain {
+  display: flex;
+  flex-direction: row;        /* 宽容器:横向 对象组 → command → 对象组 */
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 6px;
+}
+
+/* 对象组:数据态节点(信息态,非命令块 → 不画块边/卡片);标题 + 字段/预览竖排。 */
+.ze-pipeline__group {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ze-pipeline__group > h4 {
+  margin: 0;
+}
+
+.ze-pipeline__object-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* 对象组预览图:复用 preview 语义,自身只定几何(不自画黑边)。 */
+.ze-pipeline__object-preview {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+/* command 单元:块配方(raised/line-mid 边/radius/overflow)由 L2 .ze-editor__unit 给(同 cell);
+ * 此处只定链路内伸缩 + 头部/控制排布。 */
+.ze-pipeline__command {
+  flex: 0 1 auto;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.ze-pipeline__command-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ze-pipeline__command-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 8px;
+}
+
+/* 连接件:只表达方向(横向右指 / 纵向下指),纯 currentColor 三角,无文字、不抢视觉。 */
+.ze-pipeline__connector {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  opacity: 0.5;
+}
+
+/* 展开详情切换 + 详情 notebook 容器(不自带滚动:.ze-pipeline 是唯一纵向滚动 owner)。 */
+.ze-pipeline__details-toggle {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ze-pipeline__details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+/* 窄容器:链路转纵向;连接件箭头转下指(canonical 断点,禁 viewport media query)。 */
+@container ze-editor (max-width: 768px) {
+  .ze-pipeline__chain {
+    flex-direction: column;
+  }
+  .ze-pipeline__group,
+  .ze-pipeline__command {
+    flex: 0 0 auto;
+  }
+  .ze-pipeline__connector {
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid currentColor;
+    border-bottom: 0;
+  }
+}

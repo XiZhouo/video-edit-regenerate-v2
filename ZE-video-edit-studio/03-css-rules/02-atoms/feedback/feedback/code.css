@@ -1,0 +1,101 @@
+/*
+ * feedback.css — ze-spinner / ze-skeleton / ze-empty (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 三件反馈类合一,并集中托管共享 @keyframes(ze-spin / ze-skeleton-shimmer);
+ * button.css 的 loading spinner 引用 ze-spin。带 prefers-reduced-motion guard。
+ * empty 对齐 v3 footer 的空态(居中 icon + 文字)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+/* ============================================================
+ * 共享 keyframes(全局,顺序无关)
+ * ============================================================ */
+@keyframes ze-spin { to { transform: rotate(360deg); } }
+@keyframes ze-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+
+/* ============================================================
+ * spinner
+ * ============================================================ */
+.ze-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--ze-overlay-soft);
+  border-top-color: var(--ze-accent-500);
+  border-radius: var(--ze-radius-pill);
+  animation: ze-spin var(--ze-dur-slow) linear infinite;
+}
+.ze-spinner[data-size="sm"] { width: 12px; height: 12px; }
+.ze-spinner[data-size="lg"] { width: 24px; height: 24px; border-width: 3px; }
+.ze-spinner[data-variant="inverse"] {
+  border-color: color-mix(in oklab, var(--ze-ink-inverse) 30%, transparent);
+  border-top-color: var(--ze-ink-inverse);
+}
+
+
+/* ============================================================
+ * skeleton
+ * ============================================================ */
+.ze-skeleton {
+  display: block;
+  min-height: var(--ze-space-3);
+  border-radius: var(--ze-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--ze-overlay-soft) 25%,
+    color-mix(in oklab, var(--ze-overlay-soft) 40%, var(--ze-surface-raised)) 50%,
+    var(--ze-overlay-soft) 75%
+  );
+  background-size: 200% 100%;
+  animation: ze-skeleton-shimmer 1.4s var(--ze-easing-standard) infinite;
+}
+.ze-skeleton[data-variant="text"] { height: var(--ze-fs-sm); }
+.ze-skeleton[data-variant="circle"] { border-radius: var(--ze-radius-pill); aspect-ratio: 1; }
+.ze-skeleton[data-variant="block"] { height: var(--ze-space-12); border-radius: var(--ze-radius-md); }
+
+
+/* ============================================================
+ * empty(对齐 footer 空态:居中 icon 圆 + 标题 + 正文 + action)
+ * ============================================================ */
+.ze-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-6);
+  text-align: center;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-sm);
+}
+.ze-empty__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ze-space-8);
+  height: var(--ze-space-8);
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-lg);
+}
+.ze-empty__title { color: var(--ze-ink-secondary); font-weight: var(--ze-fw-medium); }
+.ze-empty__body { color: var(--ze-ink-tertiary); font-size: var(--ze-fs-xs); max-width: 36ch; }
+.ze-empty__action { margin-top: var(--ze-space-1); }
+.ze-empty[data-size="sm"] { padding: var(--ze-space-3); }
+
+
+/* ============================================================
+ * 减少动效偏好
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .ze-skeleton { animation: none; }
+  .ze-spinner { animation-duration: 1.2s; }
+}

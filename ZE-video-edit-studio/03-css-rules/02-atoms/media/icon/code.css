@@ -1,0 +1,55 @@
+/*
+ * icon.css — ze-icon 图标原子 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / icons.md(语义映射单一真源 + 迭代规则)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 图标 = **令牌**(token 化图库):美术源 icons.svg(16×16 · 1.5px 圆头描边)经
+ * scripts/icons_build.py 生成 01-tokens/icons.css(`--ze-icon-<name>` data URI 令牌)+
+ * 同目录 icon-map.css(`.ze-icon[data-icon=<name>]` → mask-image: var(令牌))。
+ * 用法(在该用的地方直接引用,无外链文件依赖):
+ *   <span class="ze-icon" data-icon="close" aria-hidden="true" />
+ *   色 = mask + background-color: currentColor → 随文字 ink / data-tone / 暗色全自动;
+ *   皮肤可在 [data-mod] 块覆盖某 `--ze-icon-*` 令牌换图标作品(词表不变)。
+ * Unicode 字符仍是合法降级(icons.md 留 glyph 列:log、title 属性、纯文本场景);
+ * 新图标:icons.svg 画 symbol → 跑 icons_build → icons.md 补行(门禁 icon_tokens_check 守)。
+ * 尺寸 data-size / 语义色 data-tone 闭集。
+ */
+
+.ze-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  color: inherit;
+  pointer-events: none;   /* 图标永远不是命中目标,点击落在按钮上 */
+}
+
+/* token 形态底座:data-icon 指定图标名(具体 mask-image 在生成的 icon-map.css),
+ * 着色 = 不透明 mask × currentColor 底色。 */
+.ze-icon[data-icon] {
+  /* background 在生成的 icon-map.css 逐名规则里给:未知名 → 无 mask 也无底色,
+   * 退化为不可见空位(而非实心方块);名册校验由 icon_tokens_check 静态把守 */
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.ze-icon[data-size="xs"] { width: 12px; height: 12px; }
+.ze-icon[data-size="sm"] { width: 14px; height: 14px; }
+.ze-icon[data-size="lg"] { width: 20px; height: 20px; }
+
+/* 语义色(与 .ze-text[data-tone] 同词表,贴在 svg 上省一层包裹)*/
+.ze-icon[data-tone="muted"]   { color: var(--ze-ink-tertiary); }
+.ze-icon[data-tone="accent"]  { color: var(--ze-accent-500); }
+.ze-icon[data-tone="success"] { color: var(--ze-semantic-success); }
+.ze-icon[data-tone="warn"]    { color: var(--ze-semantic-warn); }
+.ze-icon[data-tone="danger"]  { color: var(--ze-semantic-danger); }
+.ze-icon[data-tone="info"]    { color: var(--ze-semantic-info); }
+
+/* 旋转(加载/刷新进行中):复用 feedback.css 的 @keyframes ze-spin */
+.ze-icon[data-spin="true"] { animation: ze-spin 1.2s linear infinite; }

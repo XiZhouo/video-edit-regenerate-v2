@@ -1,0 +1,375 @@
+/*
+ * copilot-shell.css — 常驻悬浮 AI 协作挂件外壳(.ze-copilot*,02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ * 组件: 01-core/04-user-facing/01-layout/copilot/CopilotDock.tsx
+ *
+ * 为什么在 L2:与 auth-shell / header-shell 同类——框架级 shell chrome,含状态化样式
+ * (Siri 感呼吸动效 / busy 加速脉冲 / hover accent-wash / 浮层阴影 / data-side 换边),
+ * 无法降为 L4 无令牌结构。视觉 DNA 复用 .ze-card(raised 底 + overlay-soft 边 + 浮层阴影)。
+ * 全走令牌(var(--ze-*)),禁字面 hex/rgb;明暗随 [data-theme=dark] 自动跟随。
+ */
+
+/* ============================================================
+ * § 0 助手根(W1-1,css 20.3):精灵与对话面板的**唯一**共同祖先
+ *
+ * 此前 CopilotDock 与 GuideLayer 是 AppChrome 里两个并列兄弟,面板只能凭空
+ * 出现在自己的固定角落——用户判词「聊天框是它的分身」说的就是这个结构。
+ * 根本身不占布局、不吃事件,只做两件事:①把两者装进同一棵树;②承载精灵播来的
+ * 展开起点变量 --ze-assistant-origin-x/y(由 AssistantRoot 换算成面板相对坐标)。
+ * ============================================================ */
+
+.ze-assistant {
+  display: contents;                 /* 零布局影响:两个孩子各自 fixed,与合并前逐像素一致 */
+}
+
+/* ============================================================
+ * § 1 定位:浮在整页最上层的角落挂件(左/右可换边)
+ * ============================================================ */
+
+.ze-copilot {
+  position: fixed;
+  bottom: var(--ze-space-5);
+  z-index: var(--ze-z-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--ze-space-3);
+  pointer-events: none;              /* 只让挂件本体可点,不挡下层工具 */
+}
+.ze-copilot[data-side="right"] { right: var(--ze-space-5); align-items: flex-end; }
+.ze-copilot[data-side="left"]  { left: var(--ze-space-5);  align-items: flex-start; }
+.ze-copilot > * { pointer-events: auto; }
+
+/* ============================================================
+ * § 2 折叠态:Siri 感小球
+ * ============================================================ */
+
+.ze-copilot__orb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--ze-radius-pill);
+  border: 1px solid var(--ze-overlay-soft);
+  background: var(--ze-surface-float);
+  box-shadow: var(--ze-shadow-floating);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  transition: transform var(--ze-dur-fast) ease, box-shadow var(--ze-dur-fast) ease;
+}
+.ze-copilot__orb:hover { transform: translateY(-2px); box-shadow: var(--ze-shadow-overlay); }
+.ze-copilot[data-open="true"] .ze-copilot__orb { display: none; }
+/* W1-1(2026-07-26 用户裁定「球本身变成对话框」):面板展开后,精灵的**透明命中区**也要退场。
+   引擎已让精灵本体飞到面板展开起点并淡出;命中区是零视觉的 44px 圆,留着就是屏幕上一个
+   看不见却点得到的洞。上面那条 __orb 规则是合并前 dock 自带小球的遗留 —— 合并后真正
+   显示的球来自 GuideLayer,规则还在但指错了对象,这正是「面板开了球还在」的成因。 */
+.ze-assistant[data-open="true"] .ze-guide__self,
+.ze-assistant[data-open="true"] .ze-guide__glow { display: none; }
+
+/* 动效核:精灵停靠态(变形体同体材质:白芯蓝边,css 20.1 与 guide-shell 统一),idle 呼吸;
+   busy=thinking 呼吸加速(2.4s→1.4s,气泡三点仍是主信号——一实体一层光,不加新光层) */
+.ze-copilot__orb-core,
+.ze-copilot__pulse {
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-guide-fill);
+  border: 1.5px solid var(--ze-accent-500);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--ze-accent-500) 45%, transparent);
+  animation: ze-copilot-breathe var(--ze-dur-breathe) ease-in-out infinite;
+}
+.ze-copilot__orb-core { width: 28px; height: 28px; }
+.ze-copilot__pulse    { width: 18px; height: 18px; flex: none; }
+.ze-copilot[data-busy="true"] .ze-copilot__orb-core,
+.ze-copilot[data-busy="true"] .ze-copilot__pulse {
+  animation-duration: var(--ze-dur-breathe-fast);   /* thinking 变体:呼吸加速(定稿 §5-1),非高频闪 */
+}
+
+/* ============================================================
+ * § 3 展开态:对话面板
+ * ============================================================ */
+
+.ze-copilot__panel { display: none; }
+.ze-copilot[data-open="true"] .ze-copilot__panel {
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - var(--ze-space-8)));
+  height: min(560px, calc(100vh - var(--ze-space-12)));
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-lg);
+  box-shadow: var(--ze-shadow-overlay);
+  overflow: hidden;
+  /* W1-1 / 0721 §3.2 阶段③「变形撑开」:起点 = 精灵翻转前所在的那个点
+     (--ze-assistant-origin-* 由 AssistantRoot 量面板盒换算得出;未播到时回落
+     100%/100% = 右下角,那正是精灵的默认停靠位,故回落也不会看着像从别处飞来)。 */
+  transform-origin:
+    var(--ze-assistant-origin-x, 100%)
+    var(--ze-assistant-origin-y, 100%);
+  animation: ze-copilot-grow var(--ze-dur-grow) var(--ze-spring);
+}
+
+.ze-copilot__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-3) var(--ze-space-4);
+  border-bottom: 1px solid var(--ze-overlay-soft);
+}
+.ze-copilot__title {
+  flex: 1;
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-semibold);
+  color: var(--ze-ink-primary);
+}
+.ze-copilot__bar-actions { display: flex; gap: var(--ze-space-1); }
+.ze-copilot__icon-btn {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--ze-radius-sm);
+  background: transparent;
+  color: var(--ze-ink-secondary);
+  cursor: pointer;
+  transition: background var(--ze-dur-fast) ease, color var(--ze-dur-fast) ease;
+}
+.ze-copilot__icon-btn:hover { background: var(--ze-overlay-accent-wash); color: var(--ze-ink-primary); }
+
+/* ============================================================
+ * § 4 对话流(真实滚动条,历史可上翻)
+ * ============================================================ */
+
+.ze-copilot__transcript {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ze-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-3);
+}
+.ze-copilot__empty {
+  margin: auto;
+  padding: var(--ze-space-4);
+  text-align: center;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+}
+.ze-copilot__msg { display: flex; }
+.ze-copilot__msg[data-role="user"] { justify-content: flex-end; }
+.ze-copilot__msg[data-role="assistant"],
+.ze-copilot__msg[data-role="system"] { justify-content: flex-start; }
+
+.ze-copilot__bubble {
+  max-width: 84%;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  border-radius: var(--ze-radius-md);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ze-copilot__msg[data-role="user"] .ze-copilot__bubble {
+  background: var(--ze-accent-500);
+  color: var(--ze-ink-inverse);
+}
+.ze-copilot__msg[data-role="assistant"] .ze-copilot__bubble {
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-primary);
+}
+.ze-copilot__msg[data-role="system"] .ze-copilot__bubble {
+  background: var(--ze-semantic-danger-wash);
+  color: var(--ze-semantic-danger);
+}
+.ze-copilot__bubble--thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  color: var(--ze-ink-secondary);
+}
+.ze-copilot__thinking { font-size: var(--ze-fs-sm); }
+.ze-copilot__dots { display: inline-flex; gap: 3px; }
+.ze-copilot__dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+  animation: ze-copilot-dot 1.2s ease-in-out infinite;
+}
+.ze-copilot__dots i:nth-child(2) { animation-delay: 0.16s; }
+.ze-copilot__dots i:nth-child(3) { animation-delay: 0.32s; }
+
+/* ============================================================
+ * § 5 输入区
+ * ============================================================ */
+
+.ze-copilot__composer {
+  border-top: 1px solid var(--ze-overlay-soft);
+  padding: var(--ze-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+}
+.ze-copilot__context { font-size: var(--ze-fs-xs); color: var(--ze-ink-tertiary); }
+
+/* §7.3 本轮改动卡:计数行(计数 + 撤销按钮)+ 可点定位的实体 chips */
+.ze-copilot__changecard-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ze-space-2);
+}
+.ze-copilot__changechips { display: flex; flex-wrap: wrap; gap: var(--ze-space-1); margin-top: var(--ze-space-2); }
+.ze-copilot__changechip {
+  font-size: var(--ze-fs-xs); color: var(--ze-ink-secondary);
+  padding: var(--ze-space-1) var(--ze-space-2);
+  border-radius: var(--ze-radius-sm); border: 1px solid var(--ze-overlay-soft);
+  background: transparent; cursor: pointer;
+}
+
+/* §3.1 设置中心分页 tab 条(连接方式 | 诊断与用量) */
+.ze-copilot__acct-tabs { display: flex; gap: var(--ze-space-2); padding-bottom: var(--ze-space-1); }
+
+/* §3.1「诊断与用量」页:近期 AI 调用的实际落位与用量摘要(诊断展示,非计费权威) */
+.ze-copilot__diag { display: flex; flex-direction: column; gap: var(--ze-space-3); }
+.ze-copilot__diag-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ze-space-2);
+}
+.ze-copilot__diag-summary {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ze-space-1) var(--ze-space-3);
+}
+.ze-copilot__diag-group { display: flex; flex-direction: column; gap: var(--ze-space-1); }
+.ze-copilot__diag-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: var(--ze-space-1);
+}
+.ze-copilot__diag-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+}
+.ze-copilot__diag-key { color: var(--ze-ink-secondary); font-variant-numeric: tabular-nums; }
+
+/* §7.3 P0-C AssistantStage 卡区容器(过程/变更/确认卡编排) */
+.ze-copilot__stage { display: flex; flex-direction: column; gap: var(--ze-space-2); }
+
+/* §7.3 过程卡:事后「这一轮做了什么」摘要 */
+.ze-copilot__process-title { font-size: var(--ze-fs-xs); font-weight: var(--ze-fw-semibold); color: var(--ze-ink-secondary); }
+.ze-copilot__process-empty { font-size: var(--ze-fs-xs); color: var(--ze-ink-tertiary); }
+.ze-copilot__process-steps {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: var(--ze-space-1);
+}
+.ze-copilot__process-step {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+}
+.ze-copilot__process-type { color: var(--ze-ink-secondary); }
+.ze-copilot__process-count { color: var(--ze-ink-tertiary); }
+.ze-copilot__process-summary { font-size: var(--ze-fs-xs); color: var(--ze-ink-tertiary); }
+
+/* §7.3 确认卡:说明要做什么/影响/为什么 + 批准·稍后·取消 */
+.ze-copilot__confirm-title { font-size: var(--ze-fs-sm); font-weight: var(--ze-fw-semibold); color: var(--ze-ink-primary); }
+.ze-copilot__confirm-fields {
+  margin: 0; display: flex; flex-direction: column; gap: var(--ze-space-1);
+  font-size: var(--ze-fs-xs);
+}
+.ze-copilot__confirm-fields dt { color: var(--ze-ink-tertiary); }
+.ze-copilot__confirm-fields dd { margin: 0 0 var(--ze-space-1); color: var(--ze-ink-secondary); }
+.ze-copilot__confirm-warn {
+  font-size: var(--ze-fs-xs); color: var(--ze-semantic-warn);
+  background: var(--ze-semantic-warn-wash);
+  border-radius: var(--ze-radius-sm); padding: var(--ze-space-1) var(--ze-space-2);
+}
+.ze-copilot__confirm-actions { display: flex; flex-wrap: wrap; gap: var(--ze-space-2); }
+
+/* 附图缩略图行(composer 上方)+ 气泡内缩略图 */
+.ze-copilot__attachments { display: flex; flex-wrap: wrap; gap: var(--ze-space-2); }
+.ze-copilot__chip { position: relative; width: 44px; height: 44px; }
+.ze-copilot__chip-img {
+  width: 44px; height: 44px; object-fit: cover;
+  border-radius: var(--ze-radius-sm); border: 1px solid var(--ze-overlay-soft);
+}
+.ze-copilot__chip-x {
+  position: absolute; top: -6px; right: -6px;
+  width: 18px; height: 18px; display: grid; place-items: center;
+  border: none; border-radius: var(--ze-radius-pill);
+  background: var(--ze-surface-inverse); color: var(--ze-ink-inverse);
+  cursor: pointer; padding: 0;
+}
+.ze-copilot__thumbs { display: flex; flex-wrap: wrap; gap: var(--ze-space-1); margin-bottom: var(--ze-space-1); }
+.ze-copilot__thumb {
+  width: 96px; max-width: 100%; height: auto; object-fit: cover;
+  border-radius: var(--ze-radius-sm); border: 1px solid var(--ze-overlay-soft);
+}
+
+.ze-copilot__input-row { display: flex; align-items: flex-end; gap: var(--ze-space-2); }
+.ze-copilot__attach {
+  flex: none; width: 34px; height: 34px; display: grid; place-items: center;
+  border: 1px solid var(--ze-overlay-soft); border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-sunken); color: var(--ze-ink-secondary);
+  cursor: pointer; transition: color var(--ze-dur-fast) ease, border-color var(--ze-dur-fast) ease;
+}
+.ze-copilot__attach:hover { color: var(--ze-accent-500); border-color: var(--ze-accent-500); }
+.ze-copilot__attach:disabled { opacity: 0.45; cursor: default; }
+.ze-copilot__input {
+  flex: 1;
+  resize: none;
+  max-height: 120px;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-primary);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+}
+.ze-copilot__input:focus { outline: none; border-color: var(--ze-accent-500); box-shadow: var(--ze-focus-ring); }
+.ze-copilot__send {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-accent-500);
+  color: var(--ze-ink-inverse);
+  cursor: pointer;
+  transition: opacity var(--ze-dur-fast) ease;
+}
+.ze-copilot__send:disabled { opacity: 0.45; cursor: default; }
+
+/* ============================================================
+ * § 6 动效
+ * ============================================================ */
+
+@keyframes ze-copilot-breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.9; }
+  50%      { transform: scale(1.14); opacity: 1; }
+}
+/* @deprecated css 20.3:整体上移的入场 —— 那是「另一个面板出现」的观感。
+   定义保留供既有引用降级,新代码用 ze-copilot-grow。 */
+@keyframes ze-copilot-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+/* W1-1:从精灵所在的点撑开成面板(0721 §3.2 阶段③)。
+   起点是一个球大小的比例而不是 0 —— 精灵不是从无到有,它一直在那儿。 */
+@keyframes ze-copilot-grow {
+  from { transform: scale(0.08); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes ze-copilot-dot {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50%      { opacity: 1;   transform: translateY(-2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ze-copilot__orb-core,
+  .ze-copilot__pulse,
+  .ze-copilot__dots i,
+  .ze-copilot[data-open="true"] .ze-copilot__panel { animation: none; transform: none; }
+}

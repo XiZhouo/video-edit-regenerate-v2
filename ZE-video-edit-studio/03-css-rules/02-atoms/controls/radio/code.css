@@ -1,0 +1,55 @@
+/*
+ * radio.css — ze-radio 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 实现: 原生 <input type=radio> + appearance:none 全自定义 + ::after 实心点。
+ *   跟 checkbox 同密度(14px),圆形;选中 = accent 边 + accent 实心点。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 1px solid var(--ze-ink-tertiary);
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-surface-raised);
+  cursor: pointer;
+  transition:
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-radio:hover { border-color: var(--ze-accent-500); }
+.ze-radio:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+
+.ze-radio:checked { border-color: var(--ze-accent-500); }
+.ze-radio:checked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+}
+
+.ze-radio:disabled { border-color: var(--ze-ink-disabled); background: var(--ze-surface-sunken); cursor: not-allowed; }
+.ze-radio:disabled:checked::after { background: var(--ze-ink-disabled); }
+.ze-radio[aria-invalid="true"] { border-color: var(--ze-semantic-danger); }
+
+/* 行包装:radio + 文案 */
+.ze-radio__row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  cursor: pointer;
+}
+.ze-radio__label { font-size: var(--ze-fs-sm); color: var(--ze-ink-primary); }

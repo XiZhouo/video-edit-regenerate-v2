@@ -1,0 +1,249 @@
+{
+  "_comment": "域层 clip_geometry.canvas_rect_of 与前端 clipGeometry.canvasRectOf 共用的钉子表。由 test_clip_geometry_fixture.py 生成/校验;两侧各有一条测试断言自己等于这张表。",
+  "cases": [
+    {
+      "name": "默认 contain 同比例",
+      "clip": {},
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        1920,
+        1080
+      ],
+      "rect": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1920.0,
+        "height": 1080.0
+      }
+    },
+    {
+      "name": "contain 横片进竖画布",
+      "clip": {},
+      "canvas": [
+        1080,
+        1920
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": 0.0,
+        "y": 656.25,
+        "width": 1080.0,
+        "height": 607.5
+      }
+    },
+    {
+      "name": "cover 横片裁满竖画布",
+      "clip": {
+        "fitMode": "cover"
+      },
+      "canvas": [
+        1080,
+        1920
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": -1166.6667,
+        "y": 0.0,
+        "width": 3413.3333,
+        "height": 1920.0
+      }
+    },
+    {
+      "name": "stretch 拉满",
+      "clip": {
+        "fitMode": "stretch"
+      },
+      "canvas": [
+        1080,
+        1920
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1080.0,
+        "height": 1920.0
+      }
+    },
+    {
+      "name": "none 原始像素",
+      "clip": {
+        "fitMode": "none"
+      },
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        640,
+        480
+      ],
+      "rect": {
+        "x": 640.0,
+        "y": 300.0,
+        "width": 640.0,
+        "height": 480.0
+      }
+    },
+    {
+      "name": "none + 放大 1.5",
+      "clip": {
+        "fitMode": "none",
+        "scale": 1.5
+      },
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        640,
+        480
+      ],
+      "rect": {
+        "x": 480.0,
+        "y": 180.0,
+        "width": 960.0,
+        "height": 720.0
+      }
+    },
+    {
+      "name": "contain + 平移",
+      "clip": {
+        "x": 0.25,
+        "y": -0.1
+      },
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": 480.0,
+        "y": -108.0,
+        "width": 1920.0,
+        "height": 1080.0
+      }
+    },
+    {
+      "name": "contain + 缩小 0.5",
+      "clip": {
+        "scale": 0.5
+      },
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": 480.0,
+        "y": 270.0,
+        "width": 960.0,
+        "height": 540.0
+      }
+    },
+    {
+      "name": "四边裁切",
+      "clip": {
+        "cropL": 0.1,
+        "cropT": 0.2,
+        "cropR": 0.1,
+        "cropB": 0.05
+      },
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": 0.0,
+        "y": 33.75,
+        "width": 1920.0,
+        "height": 1012.5
+      }
+    },
+    {
+      "name": "cover + 裁 + 平移 + 缩放",
+      "clip": {
+        "fitMode": "cover",
+        "cropL": 0.05,
+        "cropR": 0.05,
+        "x": -0.2,
+        "y": 0.15,
+        "scale": 1.2
+      },
+      "canvas": [
+        1080,
+        1920
+      ],
+      "src": [
+        1920,
+        1080
+      ],
+      "rect": {
+        "x": -1519.2,
+        "y": 96.0,
+        "width": 3686.4,
+        "height": 2304.0
+      }
+    },
+    {
+      "name": "竖片进横画布 contain",
+      "clip": {},
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        720,
+        1280
+      ],
+      "rect": {
+        "x": 656.25,
+        "y": 0.0,
+        "width": 607.5,
+        "height": 1080.0
+      }
+    },
+    {
+      "name": "认不出的 fitMode 退回 contain",
+      "clip": {
+        "fitMode": "wat"
+      },
+      "canvas": [
+        1920,
+        1080
+      ],
+      "src": [
+        1280,
+        720
+      ],
+      "rect": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1920.0,
+        "height": 1080.0
+      }
+    }
+  ]
+}

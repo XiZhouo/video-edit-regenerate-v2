@@ -1,0 +1,548 @@
+{
+  "schema": "ze-command-registry.v1",
+  "skill_id": "ZE-video-edit-studio",
+  "title": "ZE-video-edit-studio",
+  "generated_by": "ZE-skill-build/scripts/verify_all.py",
+  "commands": [
+    {
+      "id": "annotation.add",
+      "label": "新建标注",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "annotation"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "框选画布新建标注(bbox + 区间 + 指令文字);编号按现有标注顺延。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "label": "指令文字"
+          },
+          "targetClipId": {
+            "type": "string"
+          },
+          "bboxX": {
+            "type": "number"
+          },
+          "bboxY": {
+            "type": "number"
+          },
+          "bboxW": {
+            "type": "number"
+          },
+          "bboxH": {
+            "type": "number"
+          },
+          "intervalStart": {
+            "type": "number"
+          },
+          "intervalEnd": {
+            "type": "number"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "annotation.remove",
+      "label": "删除标注",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "annotation"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "删除标注并把剩余标注编号重排(与提示词行一致)。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "asset.import",
+      "label": "导入素材",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "asset"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "登记命名素材(项目内唯一);视频/图片/音频。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "assetType": {
+            "type": "string"
+          },
+          "sourcePath": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "candidate.adopt",
+      "label": "采纳候选",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "clip",
+        "candidate"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "把候选写成片段正片(videoRef/adoptedCandidateId);stale 候选拒采。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "candidate.verify",
+      "label": "机检候选",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "candidate",
+        "verify_report"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "对候选跑机检(时长/帧率漂移等);ffmpeg 缺位→requires_runtime。黄=标出不拦,红(时长/帧率)=禁采纳。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "composite.mask_merge",
+      "label": "时空蒙版合成",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "candidate"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "把候选按标注 bbox(外扩+羽化)合成到原片,框外逐位原片(治过改);ffmpeg 缺位→requires_runtime。产出新候选。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "label": "candidate id"
+          },
+          "annotationId": {
+            "type": "string"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "document.rename",
+      "label": "重命名文档",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "document.set_acl",
+      "label": "修改文档权限",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.add",
+      "label": "新增 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.batch_add",
+      "label": "批量新增 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "一次建 N 个 entity(每项自带 type,可混型);单 Operation 一键撤销。供 stage 建实体/批量建复用。",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.batch_update",
+      "label": "批量更新 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "对同型多个 entity 应用字段 patches;单 Operation 一键 undo;任一项版本不匹配整体拒绝。",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.cascade_delete",
+      "label": "级联软删 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.delete",
+      "label": "软删 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.hard_remove",
+      "label": "硬删 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.reorder",
+      "label": "拖拽排序 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "把 id 移到 before_id 之前(缺则末尾),重写该 type 的 order 字段为连续整数;复用 batch_update 单 Operation 一键 undo。平的有序列表通用;树/图特殊语义 mod 自声明。",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.restore",
+      "label": "恢复 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "entity.update",
+      "label": "更新 entity",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "",
+      "outputs_schema": {},
+      "params_schema": {},
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "notify.push",
+      "label": "推送消息(飞书)",
+      "kind": "native",
+      "phase": 1,
+      "touches": [],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "向指定账号(open_id 或 ze.notify.recipients 名册 key)发一条外发通知;Operation 只记 pending 意图;提交与事件接受后才发送并写 NotifyLog。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "recipient": {
+            "type": "string",
+            "description": "ZE user_id(推荐)、open_id(ou_/on_) 或名册 key",
+            "x-ze-widget": "user-picker",
+            "x-ze-channel": "feishu",
+            "x-ze-raw-fallback": true
+          },
+          "message": {
+            "type": "string",
+            "description": "预渲染正文(可含 <at user_id=…> 提及)"
+          },
+          "channel": {
+            "type": "string",
+            "description": "通知渠道,默认 feishu"
+          },
+          "template": {
+            "type": "string",
+            "description": "模板标识(仅留痕用)"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipient",
+          "message"
+        ]
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "send.compile",
+      "label": "编译发送(审查快照)",
+      "kind": "native",
+      "phase": 1,
+      "touches": [
+        "send_job"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "按 send_profile + 标注编译出实发提示词/文件序/渲染面快照,落 send_job(status=compiled);不派发。红线阻断(引用缺失/未改写名人)。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "label": "send_profile id"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    },
+    {
+      "id": "send.dispatch",
+      "label": "确认并发送",
+      "kind": "stage",
+      "phase": 1,
+      "touches": [
+        "send_job",
+        "candidate"
+      ],
+      "requires_route": "",
+      "sources_allowed": [
+        "user",
+        "ai",
+        "sync",
+        "system"
+      ],
+      "shortcut": "",
+      "description": "把已编译 send_job 派发到视频服务(慢);轮询→候选回填;空段首结果自动采纳(可关)。服务不可达→requires_runtime。",
+      "outputs_schema": {},
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "label": "send_job id"
+          }
+        }
+      },
+      "ui_ports": {},
+      "requires_confirm": false
+    }
+  ]
+}

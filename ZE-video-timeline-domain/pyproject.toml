@@ -1,0 +1,9 @@
+[project]
+name = "ze-video-timeline-domain"
+version = "0.1.0"
+description = "Shared managed domain layer for the ZE video quartet (schema/engines/compiler/strategy/persistence)"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+testpaths = ["tests"]

@@ -1,0 +1,65 @@
+/*
+ * chip.css — ze-chip 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * chip = 可交互/可删的标签(比 badge 大一档,可点、可选中、可带删除 ×)。
+ *   data-selected 选中态走 accent-wash;__remove 是删除按钮槽。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  height: var(--ze-space-6);                /* 24px */
+  padding: 0 var(--ze-space-2);
+  border: 1px solid var(--ze-line-soft);
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-xs);
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: default;
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-chip[data-interactive="true"] { cursor: pointer; }
+.ze-chip[data-interactive="true"]:hover { border-color: var(--ze-accent-500); color: var(--ze-ink-primary); }
+.ze-chip:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+
+.ze-chip[data-selected="true"] {
+  background: var(--ze-overlay-accent-wash);
+  border-color: var(--ze-accent-500);
+  color: var(--ze-accent-500);
+}
+
+.ze-chip[data-disabled="true"] { color: var(--ze-ink-disabled); cursor: not-allowed; }
+
+/* 尺寸 */
+.ze-chip[data-size="sm"] { height: 18px; padding: 0 var(--ze-space-2); }
+.ze-chip[data-size="lg"] { height: var(--ze-space-7); padding: 0 var(--ze-space-3); font-size: var(--ze-fs-sm); }
+
+/* parts */
+.ze-chip__icon { display: inline-flex; align-items: center; width: 12px; height: 12px; }
+.ze-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: -2px;
+  border: 0;
+  border-radius: var(--ze-radius-pill);
+  background: transparent;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-2xs);
+  line-height: 1;
+  cursor: pointer;
+}
+.ze-chip__remove:hover { background: var(--ze-overlay-soft); color: var(--ze-ink-primary); }

@@ -1,0 +1,16 @@
+/*
+ * review.css — review 编辑器内容视觉 (04-editors)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ * 消费: 01-core 的 ReviewEditor(.ze-editor--review)。基座在 editor.css。
+ *
+ * 绝对严格分层(P4 去令牌):本文件 **零令牌**。竖排/内距=React `.ze-stack[data-gap][data-pad]`;
+ * 动作行=`.ze-row`;标签=`.ze-text[data-role=secondary]`;状态徽章=`.ze-badge[data-variant][data-emphasis]`;
+ * 文本域=`.ze-textarea`。本层只留无令牌结构(填充/居中/不可缩放)。
+ */
+.ze-review__body { flex: 1; min-height: 0; overflow: auto; /* scroll-owner(01-layout SPEC §2.10 C2):长批注/动作流内部滚,不再被 content clip 吞 */ }
+.ze-review__body[data-run-phase="error"] { place-content: center; }
+.ze-review__note { flex: 0 0 auto; /* 高度由 L2 .ze-textarea[data-rows=4] 供给(n×row-h);类保留作语义挂点 */ }
+
+/* W4 前后对比(opt-in):review body 顶部嵌 CompareFrame 的容器(给它可视高度)。 */
+.ze-review__compare { flex: 1; min-height: 0; display: flex; flex-direction: column; }

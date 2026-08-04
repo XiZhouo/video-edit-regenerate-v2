@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ze.local/contracts/artifact/ze.artifact-variant-manifest.v1.schema.json",
+  "title": "ZE reproducible artifact matrix and scoped overlay manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "skill_uid", "current_skill_id", "source_digest", "source_inventory",
+    "variants", "series_overlays", "update_candidate", "isolation"
+  ],
+  "properties": {
+    "schema": {"const": "ze.artifact-variant-manifest.v1"},
+    "skill_uid": {"$ref": "#/$defs/skill_uid"},
+    "current_skill_id": {"$ref": "#/$defs/skill_id"},
+    "source_digest": {"$ref": "#/$defs/digest"},
+    "source_inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relative_path"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "variants": {
+      "type": "array", "minItems": 1, "maxItems": 32,
+      "items": {"$ref": "#/$defs/variant"}
+    },
+    "series_overlays": {
+      "type": "array", "maxItems": 256,
+      "items": {"$ref": "#/$defs/overlay_ref"}
+    },
+    "update_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version", "channel_eligibility", "minimum_launcher_version",
+        "migration", "rollback"
+      ],
+      "properties": {
+        "version": {"$ref": "#/$defs/version"},
+        "channel_eligibility": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["stable", "beta", "pinned"]}
+        },
+        "minimum_launcher_version": {"$ref": "#/$defs/version"},
+        "migration": {"enum": ["none", "forward-compatible", "requires-backup"]},
+        "rollback": {"enum": ["supported", "manual", "unsupported"]},
+        "release_notes_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base_scope", "overlay_scope", "scan_policy", "cross_series_asset_refs"
+      ],
+      "properties": {
+        "base_scope": {"const": "global"},
+        "overlay_scope": {"const": "series-organization-target"},
+        "scan_policy": {"const": "structured-scope-markers-v1"},
+        "cross_series_asset_refs": {"type": "array", "maxItems": 0}
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "skill_uid": {"type": "string", "pattern": "^skill_[0-9a-f]{32}$"},
+    "skill_id": {
+      "type": "string", "maxLength": 128,
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,127}$"
+    },
+    "slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"},
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "relative_path": {
+      "type": "string", "minLength": 1, "maxLength": 512,
+      "pattern": "^[^/\\\\].*$"
+    },
+    "delivery_mode": {
+      "enum": [
+        "local-full", "self-hosted-full", "creator-hosted-api",
+        "frontend-only", "hybrid", "evidence-only"
+      ]
+    },
+    "artifact_role": {
+      "enum": ["runtime", "client", "server", "local-adapter", "evidence"]
+    },
+    "input_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relative_path"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "variant_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_variant", "delivery_mode", "artifact_role",
+        "surface_profile_digest", "compatibility_profile_digest",
+        "dependency_locks", "feature_set", "code_assets"
+      ],
+      "properties": {
+        "runtime_variant": {"$ref": "#/$defs/slug"},
+        "delivery_mode": {"$ref": "#/$defs/delivery_mode"},
+        "artifact_role": {"$ref": "#/$defs/artifact_role"},
+        "surface_profile_digest": {"$ref": "#/$defs/digest"},
+        "compatibility_profile_digest": {"$ref": "#/$defs/digest"},
+        "dependency_locks": {
+          "type": "array", "maxItems": 64,
+          "items": {"$ref": "#/$defs/input_file"}
+        },
+        "feature_set": {
+          "type": "array", "maxItems": 128, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/slug"}
+        },
+        "code_assets": {
+          "type": "array", "maxItems": 4096,
+          "items": {"$ref": "#/$defs/input_file"}
+        },
+        "build_options_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "base_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id", "artifact_role", "path", "format", "digest",
+        "size_bytes", "delivery_mode", "sbom", "signature",
+        "compatibility_profile_digest"
+      ],
+      "properties": {
+        "artifact_id": {
+          "type": "string", "minLength": 1, "maxLength": 160,
+          "pattern": "^base-[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "artifact_role": {"$ref": "#/$defs/artifact_role"},
+        "path": {"$ref": "#/$defs/relative_path"},
+        "format": {"enum": ["zip", "tar"]},
+        "digest": {"$ref": "#/$defs/digest"},
+        "size_bytes": {"type": "integer", "minimum": 1},
+        "delivery_mode": {"$ref": "#/$defs/delivery_mode"},
+        "sbom": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "digest", "format"],
+          "properties": {
+            "path": {"$ref": "#/$defs/relative_path"},
+            "digest": {"$ref": "#/$defs/digest"},
+            "format": {"const": "cyclonedx-json"}
+          }
+        },
+        "runtime_package": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema", "manifest_path", "manifest_digest"],
+          "properties": {
+            "schema": {"const": "ze.runtime-package.v1"},
+            "manifest_path": {"const": "ze-runtime.json"},
+            "manifest_digest": {"$ref": "#/$defs/digest"}
+          }
+        },
+        "signature": {"$ref": "#/$defs/signature"},
+        "compatibility_profile_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "variant_id", "variant_inputs", "variant_inputs_digest",
+        "build_key", "base_artifact"
+      ],
+      "properties": {
+        "variant_id": {"$ref": "#/$defs/slug"},
+        "variant_inputs": {"$ref": "#/$defs/variant_inputs"},
+        "variant_inputs_digest": {"$ref": "#/$defs/digest"},
+        "build_key": {"$ref": "#/$defs/digest"},
+        "base_artifact": {"$ref": "#/$defs/base_artifact"}
+      }
+    },
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["series_id", "organization_id", "target_id"],
+      "properties": {
+        "series_id": {"$ref": "#/$defs/id"},
+        "organization_id": {"$ref": "#/$defs/id"},
+        "target_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "overlay_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope", "base_artifact_id", "base_artifact_digest",
+        "artifact", "catalog_snapshot"
+      ],
+      "properties": {
+        "scope": {"$ref": "#/$defs/scope"},
+        "base_artifact_id": {
+          "type": "string", "minLength": 1, "maxLength": 160,
+          "pattern": "^base-[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "base_artifact_digest": {"$ref": "#/$defs/digest"},
+        "artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "digest", "size_bytes", "signature"],
+          "properties": {
+            "path": {"$ref": "#/$defs/relative_path"},
+            "digest": {"$ref": "#/$defs/digest"},
+            "size_bytes": {"type": "integer", "minimum": 1},
+            "signature": {"$ref": "#/$defs/signature"}
+          }
+        },
+        "catalog_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "digest", "snapshot_id", "etag"],
+          "properties": {
+            "path": {"$ref": "#/$defs/relative_path"},
+            "digest": {"$ref": "#/$defs/digest"},
+            "snapshot_id": {"type": "string", "minLength": 1, "maxLength": 160},
+            "etag": {"$ref": "#/$defs/digest"}
+          }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm", "key_id", "signed_digest", "public_key",
+        "detached_signature"
+      ],
+      "properties": {
+        "algorithm": {"const": "ed25519"},
+        "key_id": {"$ref": "#/$defs/slug"},
+        "signed_digest": {"$ref": "#/$defs/digest"},
+        "public_key": {"$ref": "#/$defs/input_file"},
+        "detached_signature": {"$ref": "#/$defs/input_file"}
+      }
+    }
+  }
+}

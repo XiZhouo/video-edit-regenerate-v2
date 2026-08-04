@@ -1,0 +1,13 @@
+/*
+ * layout.css — LayoutTree 中区结构(04-editors · 已迁空 stub)
+ *
+ * 协议: 01-core/04-user-facing/01-layout/SPEC.md §2.2
+ *
+ * 绝对严格分层(L5 chrome 轮 batch1):LayoutTree 中区根 / 二叉分屏(Split + 可拖分割条)/
+ * EditorSlot 容器是框架级布局 primitive(LayoutRenderer 渲染),分割条状态化(hover/dragging→accent)
+ * + slot chrome 悬浮显隐,令牌样式无法降为 L4 无令牌结构,已整组上移 L2 组件原子 →
+ * 见 03-css-rules/02-atoms/layout-tree.css(经 index.css @import)。
+ *
+ * 本文件无残留(全是该布局 primitive),清空为指针 stub:零规则、零 var(--ze-*)。保留文件 +
+ * 各 import 以免改动牵连;类名/消费方(LayoutRenderer)无变化。
+ */

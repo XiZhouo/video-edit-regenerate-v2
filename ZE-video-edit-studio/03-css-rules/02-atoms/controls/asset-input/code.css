@@ -1,0 +1,141 @@
+/*
+ * asset-input.css — ze-asset-input 组件视觉 (02-atoms)
+ *
+ * 资产挂载控件外壳:dropzone 空态 + 预览框 + 操作区。预览内容(按 mime 分流的
+ * img/video/audio/文件卡)由 L2 primitive AssetView 渲染进 __preview / __file;
+ * 本原子只画「框 + 状态」(empty/filled/dragover/busy/disabled),不按 mime 分流。
+ * 状态走 data-* 闭集,只改颜色/描边/光标,不改外盒尺寸。
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ * 全部走令牌(var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-asset-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  width: 100%;
+  min-width: 0;
+}
+
+/* 落区:可点 + 可拖放的框 */
+.ze-asset-input__frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--ze-space-16);
+  padding: var(--ze-space-2);
+  background: var(--ze-surface-sunken);
+  border: 1px dashed var(--ze-line-mid);
+  border-radius: var(--ze-radius-md);
+  color: var(--ze-ink-tertiary);
+  cursor: pointer;
+  transition:
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-asset-input__frame:hover {
+  border-color: color-mix(in oklab, var(--ze-ink-tertiary) 36%, transparent);
+}
+.ze-asset-input__frame:focus-visible {
+  outline: none;
+  border-color: var(--ze-accent-500);
+  box-shadow: 0 0 0 2px var(--ze-overlay-accent-wash);
+}
+
+/* 有内容:实线、墨色 */
+.ze-asset-input[data-state="filled"] .ze-asset-input__frame {
+  border-style: solid;
+  border-color: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+
+/* 拖拽悬停 */
+.ze-asset-input[data-dragover="true"] .ze-asset-input__frame {
+  border-style: solid;
+  border-color: var(--ze-accent-500);
+  background: var(--ze-overlay-accent-wash);
+}
+
+/* 上传中 */
+.ze-asset-input[data-busy="true"] .ze-asset-input__frame {
+  cursor: progress;
+  opacity: 0.72;
+}
+
+/* 禁用 / 只读(无 uploadAsset 时降级) */
+.ze-asset-input[data-disabled="true"] .ze-asset-input__frame {
+  cursor: not-allowed;
+  color: var(--ze-ink-disabled);
+  background: var(--ze-surface-canvas);
+}
+
+/* 空态提示行(图标 + 文字) */
+.ze-asset-input__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  font-size: var(--ze-fs-xs);
+}
+
+/* 预览媒体:限高,避免撑爆属性面板(参考图/生成图看得清,翻倍) */
+.ze-asset-input__preview {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(var(--ze-space-16) * 3 + var(--ze-space-4));
+  object-fit: contain;
+  border-radius: var(--ze-radius-sm);
+}
+.ze-asset-input__image-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  max-width: 100%;
+  max-height: calc(var(--ze-space-16) * 3 + var(--ze-space-4));
+  overflow: hidden;
+}
+.ze-asset-input__preview-button {
+  position: absolute;
+  top: var(--ze-space-1);
+  right: var(--ze-space-1);
+  background: var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+}
+
+/* 非图预览的文件卡(类型图标 + 文件名 + 大小) */
+.ze-asset-input__file {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  min-width: 0;
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+}
+.ze-asset-input__file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 操作区(清除 / 替换) */
+.ze-asset-input__actions {
+  display: inline-flex;
+  gap: var(--ze-space-1);
+  justify-content: flex-end;
+}
+
+/* 隐藏的原生 file input(点 __frame 触发) */
+.ze-asset-input__file-field {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}

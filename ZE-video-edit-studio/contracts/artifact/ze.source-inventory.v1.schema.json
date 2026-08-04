@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ze.local/contracts/artifact/ze.source-inventory.v1.schema.json",
+  "title": "ZE deterministic build source inventory v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "selection", "files"],
+  "properties": {
+    "schema": {"const": "ze.source-inventory.v1"},
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "roots", "excludes"],
+      "properties": {
+        "policy": {"const": "ze-source-selection-v1"},
+        "roots": {
+          "type": "array", "minItems": 1, "maxItems": 128, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/selection_path"}
+        },
+        "excludes": {
+          "type": "array", "maxItems": 4096, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/relative_path"}
+        }
+      }
+    },
+    "files": {
+      "type": "array", "minItems": 1, "maxItems": 200000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "digest", "size_bytes"],
+        "properties": {
+          "path": {"$ref": "#/$defs/relative_path"},
+          "digest": {"$ref": "#/$defs/digest"},
+          "size_bytes": {"type": "integer", "minimum": 0}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "selection_path": {
+      "type": "string", "minLength": 1, "maxLength": 512,
+      "pattern": "^(?:\\.|[^/\\\\].*)$"
+    },
+    "relative_path": {
+      "type": "string", "minLength": 1, "maxLength": 512,
+      "pattern": "^[^/\\\\].*$"
+    }
+  }
+}

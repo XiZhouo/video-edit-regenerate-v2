@@ -1,0 +1,28 @@
+{
+  "name": "ze-video-edit-studio",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "ZE-video-edit-studio web workspace entry — also serves as scaffold template for new ZE skills.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.11",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.9.0",
+    "vite": "^7.2.0",
+    "vitest": "^4.1.8"
+  }
+}

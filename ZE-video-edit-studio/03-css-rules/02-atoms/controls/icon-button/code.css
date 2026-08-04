@@ -1,0 +1,68 @@
+/*
+ * icon-button.css — ze-icon-button 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: Header/Footer 的方形图标按钮(唯一图标按钮组件,统一名 .ze-icon-button)。
+ *   - 方形,transparent base + overlay-soft hover;data-active 做 toggle 选中态
+ *   - 尺寸 token-pure:sm=24/md=28/lg=32(--ze-space-6/7/8),不造 px 字面量
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ze-space-7);                      /* md = 28px */
+  height: var(--ze-space-7);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--ze-radius-sm);
+  background: transparent;
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-sm);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard),
+    transform var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-icon-button:hover { background: var(--ze-overlay-soft); color: var(--ze-ink-primary); }
+.ze-icon-button:active { background: var(--ze-overlay-soft); transform: translateY(0.5px); }
+.ze-icon-button:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+.ze-icon-button:disabled,
+.ze-icon-button[aria-disabled="true"] { color: var(--ze-ink-disabled); cursor: not-allowed; }
+
+/* toggle 选中态 */
+.ze-icon-button[data-active="true"] {
+  background: var(--ze-overlay-accent-wash);
+  color: var(--ze-accent-500);
+}
+
+/* ---- 变体 ---- */
+.ze-icon-button[data-variant="primary"] { background: var(--ze-accent-500); color: var(--ze-ink-inverse); }
+.ze-icon-button[data-variant="primary"]:hover { background: var(--ze-accent-700); }
+.ze-icon-button[data-variant="danger"] { color: var(--ze-semantic-danger); }
+.ze-icon-button[data-variant="danger"]:hover {
+  background: color-mix(in oklab, var(--ze-semantic-danger) 12%, transparent);
+}
+/* 语义色变体(footer pipeline 行内控件:pause=warn / resume=success;cancel 用 danger)*/
+.ze-icon-button[data-variant="warn"] { color: var(--ze-semantic-warn); }
+.ze-icon-button[data-variant="warn"]:hover { background: color-mix(in oklab, var(--ze-semantic-warn) 12%, transparent); }
+.ze-icon-button[data-variant="success"] { color: var(--ze-semantic-success); }
+.ze-icon-button[data-variant="success"]:hover { background: color-mix(in oklab, var(--ze-semantic-success) 12%, transparent); }
+
+/* ---- 尺寸 ---- */
+.ze-icon-button[data-size="xs"] { width: 18px; height: 18px; font-size: var(--ze-fs-xs); }  /* xs=18px:footer 行内等密集场景;几何字面量豁免(L1 无 18px 档)*/
+.ze-icon-button[data-size="sm"] { width: var(--ze-space-6); height: var(--ze-space-6); font-size: var(--ze-fs-xs); }
+.ze-icon-button[data-size="lg"] {
+  width: var(--ze-space-8);
+  height: var(--ze-space-8);
+  font-size: var(--ze-fs-sm);
+  border-radius: var(--ze-radius-md);
+}
+
+.ze-icon-button__icon { display: inline-flex; align-items: center; justify-content: center; }

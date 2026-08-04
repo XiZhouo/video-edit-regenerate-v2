@@ -1,0 +1,51 @@
+# Local runtime state and credentials
+.data-v2-local/
+.data/
+**/.data/
+**/auth/
+**/credentials.json
+**/credentials.key
+**/*credentials*.json
+**/*credentials*.key
+*.pid
+*.log
+openapi.json
+
+# Python
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Frontend
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.vite-temp/
+*.tsbuildinfo
+
+# Local/editor/system files
+.DS_Store
+.codex/
+.claude/
+*.swp
+
+# Generated test and report artifacts
+*.coverage
+htmlcov/
+coverage.xml
+*.report.html
+*.report.md
+
+# Local demos and handoff-only material, not required by the runnable tool
+**/demo_media/
+规划/
+提交记录/
+**/ZE_BUILD_EVIDENCE.json
+**/ZE_SYNC_RECEIPT.json

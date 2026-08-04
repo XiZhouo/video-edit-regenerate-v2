@@ -1,0 +1,61 @@
+/*
+ * textarea.css — ze-textarea 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: 复用 ze-input 的视觉(sunken 底 + accent focus ring),多行差异:
+ *   min-height 双行起、resize: vertical、padding 大一档。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--ze-space-7) * 2);       /* ~两行起 */
+  padding: var(--ze-space-2);
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  color: var(--ze-ink-primary);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+  resize: vertical;
+  transition:
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    box-shadow var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-textarea::placeholder { color: var(--ze-ink-tertiary); }
+.ze-textarea:hover { border-color: color-mix(in oklab, var(--ze-ink-tertiary) 30%, transparent); }
+.ze-textarea:focus,
+.ze-textarea:focus-visible {
+  outline: none;
+  border-color: var(--ze-accent-500);
+  box-shadow: 0 0 0 2px var(--ze-overlay-accent-wash);
+}
+.ze-textarea:disabled {
+  color: var(--ze-ink-disabled);
+  background: var(--ze-surface-canvas);
+  cursor: not-allowed;
+  resize: none;
+}
+.ze-textarea[aria-invalid="true"] { border-color: var(--ze-semantic-danger); }
+.ze-textarea[aria-invalid="true"]:focus,
+.ze-textarea[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ze-semantic-danger) 22%, transparent);
+}
+
+.ze-textarea[data-size="sm"] { padding: var(--ze-space-1); font-size: var(--ze-fs-xs); }
+.ze-textarea[data-size="lg"] { padding: var(--ze-space-3); font-size: var(--ze-fs-sm); }
+
+/* 有界多行档(闭集 4|8):高度 = n×row-h(行高系统),给"非 field-row 内的独立多行"
+ * (审阅批注/对话框备注)。resize:vertical 沿用 base,可手动拉高。 */
+.ze-textarea[data-rows="3"] { height: calc(var(--ze-row-h) * 3); }
+.ze-textarea[data-rows="4"] { height: calc(var(--ze-row-h) * 4); }
+.ze-textarea[data-rows="8"] { height: calc(var(--ze-row-h) * 8); }
+
+/* mono 变体(代码 / 路径输入)*/
+.ze-textarea[data-variant="mono"] { font-family: var(--ze-font-mono); font-size: var(--ze-fs-xs); }

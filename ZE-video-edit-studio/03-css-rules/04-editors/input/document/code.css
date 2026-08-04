@@ -1,0 +1,34 @@
+/*
+ * document.css — document(块文档)编辑器内容视觉 (04-editors)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ * 消费: 01-core 的 DocumentEditor(.ze-editor--document)。基座在 editor-shell(L2)。
+ *
+ * 绝对严格分层(L4 零令牌):本文件**零 var(--ze-*)**。块视觉=L2 .ze-text[data-prose](markdown 注入的
+ * h/p/列表/引用/码/hr/链由后代选择器排版);竖排/间距=React .ze-stack;按钮=.ze-button;文本域=.ze-textarea。
+ * 本层只留无令牌结构(填充/滚动/缩进定位锚/绝对定位删除钮)。块缩进 padding 经 JSX 行内 calc(令牌×depth)。
+ */
+
+/* 文档正文:竖排块流,撑满 + 纵向滚动(min-height:0 满足 R1 滚动归属)。 */
+.ze-document__body { flex: 1; min-height: 0; overflow-y: auto; }
+
+/* 单块:相对定位作删除钮的定位锚。 */
+.ze-document__block { position: relative; }
+
+/* 拖拽落点指示(零令牌:currentColor = 块继承墨色)。before/after = 同级置前/后的上/下边线,
+ * inside = 成为目标子块的虚线框。纯结构 + currentColor,不引令牌(与 outline 同法)。 */
+.ze-document__block[data-drop="before"] { box-shadow: inset 0 2px 0 0 currentColor; }
+.ze-document__block[data-drop="after"]  { box-shadow: inset 0 -2px 0 0 currentColor; }
+.ze-document__block[data-drop="inside"] { outline: 1px dashed currentColor; outline-offset: -1px; }
+
+/* 块展示态(失焦渲染视图):可点进编辑,min-width:0 防长内容撑破。 */
+.ze-document__view { cursor: text; min-width: 0; }
+
+/* 块编辑态(聚焦源 markdown 文本域):撑满宽、可纵向拉高。 */
+.ze-document__edit { width: 100%; min-height: 0; resize: vertical; }
+
+/* 新增块条:贴左,不拉伸。 */
+.ze-document__add { align-self: flex-start; }
+
+/* 选中块的删除钮:贴块右上角(绝对定位,视觉走 .ze-button)。 */
+.ze-document__del { position: absolute; inset-block-start: 0; inset-inline-end: 0; }

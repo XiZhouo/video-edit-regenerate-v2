@@ -1,0 +1,720 @@
+/*
+ * header-shell.css — 工作台顶部固定栏 框架 shell 组件原子(02-atoms · L2)
+ *
+ * 协议:03-css-rules 契约。消费方:01-core/04-user-facing/01-layout/01-header/(HeaderShell + 子件)。
+ *
+ * 绝对严格分层(L5 chrome 轮 batch4):顶部栏(.ze-header* 块)是框架级工作台 shell chrome
+ *   —— 三段栅格容器、skill 图标/名、项目名/同步指示、菜单 trigger/popover/submenu、主题切换、
+ *   头像。含状态化 hover(menu-trigger / theme-toggle / avatar)、data-state 选择器(sync /
+ *   avatar)、@keyframes 脉冲动画、popover/submenu 绝对定位,无法降为 L4 无令牌结构,
+ *   按 §0.5 整组 verbatim 上移本层(类名不变、0 JSX 改动)。
+ *
+ * 经 02-atoms/index.css @import 全局加载。menu-item / menu-group / menu-section-header 等
+ * 菜单通用 class 不在此(已在 02-atoms/menu-item.css);本文件只含 header 专属 chrome。
+ *
+ * 命名:容器单一名 .ze-header;菜单触发 .ze-header__menu-trigger;图标按钮统一用 .ze-icon-button。
+ *   - 高度 = 1×--ze-row-h / 极紧凑内边距 + 小字号 / menu-trigger 默认 transparent border,hover 显微底
+ *   - popover 用 floating 深投影,贴紧 trigger 3px / icon-btn 24×24 方形
+ *
+ * 全部走 令牌 (var(--ze-*));禁止字面量。
+ */
+
+/* ============================================================
+ * § 1 容器 - 三段布局(SPEC §2.2,高度对齐 v1)
+ * ============================================================ */
+
+.ze-header {
+  /* 工作台 chrome 不变量:Header / Footer 折叠条 / Editor toolbar 均为 1×row-h。 */
+  height: var(--ze-row-h);
+  min-height: var(--ze-row-h);
+  max-height: var(--ze-row-h);
+
+  /* v1 对齐:三段都自适应,内容决定宽度;左段不固定 240 */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: stretch;
+
+  /* [皮肤 · 晴空瓷釉] 顶栏 = 浮动玻璃条:外侧空气缝与中区/底栏共用 workspace chrome gutter,
+   * 半透釉面 + 背景模糊 + 发丝描边 + 顶缘高光;不再用 border-bottom 贴边分割。 */
+  margin: var(--ze-workspace-gutter) var(--ze-workspace-gutter) 0;
+  background: var(--ze-surface-glass);
+  -webkit-backdrop-filter: blur(var(--ze-glass-blur)) saturate(var(--ze-glass-saturate));
+  backdrop-filter: blur(var(--ze-glass-blur)) saturate(var(--ze-glass-saturate));
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-panel);
+  color: var(--ze-ink-primary);
+  font-family: var(--ze-font-sans);
+  font-size: var(--ze-fs-sm);
+
+  flex-shrink: 0;
+  position: relative;
+  z-index: var(--ze-z-sticky);
+
+  overflow: visible;
+}
+
+.ze-header__left,
+.ze-header__middle,
+.ze-header__right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.ze-header__left {
+  padding-inline: var(--ze-space-2);
+  gap: var(--ze-space-1);
+  justify-content: flex-start;
+}
+
+.ze-header__middle {
+  padding-inline: var(--ze-space-2);
+  gap: var(--ze-space-1);
+  justify-content: flex-start;
+}
+
+.ze-header__right {
+  padding-inline: var(--ze-space-2);
+  gap: var(--ze-space-0-5);  /* v1 icon-btn 间隙极紧 */
+  justify-content: flex-end;
+}
+
+
+/* ============================================================
+ * § 2 左段 - skill 图标 + 名(对齐 v1 14×14 品牌图标)
+ * ============================================================ */
+
+.ze-header__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: var(--ze-radius-sm);
+  object-fit: contain;
+  background: var(--ze-surface-sunken);
+}
+
+.ze-header__icon[data-fallback="true"] {
+  /* v1 对齐:fallback 是实心圆,字符隐藏(像 v1 那个绿色圆品牌图标)*/
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ze-accent-500);
+  color: var(--ze-ink-inverse);
+  font-weight: var(--ze-fw-bold);
+  font-size: var(--ze-fs-xs);
+  border-radius: var(--ze-radius-pill);
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0.92;
+}
+
+.ze-header__skill-name {
+  /* v1 对齐:16px / bold 厚重感 */
+  font-size: var(--ze-fs-lg);
+  font-weight: var(--ze-fw-bold);
+  color: var(--ze-ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: var(--ze-space-1);
+}
+
+/* 品牌字标作「回我的项目」首页按钮时(LeftSegment onHome 接了 closeProject):去 button UA
+ * chrome(边框/背景/内距)、继承字族,保留本 class 的字号/字重/色;cursor 提示可点。未接 onHome
+ * 时仍是纯 span,不受此规则影响。字号/字重不在此设 → 沿用上方 class 值(与 span 视觉一致)。 */
+button.ze-header__skill-name {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+
+/* ============================================================
+ * § 3 中段 - 项目名 + 同步指示
+ * ============================================================ */
+
+.ze-header__project-name {
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40ch;
+  margin-left: var(--ze-space-2);  /* 跟左段隔开 */
+}
+
+.ze-header__project-name[data-placeholder="true"] {
+  /* v1 对齐:无 doc 时不显项目名(v1 截图里 skill 名后直接接菜单)*/
+  display: none;
+}
+
+.ze-header__sync-indicator {
+  display: inline-block;
+  width: var(--ze-space-2);
+  height: var(--ze-space-2);
+  flex-shrink: 0;
+  align-self: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ze-radius-pill);
+  cursor: pointer;
+  transition: transform var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-header__sync-indicator:hover {
+  transform: scale(1.3);
+}
+
+.ze-header__sync-indicator[data-state="in-sync"] { display: none; }
+.ze-header__sync-indicator[data-state="syncing"]  { background: var(--ze-semantic-info); }
+.ze-header__sync-indicator[data-state="delayed"]  { background: var(--ze-semantic-warn); }
+.ze-header__sync-indicator[data-state="conflict"] {
+  background: var(--ze-semantic-danger);
+  animation: ze-header-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite;
+}
+
+@keyframes ze-header-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+
+/* ============================================================
+ * § 4 菜单触发(对齐 v1 .ze-menu-trigger 紧凑风格)
+ *
+ * 两种形态共用一套 base + 内部内容差异化:
+ *   1. 文字 trigger(文件菜单)— 含 .ze-header__menu-trigger-label
+ *   2. 图标 trigger(设置 / 帮助 / 主题切换)— 仅图标字符
+ * ============================================================ */
+
+.ze-header__menu-trigger {
+  /* base:栏内控件比外层 chrome 小一档,不撑高 1×row-h 外栏 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ze-space-0-5);
+  height: var(--ze-space-6);
+
+  border: 1px solid transparent;  /* v1 默认 transparent,hover 才显 */
+  background: transparent;
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-sm);
+  font-family: inherit;
+  border-radius: var(--ze-radius-sm);
+  cursor: pointer;
+  padding: 0 var(--ze-space-2);
+
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+/* 文字 trigger(文件菜单)— 紧凑文字 + caret */
+.ze-header__menu-trigger:has(.ze-header__menu-trigger-label) {
+  padding: 0 var(--ze-space-2);
+}
+
+/* 图标 trigger(⚙ ? ◐ 等)— 24×24 方形,默认完全 transparent */
+.ze-header__menu-trigger:not(:has(.ze-header__menu-trigger-label)) {
+  width: var(--ze-space-6);
+  height: var(--ze-space-6);
+  padding: 0;
+}
+
+.ze-header__menu-trigger:hover {
+  /* v1 对齐:hover 只显微底,不显边框 */
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+
+.ze-header__menu-trigger:focus-visible {
+  outline: 2px solid var(--ze-focus-ring);
+  outline-offset: 1px;
+}
+
+.ze-header__menu-trigger[data-open="true"] {
+  background: var(--ze-overlay-soft);
+  border-color: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+
+/* caret ▼ — v1 没有,隐藏 */
+.ze-header__menu-trigger > .ze-header__menu-caret {
+  display: none;
+}
+
+.ze-header__menu-trigger-label {
+  font-weight: var(--ze-fw-medium);
+}
+
+
+/* ============================================================
+ * § 5 菜单弹层(对齐 v1 .ze-menu-popover elev-2 阴影 + 紧贴 trigger)
+ * ============================================================ */
+
+.ze-header__menu-popover {
+  position: absolute;
+  top: calc(var(--ze-row-h) + 3px);  /* Header 1×row-h + 3px 紧贴 */
+  min-width: 184px;  /* 对齐 v1 */
+  /* [浮层瓷盘] 实底:菜单盖在密集内容上,玻璃透明会让下层文字鬼影干扰阅读(R-FLOAT) */
+  background: var(--ze-surface-float);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-floating);
+  padding: var(--ze-space-1);  /* 对齐 v1 紧贴 4px */
+  z-index: var(--ze-z-dropdown);
+  color: var(--ze-ink-primary);
+}
+
+.ze-header__menu-popover[data-anchor="left"]  { left: 0; }
+.ze-header__menu-popover[data-anchor="right"] { right: 0; }
+
+
+/* ============================================================
+ * § 5b/5c 菜单分组 + 子项
+ *
+ * 改用 02-atoms 通用组件 02-atoms/menu-item.css:
+ *   .ze-menu-group / .ze-menu-group+.ze-menu-group(分隔)/ .ze-menu-item /
+ *   .ze-menu-item__shortcut / [data-variant=danger] / [data-has-submenu] / .ze-menu-section-header
+ * MenuItem.tsx / MenuGroup / SettingsMenu 已切到这些 class。本文件不再重复定义。
+ * (header 专属的 menu-trigger / menu-popover / menu-info-* 仍在本文件)
+ * ============================================================ */
+
+
+/* ============================================================
+ * § 5e 菜单内特殊行 - info 卡片(section-header 已切 .ze-menu-section-header)
+ * ============================================================ */
+
+.ze-header__menu-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--ze-space-1) var(--ze-space-2);
+  cursor: default;
+  background: transparent;
+  border: 0;
+  text-align: start;
+  width: 100%;
+}
+
+.ze-header__menu-info-label {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+}
+
+.ze-header__menu-info-value {
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-primary);
+  word-break: break-all;
+}
+
+.ze-header__menu-info-value[data-monospace="true"] {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+}
+
+.ze-header__menu-info-name {
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-medium);
+  color: var(--ze-ink-primary);
+}
+
+.ze-header__menu-info-meta {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+}
+
+
+/* ============================================================
+ * § 6 右段控件 - 主题切换 / 头像(紧凑 24×24)
+ * ============================================================ */
+
+.ze-header__theme-toggle {
+  /* 栏内控件 = 24×24,外层 chrome = 28px。 */
+  width: var(--ze-space-6);
+  height: var(--ze-space-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ze-ink-secondary);
+  border-radius: var(--ze-radius-sm);
+  cursor: pointer;
+  padding: 0;
+  font-size: var(--ze-fs-sm);
+  line-height: 1;
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-header__theme-toggle:hover {
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+
+.ze-header__theme-toggle:focus-visible {
+  outline: 2px solid var(--ze-focus-ring);
+  outline-offset: 1px;
+}
+
+
+.ze-header__avatar {
+  /* 栏内控件 = 24×24,外层 chrome = 28px。 */
+  width: var(--ze-space-6);
+  height: var(--ze-space-6);
+  border-radius: var(--ze-radius-pill);
+  cursor: pointer;
+  background: transparent;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid transparent;
+  padding: 0;
+  font-size: var(--ze-fs-xs);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ze-ink-tertiary);
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-header__avatar:hover {
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+
+.ze-header__avatar[data-state="anonymous"] {
+  color: var(--ze-ink-tertiary);
+}
+
+.ze-header__avatar[data-state="signed-in"] {
+  background: var(--ze-accent-500);
+  /* 头像底图:UserAvatar 经 --ze-avatar-url 传运行时 URL;无图则 none、露出 accent 底首字母。
+   * 必须写在 background 简写之后(简写会把 background-image 重置为 none)。 */
+  background-image: var(--ze-avatar-url, none);
+  background-size: cover;
+  background-position: center;
+  color: var(--ze-ink-inverse);
+  font-weight: var(--ze-fw-bold);
+}
+
+
+/* ============================================================
+ * § 7 响应式(R6/R-MEDIA:一律 @container 不用 @media;断点走 canonical 集
+ *    {320,480,768,1024,1440},见 DESIGN-SYSTEM 规则注册表 / 01-tokens/SPEC.md「响应式断点」)
+ *
+ * 按 .ze-app 容器宽触发(container 声明在 04-editors/app-shell.css 的 .ze-app)。
+ * Header 高度固定 1×row-h;窄屏内部段紧缩。
+ * ============================================================ */
+
+@container ze-app (max-width: 768px) {
+  .ze-header__skill-name { display: none; }
+}
+
+@container ze-app (max-width: 480px) {
+  .ze-header {
+    grid-template-columns: auto 1fr auto;
+  }
+  .ze-header__menu-trigger > .ze-header__menu-trigger-label {
+    display: none;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+ * [v4 · 精密瓷釉] Header 重排 — 项目名居中可改名,同步状态贴名
+ *   - 三段栅格 1fr auto 1fr:两翼等宽 → 中段绝对居中
+ *   - skill 名退为 12px/600 标识,项目名(中段)成为主角
+ *   - 新增:__rename(hover 出笔)/ __sync-dot / __sync-label
+ *   - 面板描边换 line-mid 实线
+ * ════════════════════════════════════════════════════════════ */
+.ze-header { grid-template-columns: 1fr auto 1fr; border-color: var(--ze-line-mid); }
+.ze-header__menu-popover { border-color: var(--ze-line-mid); }
+.ze-header__left { gap: var(--ze-space-1); }
+.ze-header__skill-name {
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-semibold);
+  letter-spacing: 0;
+  margin-right: var(--ze-space-2);
+}
+.ze-header__middle { justify-content: center; gap: var(--ze-space-2); }
+.ze-header__project-name {
+  margin-left: 0;
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  border-radius: var(--ze-radius-sm);
+  font-weight: var(--ze-fw-semibold);
+  cursor: text;
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-header__project-name:hover { background: var(--ze-overlay-soft); }
+.ze-header__rename {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  opacity: 0;
+  transition: opacity var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-header__middle:hover .ze-header__rename { opacity: 1; }
+.ze-header__sync-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-ink-disabled);
+}
+.ze-header__sync-dot[data-state="in-sync"]  { background: var(--ze-semantic-success); }
+.ze-header__sync-dot[data-state="syncing"]  { background: var(--ze-semantic-info); animation: ze-header-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite; }
+.ze-header__sync-dot[data-state="delayed"]  { background: var(--ze-semantic-warn); animation: ze-header-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite; }
+.ze-header__sync-dot[data-state="conflict"] { background: var(--ze-semantic-danger); animation: ze-header-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite; }
+.ze-header__sync-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════════════════
+ * [v4.1 · 精密瓷釉] 品牌字标 + 标准图标
+ *   - 左上不再放圆形图标位:工具名 = 纯字标(semibold + 右发丝分隔),
+ *     .ze-header__icon 保留词表但默认隐藏(向后兼容)。
+ *   - 右段 设置/帮助/主题 一律引用令牌图库(.ze-icon[data-icon=settings|help|theme]),
+ *     不再用字符表情;trigger 内图标统一 14px。
+ * ════════════════════════════════════════════════════════════ */
+.ze-header__icon { display: none; }
+.ze-header__skill-name {
+  letter-spacing: 0;
+  padding-right: var(--ze-space-3);
+  border-right: 1px solid var(--ze-line-soft);
+}
+.ze-header__menu-trigger .ze-icon,
+.ze-header__theme-toggle .ze-icon { width: 14px; height: 14px; }
+
+/* ════════════════════════════════════════════════════════════
+ * [v4.2 · header-v2] 品牌衬线字标 + 中段文件切换器 + 宽弹层
+ *   - 左段字标改衬线品牌栈(--ze-font-display,唯一消费点);文件菜单退役,
+ *     文件操作整体并入中段文件名下拉(.ze-header__file-*)。
+ *   - 中段:文件名 = 下拉 trigger(无 doc 显占位仍可开列表);行 hover 出
+ *     行内按钮组(重命名/复制/另存为/删除,图标令牌 + aria-label)。
+ *   - 弹层新增 data-anchor="center"(贴中段)与 data-wide(列表加宽)。
+ * ════════════════════════════════════════════════════════════ */
+.ze-header__skill-name {
+  font-family: var(--ze-font-display);
+  font-weight: var(--ze-fw-semibold);
+  letter-spacing: 0;
+}
+
+.ze-header__file-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  height: var(--ze-space-6);
+  max-width: 48ch;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--ze-radius-sm);
+  cursor: pointer;
+  padding: 0 var(--ze-space-2);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-medium);
+  color: var(--ze-ink-primary);
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-header__file-trigger:hover,
+.ze-header__file-trigger[data-open="true"] { background: var(--ze-overlay-soft); }
+.ze-header__file-trigger:focus-visible {
+  outline: 2px solid var(--ze-focus-ring);
+  outline-offset: 1px;
+}
+.ze-header__file-trigger-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ze-header__file-trigger[data-placeholder="true"] .ze-header__file-trigger-name {
+  color: var(--ze-ink-tertiary);
+  font-weight: var(--ze-fw-regular);
+}
+.ze-header__file-trigger .ze-header__menu-caret { display: inline-flex; opacity: 0.6; }
+
+/* demo 沙盒态:文件名前缀「示例」徽记(提示当前是可重置示例,编辑不保存)*/
+.ze-header__file-demo-badge {
+  flex: none;
+  padding: 0 var(--ze-space-1);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-overlay-accent-wash);
+  color: var(--ze-accent-500);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-semibold);
+  letter-spacing: 0;
+}
+
+.ze-header__menu-popover[data-anchor="center"] {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.ze-header__menu-popover[data-wide] { min-width: 320px; max-width: 440px; }
+
+.ze-header__file-list {
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ze-header__file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  width: 100%;
+  border: 0;
+  background: transparent;
+  border-radius: var(--ze-radius-sm);
+  padding: var(--ze-space-1) var(--ze-space-2);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-primary);
+  cursor: pointer;
+  text-align: left;
+}
+.ze-header__file-row:hover { background: var(--ze-overlay-soft); }
+.ze-header__file-row[data-current="true"] {
+  background: var(--ze-accent-soft);
+}
+.ze-header__file-row-check {
+  width: 14px;
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--ze-accent-700);
+}
+.ze-header__file-row-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ze-header__file-row-meta {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  flex-shrink: 0;
+}
+.ze-header__file-row-actions {
+  /* 常驻占位、悬停只切可见性:display 翻转会让行回流、内容定宽的弹窗跟着变形 */
+  display: inline-flex;
+  visibility: hidden;
+  align-items: center;
+  gap: var(--ze-space-0-5);
+  flex-shrink: 0;
+}
+.ze-header__file-row:hover .ze-header__file-row-actions,
+.ze-header__file-row:focus-within .ze-header__file-row-actions { visibility: visible; }
+.ze-header__file-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ze-space-5);
+  height: var(--ze-space-5);
+  border: 0;
+  background: transparent;
+  border-radius: var(--ze-radius-sm);
+  color: var(--ze-ink-secondary);
+  cursor: pointer;
+}
+.ze-header__file-row-action:hover {
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+.ze-header__file-row-action[data-variant="danger"]:hover { color: var(--ze-semantic-danger); }
+.ze-header__file-row-action .ze-icon { width: 12px; height: 12px; }
+
+/* 头像菜单内的成员面板(共享并入头像;owner 才显添加行) */
+.ze-header__acl-panel {
+  padding: var(--ze-space-1) var(--ze-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+}
+.ze-header__acl-title {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  letter-spacing: 0;
+}
+.ze-header__acl-member {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-primary);
+}
+.ze-header__acl-member-badge {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-accent-700);
+}
+.ze-header__acl-member-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ze-header__acl-remove {
+  border: 0;
+  background: transparent;
+  color: var(--ze-ink-tertiary);
+  cursor: pointer;
+  border-radius: var(--ze-radius-sm);
+  display: inline-flex;
+  padding: 2px;
+}
+.ze-header__acl-remove:hover { color: var(--ze-semantic-danger); background: var(--ze-overlay-soft); }
+.ze-header__acl-add-row { display: flex; gap: var(--ze-space-1); }
+.ze-header__acl-error {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-semantic-danger);
+}
+
+/* ════════════════════════════════════════════════════════════
+ * [v5 · 工具字标重做] accent 方形印记 + Lora 衬线字标(参考 seek-find .ze-brand)
+ *   - 追加在末尾 → 覆盖 v4.1/v4.2 的字标视觉,无需删旧行。
+ *   - 印记走 .ze-header__skill-name::before(既有 class 的伪元素,不增删 class、不加 data-*)。
+ *   - 字标字号与字重走令牌;.ze-header__icon 维持隐藏。
+ * ════════════════════════════════════════════════════════════ */
+.ze-header__skill-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  min-width: 0;
+  font-family: var(--ze-font-display);
+  font-size: var(--ze-fs-lg);
+  font-weight: var(--ze-fw-semibold);
+  letter-spacing: 0;
+  line-height: 1.2;
+  color: var(--ze-ink-primary);
+  padding-right: var(--ze-space-3);
+  margin-right: var(--ze-space-1);
+  border-right: 1px solid var(--ze-line-soft);
+}
+/* accent 方形印记(14px·圆角 sm·顶缘内高光),紧贴字标左侧 */
+.ze-header__skill-name::before {
+  content: "";
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-accent-500);
+  /* 顶缘内高光走既有 --ze-edge-highlight 令牌(L2 禁字面色函数);底缘内阴影用 color-mix(令牌)补深度。 */
+  box-shadow: var(--ze-edge-highlight),
+              inset 0 -2px 3px -1px color-mix(in oklab, var(--ze-ink-primary) 18%, transparent);
+}

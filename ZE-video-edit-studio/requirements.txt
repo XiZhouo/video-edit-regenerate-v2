@@ -1,0 +1,15 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pytest>=8.0
+httpx>=0.27
+# credential at-rest AEAD (sealed-v2). Optional at runtime: credentials.py
+# degrades to the sealed-v1 hand-rolled path when this is absent, so a tool that
+# synced new core without rebuilding its venv still starts and runs.
+cryptography>=42
+# managed Build contracts (Artifact Variant schemas and deterministic validation)
+jsonschema>=4.23
+# Per-user Cursor prompt optimization (explicit API key per request).
+# Pin to the Python bridge that exposes Agent.create/send/wait + Run.cancel.
+cursor-sdk==1.0.26
+# 02-mod 画面引导渲染与图片自动去背景（rembg 可选，缺位时用轻量角点去背）。
+pillow>=10.0

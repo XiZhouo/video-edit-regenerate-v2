@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ze.local/contracts/artifact/ze.runtime-package.v1.schema.json",
+  "title": "ZE provider-runnable artifact package v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "skill_uid", "artifact_id", "runtime_variant",
+    "delivery_mode", "artifact_role", "runtime_family", "module_format",
+    "payload", "bindings", "required_environment_names", "healthcheck",
+    "source_visibility"
+  ],
+  "properties": {
+    "schema": {"const": "ze.runtime-package.v1"},
+    "skill_uid": {"type": "string", "pattern": "^skill_[0-9a-f]{32}$"},
+    "artifact_id": {
+      "type": "string", "minLength": 1, "maxLength": 160,
+      "pattern": "^base-[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "runtime_variant": {"$ref": "#/$defs/slug"},
+    "delivery_mode": {
+      "enum": [
+        "self-hosted-full", "creator-hosted-api", "frontend-only", "hybrid"
+      ]
+    },
+    "artifact_role": {"enum": ["server", "client"]},
+    "runtime_family": {
+      "enum": ["cloudflare-worker", "cloudflare-static-assets"]
+    },
+    "module_format": {
+      "enum": ["es-module", "service-worker", "python-module", "static"]
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "entrypoint", "assets_directory"],
+      "properties": {
+        "root": {"$ref": "#/$defs/relative_path"},
+        "entrypoint": {
+          "oneOf": [{"$ref": "#/$defs/relative_path"}, {"type": "null"}]
+        },
+        "assets_directory": {
+          "oneOf": [{"$ref": "#/$defs/relative_path"}, {"type": "null"}]
+        }
+      }
+    },
+    "bindings": {
+      "type": "array", "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "name"],
+        "properties": {
+          "kind": {
+            "enum": [
+              "d1-database", "r2-bucket", "kv-namespace", "queue",
+              "static-assets"
+            ]
+          },
+          "name": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$"}
+        }
+      }
+    },
+    "required_environment_names": {
+      "type": "array", "maxItems": 128, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,127}$"}
+    },
+    "healthcheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "expected_statuses"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^/[^?#]*$", "maxLength": 512},
+        "expected_statuses": {
+          "type": "array", "minItems": 1, "maxItems": 16,
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 100, "maximum": 599}
+        }
+      }
+    },
+    "source_visibility": {
+      "enum": ["browser-visible", "backend-not-browser-delivered"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"runtime_family": {"const": "cloudflare-worker"}}},
+      "then": {
+        "properties": {
+          "artifact_role": {"const": "server"},
+          "module_format": {"enum": ["es-module", "service-worker", "python-module"]},
+          "payload": {
+            "properties": {"entrypoint": {"$ref": "#/$defs/relative_path"}},
+            "required": ["entrypoint"]
+          },
+          "source_visibility": {"const": "backend-not-browser-delivered"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"runtime_family": {"const": "cloudflare-static-assets"}}
+      },
+      "then": {
+        "properties": {
+          "artifact_role": {"const": "client"},
+          "module_format": {"const": "static"},
+          "payload": {
+            "properties": {
+              "entrypoint": {"type": "null"},
+              "assets_directory": {"$ref": "#/$defs/relative_path"}
+            },
+            "required": ["assets_directory"]
+          },
+          "bindings": {"maxItems": 0},
+          "required_environment_names": {"maxItems": 0},
+          "source_visibility": {"const": "browser-visible"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"},
+    "relative_path": {
+      "type": "string", "minLength": 1, "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))(?!.*\\\\)[^/\\\\]+(?:/[^/\\\\]+)*$"
+    }
+  }
+}

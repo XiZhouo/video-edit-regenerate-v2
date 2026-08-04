@@ -1,0 +1,89 @@
+/*
+ * chart.css — ze-chart 数据图表可视化组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:ChartZone(框架级内容区 primitive)的 SVG 绘制图元 —— 轴 / 柱 / 线 / 面积 /
+ * 散点 / 饼切片 —— 视觉是「多态 + 多系列的 fill/stroke」:hover/selected 切 accent-700、
+ * 饼切片按 data-i 循环 6 档语义色。SVG 的 fill/stroke 不是通用 utility 原子(.ze-surface/
+ * .ze-text 管的是 background/color)能贴的,且状态/系列分支多,只能靠组件原子整组承接(同
+ * .ze-table/.ze-thumb 的组件原子模式)。tooltip 的 transform 含 calc(令牌)、crosshair 的
+ * color-mix(ink 28%)亦非通用原子可表达。故整个 plot 子树(frame/plot/svg + 绘制图元 +
+ * 悬停 overlay)收成 L2 组件原子,令牌消费合法收敛 L2;L4 chart.css 只剩编辑器自有的 KPI strip。
+ * 原 04-editors/chart.css 迁来(P4 batch9)。克制:含义从结构,系列色走令牌,无 glow/chartjunk。
+ *
+ * 全部值引 令牌(var(--ze-*)),禁字面量 hex(SVG 几何 stroke-width / r / W/H px 为结构,非令牌)。
+ */
+
+/* 图表盒子(EntityLoadingFrame 包裹,尺寸稳定)*/
+.ze-chart__frame { flex: 1; min-height: 0; padding: var(--ze-space-3); }
+.ze-chart__plot { position: relative; width: 100%; height: 100%; }
+.ze-chart__svg { width: 100%; height: 100%; display: block; }
+
+/* 交互:竖向 crosshair + 贴光标 tooltip(DOM 覆盖层,不随 SVG 拉伸糊) */
+.ze-chart__crosshair {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: color-mix(in oklab, var(--ze-ink-primary) 28%, transparent);
+  pointer-events: none;
+}
+.ze-chart__tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - var(--ze-space-2)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-0-5);
+  max-width: 200px;
+  padding: var(--ze-space-1) var(--ze-space-2);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  box-shadow: var(--ze-shadow-floating);
+  font-size: var(--ze-fs-xs);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1;
+}
+.ze-chart__tooltip-label { color: var(--ze-ink-secondary); overflow: hidden; text-overflow: ellipsis; }
+.ze-chart__tooltip-value { color: var(--ze-ink-primary); font-family: var(--ze-font-mono); }
+
+/* 轴 / 基线 */
+.ze-chart__axis { stroke: var(--ze-overlay-soft); stroke-width: 1; }
+
+/* bar */
+.ze-chart__bar {
+  fill: var(--ze-accent-500);
+  cursor: pointer;
+  transition: fill var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-chart__bar:hover,
+.ze-chart__bar[data-hover="true"],
+.ze-chart__bar[data-selected="true"] { fill: var(--ze-accent-700); }
+
+/* line / area */
+.ze-chart__line { fill: none; stroke: var(--ze-accent-500); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.ze-chart__area { fill: var(--ze-overlay-accent-wash); stroke: none; }
+
+/* scatter / line 上的点 */
+.ze-chart__dot {
+  fill: var(--ze-accent-500);
+  cursor: pointer;
+  transition: fill var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-chart__dot:hover,
+.ze-chart__dot[data-hover="true"],
+.ze-chart__dot[data-selected="true"] { fill: var(--ze-accent-700); }
+
+/* pie 切片:克制 6 色循环(accent + semantic),切片间用 surface 描边分隔 */
+.ze-chart__slice { stroke: var(--ze-surface-raised); stroke-width: 1; cursor: pointer; }
+.ze-chart__slice[data-i="0"] { fill: var(--ze-accent-500); }
+.ze-chart__slice[data-i="1"] { fill: var(--ze-semantic-info); }
+.ze-chart__slice[data-i="2"] { fill: var(--ze-semantic-success); }
+.ze-chart__slice[data-i="3"] { fill: var(--ze-semantic-warn); }
+.ze-chart__slice[data-i="4"] { fill: var(--ze-semantic-danger); }
+.ze-chart__slice[data-i="5"] { fill: var(--ze-accent-200); }
+.ze-chart__slice[data-hover="true"],
+.ze-chart__slice[data-selected="true"] { stroke: var(--ze-accent-700); stroke-width: 2; }

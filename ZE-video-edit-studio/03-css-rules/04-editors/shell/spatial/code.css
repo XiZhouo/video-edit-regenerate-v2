@@ -1,0 +1,13 @@
+/*
+ * spatial.css — 空间编辑共享基元(04-editors · 已迁空 stub)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ *
+ * 绝对严格分层(P4 batch11):CanvasViewport(.ze-canvas)/ SpatialCanvas(.ze-spatial)/
+ * TransformGizmo(.ze-gizmo)/ MaskCanvas(.ze-mask)是框架级共享 primitive(canvas2d/asset/
+ * image-cleanup 多编辑器复用),其多态 SVG stroke / 棋盘格 / HUD 的令牌样式无法降为 L4 无令牌
+ * 结构,已整组上移 L2 组件原子 → 见 03-css-rules/02-atoms/spatial.css(经 index.css @import)。
+ *
+ * 本文件无任何编辑器自有结构残留(spatial 全是共享 primitive),故清空为指针 stub:零规则、零
+ * var(--ze-*)。保留文件 + 03-editor/index.tsx 的 import 以免改动牵连;类名/消费方无变化。
+ */

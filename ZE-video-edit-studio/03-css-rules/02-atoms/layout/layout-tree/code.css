@@ -1,0 +1,147 @@
+/*
+ * layout-tree.css — ze-layout-root/ze-split/ze-slot LayoutTree 中区布局组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:LayoutRenderer 渲染的 中区根 / 二叉分屏(Split + 可拖分割条)/ EditorSlot 容器
+ * 是框架级布局 primitive(任何用本框架 LayoutTree 的应用都复用,见 01-core/.../LayoutRenderer.tsx)。
+ * 其中分割条 `.ze-split__divider` 是状态化的(常态 overlay-soft 底,:hover / [data-dragging]
+ * 切 accent + transition),slot chrome 悬浮显隐(hover/focus-within 才显)——这套「状态化 + 后代/
+ * 伪类选择器」的令牌依赖无法降为 L4 无令牌结构,故整组收成 L2 组件原子(同 .ze-table/.ze-spatial)。
+ * 所有视觉在本文件,TSX 只贴 className + data-*(唯一例外 Split pane 的 flex-basis=运行时 ratio,
+ * 是数据不是视觉)。原 04-editors/layout.css 迁来(L5 chrome 轮 batch1)。
+ *
+ * 选择器:.ze-layout-root 中区根 · .ze-split/__pane/__divider 二叉分屏 · .ze-slot/__empty
+ * EditorSlot。tabs(.ze-tabs/__headers/.ze-tab/__body)由 tab.css 统一供给,本文件不重复定义。
+ * 全部走 令牌(var(--ze-*));禁字面量。
+ *
+ * 响应式(见 DESIGN-SYSTEM §0.3 规则注册表):窄栏纵向堆叠按 ze-workspace 容器宽触发
+ * (R-RESP-2 NARROW_STACK_REQUIRED);一律 @container 非 @media(R-MEDIA);断点 canonical(规则6);
+ * split pane flex 归本文件、ratio 经 --split-basis 传值(R-RESP-3,LayoutRenderer 禁 inline flex)。
+ */
+
+/* § 1 中区根 — 兼响应式容器(C5):布局适配按本容器宽触发(@container ze-workspace),
+ * 与 editor 内部 @container 同范式;非屏宽 → 嵌入/分屏也正确。 */
+.ze-layout-root {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  /* 高度逃生:pane min 地板叠加超过中区高(矮 viewport + 多纵叠 vertical pane)时,中区整体纵向滚,
+   * 而非底部 pane 被 .ze-app__main overflow:hidden 裁掉(min-height 地板的必要配套)。
+   * 正常 viewport 内容不溢出→无滚动条;窄栏 @container 块的 overflow-y:auto 同此(冗余无害)。 */
+  overflow-y: auto;
+  /* [皮肤 · 晴空瓷釉] 中区四周留空气缝,让环境底透出来、玻璃 pane 读作浮动物体。
+   * 与 header/footer 外距和 footer resizer 共用 workspace chrome gutter。 */
+  padding: var(--ze-workspace-gutter);
+  container-type: inline-size;
+  container-name: ze-workspace;
+}
+
+/* § 2 Split — 二叉分屏 */
+.ze-split {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.ze-split[data-direction="horizontal"] { flex-direction: row; }
+.ze-split[data-direction="vertical"]   { flex-direction: column; }
+.ze-split__pane {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+/* pane flex 归 CSS(C6):TSX 只经 --split-basis 传运行时 ratio(数据),flex 本身住这里
+ * —— 消除原 LayoutRenderer 给 pane 写 inline flex 的「唯一例外」,C7 才能无 !important 覆盖。 */
+.ze-split__pane[data-pane="primary"]   { flex: 0 0 var(--split-basis, 50%); }
+.ze-split__pane[data-pane="secondary"] { flex: 1 1 0; }
+/* 最小可用尺寸地板(防塌陷):CSS 层兜底,不只活在拖拽 JS 钳制 —— 程序化 setRatio/持久化坏 ratio/
+ * 父容器收缩三条路径都绕过 onMove 钳制。min 压过百分比 basis 已真浏览器验证(240/160 顶住)。
+ * 主轴按 split 方向给:横向 split 拦宽、纵向 split 拦高;窄栏纵堆时 reset(见 §6)。 */
+.ze-split[data-direction="horizontal"] > .ze-split__pane { min-width: var(--ze-min-slot-w); }
+.ze-split[data-direction="vertical"]   > .ze-split__pane { min-height: var(--ze-min-slot-h); }
+
+/* § 3 Split 分割条(可拖):视觉上是空气缝(透明,环境透出),hover/拖拽时中心
+ * 点亮一根 accent 细线。命中区维持 ±3px 加宽。 */
+.ze-split__divider {
+  position: relative;
+  flex: 0 0 var(--ze-workspace-gutter);
+  background: transparent;
+  user-select: none;
+}
+.ze-split__divider::after {
+  content: "";
+  position: absolute;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+  opacity: 0;
+  transition: opacity var(--ze-dur-fast) var(--ze-easing-standard);
+  pointer-events: none;
+}
+.ze-split[data-direction="horizontal"] > .ze-split__divider::after { left: 50%; width: 2px; translate: -50% 0; top: var(--ze-workspace-gutter); bottom: var(--ze-workspace-gutter); }
+.ze-split[data-direction="vertical"]   > .ze-split__divider::after { top: 50%; height: 2px; translate: 0 -50%; left: var(--ze-workspace-gutter); right: var(--ze-workspace-gutter); }
+.ze-split__divider:hover::after,
+.ze-split__divider[data-dragging="true"]::after { opacity: 1; }
+.ze-split[data-direction="horizontal"] > .ze-split__divider { cursor: col-resize; }
+.ze-split[data-direction="vertical"]   > .ze-split__divider { cursor: row-resize; }
+.ze-split__divider::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.ze-split[data-direction="horizontal"] > .ze-split__divider::before { left: -3px; right: -3px; }
+.ze-split[data-direction="vertical"]   > .ze-split__divider::before { top: -3px; bottom: -3px; }
+.ze-split__divider:hover,
+.ze-split__divider[data-dragging="true"] {
+  background: transparent;
+}
+
+/* § 4 TabContainer:tabs 视觉(.ze-tabs/__headers/.ze-tab/__body)由 02-atoms/tab.css 统一供给,
+ * 本文件不重复定义 —— LayoutRenderer 的 TabsView 沿用同名 class 即生效。 */
+
+/* § 5 EditorSlot 容器 + 占位 */
+.ze-slot {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* 〔.ze-slot__chrome(pane 分屏/关闭悬浮入口)已随运行时增删槽位功能移除,
+ *  2026-06-13 用户裁决;槽位增删由 mod default layout 静态声明。〕 */
+.ze-slot__empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--ze-space-4);
+  text-align: center;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-sm);
+  /* 空 slot = 幽灵面板:不压玻璃,只留一圈虚线轮廓暗示可放置 */
+  background: transparent;
+  border: 1px dashed var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-lg);
+}
+
+/* § 6 窄栏纵向堆叠(C7)——工作区容器宽 < lg(768)时,split 树退化为纵向堆叠 + 整列滚:
+ * 手机/窄屏放不下 N 个 ≥240px 并排 pane(物理事实),改为一列排开、`.ze-layout-root` 整体滚。
+ * 滚动归属在窄栏从「editor body 内部」上移到此(显式覆盖 C2 整页不滚);宽栏(≥768)零变化。
+ * 每 pane 给 min-height,内部 editor 仍按 C2 在自身高度内滚(嵌套滚动,移动端标准)。
+ * 选择器与上方 [data-pane] 同特异性、置其后 → 后者胜,无需 !important。断点 768 ∈ canonical 集。 */
+@container ze-workspace (max-width: 768px) {
+  .ze-layout-root { overflow-y: auto; }
+  /* [data-direction] 匹配上方 .ze-split[data-direction=horizontal/vertical] 的特异性(0,2,0),
+   * 同特异性 + 后置 → 覆盖、无需 !important;否则裸 .ze-split(0,1,0)压不过 → 仍 row 不堆叠。 */
+  .ze-split[data-direction] { flex-direction: column; gap: var(--ze-workspace-gutter); }
+  /* 纵堆:reset 横向地板(单列宽=容器,横向 min 无意义,避免极窄屏横向溢出);纵向给 stack 高。
+   * min-width reset 须用 .ze-split[data-direction]> 前缀(0,3,0)压过横向 min 同特异性规则
+   * (.ze-split[data-direction=horizontal]>.ze-split__pane 也是 0,3,0,靠源序后置胜)。 */
+  .ze-split[data-direction] > .ze-split__pane { min-width: 0; }
+  .ze-split__pane[data-pane="primary"],
+  .ze-split__pane[data-pane="secondary"] { flex: 0 0 auto; min-height: var(--ze-stack-pane-h); }
+  .ze-split__divider { display: none; }
+}

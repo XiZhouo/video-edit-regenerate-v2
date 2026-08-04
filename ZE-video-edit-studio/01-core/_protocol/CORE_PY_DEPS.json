@@ -1,0 +1,11 @@
+{
+  "schema": "ze.core-py-deps.v1",
+  "_comment": "core 运行所需 Python 依赖下限的权威声明(3.55.0 起)。Skill.Sync 同步 core 层时对照目标 requirements.txt:包缺失打 WARN 进 receipt(不自动改文件)。两次实证缺口(cryptography/httpx 不随 sync 下发,BIF 与 design MAJOR 迁移均踩)的机械化补位。只列 core 直接需要的最低约束;下游自有依赖不受影响。",
+  "requires": [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "httpx>=0.27",
+    "cryptography>=42",
+    "pytest>=8.0"
+  ]
+}

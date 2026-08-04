@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ze.local/contracts/artifact/ze.artifact-build.v1.schema.json",
+  "title": "ZE environment-neutral Base Artifact build declaration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "version", "channel_eligibility", "minimum_launcher_version",
+    "migration", "rollback", "variants"
+  ],
+  "properties": {
+    "schema": {"const": "ze.artifact-build.v1"},
+    "version": {"$ref": "#/$defs/version"},
+    "channel_eligibility": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["stable", "beta", "pinned"]}
+    },
+    "minimum_launcher_version": {"$ref": "#/$defs/version"},
+    "migration": {"enum": ["none", "forward-compatible", "requires-backup"]},
+    "rollback": {"enum": ["supported", "manual", "unsupported"]},
+    "release_notes": {"$ref": "#/$defs/relative_path"},
+    "variants": {
+      "type": "array", "minItems": 1, "maxItems": 32,
+      "items": {"$ref": "#/$defs/variant"}
+    }
+  },
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"},
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "relative_path": {
+      "type": "string", "minLength": 1, "maxLength": 512,
+      "pattern": "^(?:\\.|(?!/)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))(?!.*\\\\)[^/\\\\]+(?:/[^/\\\\]+)*)$"
+    },
+    "delivery_mode": {
+      "enum": [
+        "local-full", "self-hosted-full", "creator-hosted-api",
+        "frontend-only", "hybrid", "evidence-only"
+      ]
+    },
+    "artifact_role": {
+      "enum": ["runtime", "client", "server", "local-adapter", "evidence"]
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name"],
+      "properties": {
+        "kind": {
+          "enum": ["d1-database", "r2-bucket", "kv-namespace", "queue", "static-assets"]
+        },
+        "name": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$"}
+      }
+    },
+    "runtime_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module_format", "entrypoint", "assets_directory", "bindings"],
+      "properties": {
+        "module_format": {"enum": ["es-module", "service-worker", "python-module", "static"]},
+        "entrypoint": {
+          "oneOf": [{"$ref": "#/$defs/relative_path"}, {"type": "null"}]
+        },
+        "assets_directory": {
+          "oneOf": [{"$ref": "#/$defs/relative_path"}, {"type": "null"}]
+        },
+        "bindings": {
+          "type": "array", "maxItems": 64,
+          "items": {"$ref": "#/$defs/binding"}
+        }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "variant_id", "runtime_variant", "delivery_mode", "artifact_role",
+        "feature_set", "payload_paths"
+      ],
+      "properties": {
+        "variant_id": {"$ref": "#/$defs/slug"},
+        "runtime_variant": {"$ref": "#/$defs/slug"},
+        "delivery_mode": {"$ref": "#/$defs/delivery_mode"},
+        "artifact_role": {"$ref": "#/$defs/artifact_role"},
+        "feature_set": {
+          "type": "array", "maxItems": 128, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/slug"}
+        },
+        "payload_paths": {
+          "type": "array", "minItems": 1, "maxItems": 256, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/relative_path"}
+        },
+        "runtime_package": {"$ref": "#/$defs/runtime_package"}
+      }
+    }
+  }
+}

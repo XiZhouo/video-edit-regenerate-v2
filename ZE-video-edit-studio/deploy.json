@@ -1,0 +1,19 @@
+{
+  "skill": "ZE-video-edit-studio",
+  "port": 8114,
+  "bind_host": "0.0.0.0",
+  "start": "bash start.sh",
+  "install": "python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt && cd webapp && npm ci && npm run build",
+  "healthcheck_path": "/health",
+  "rsync_exclude": [
+    ".data/",
+    ".venv/",
+    "node_modules/",
+    "__pycache__/",
+    "*.pyc",
+    "webapp/dist/",
+    ".pid",
+    "app.log"
+  ],
+  "name": "ZE-video-edit-studio"
+}

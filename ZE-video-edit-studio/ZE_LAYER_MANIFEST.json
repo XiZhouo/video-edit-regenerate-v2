@@ -1,0 +1,146 @@
+{
+  "schema": "ze.layer_manifest.v1",
+  "generated_by": "ZE-skill-build/scripts/layer_manifest.py",
+  "managed": {
+    "replace_dirs": {
+      "core": [
+        "01-core",
+        "sdk"
+      ],
+      "ops": [
+        "04-ops"
+      ],
+      "i18n": [
+        "05-i18n"
+      ],
+      "css_opt_in": [
+        "03-css-rules"
+      ]
+    },
+    "merge_dirs": {
+      "core": [
+        {
+          "path": "webapp/src",
+          "preserve": [
+            "webapp/src/product"
+          ],
+          "reason": "surface-declared product frontend is target-owned"
+        }
+      ]
+    },
+    "files": {
+      "core": [
+        "server.py",
+        "scripts/ze_command.py"
+      ],
+      "toolchain": [
+        "scripts/verify_all.py",
+        "scripts/topology_doctor.py",
+        "scripts/deployment_profile.py",
+        "scripts/artifact_variant.py",
+        "scripts/release_builder.py",
+        "scripts/TOOLCHAIN_PY_DEPS.json",
+        "contracts/artifact/README.md",
+        "contracts/artifact/ze.artifact-build.v1.schema.json",
+        "contracts/artifact/ze.artifact-variant-manifest.v1.schema.json",
+        "contracts/artifact/ze.series-overlay.v1.schema.json",
+        "contracts/artifact/ze.source-inventory.v1.schema.json",
+        "contracts/artifact/ze.runtime-package.v1.schema.json",
+        "scripts/css_contract_check.py",
+        "scripts/mod_renderer_check.py",
+        "scripts/ops_contract_check.py",
+        "scripts/i18n_contract_check.py",
+        "scripts/i18n_english_check.py",
+        "scripts/i18n_audit.py",
+        "scripts/i18n_sync.py",
+        "scripts/i18n_keys_lib.py",
+        "scripts/i18n_dump_keys.mjs",
+        "scripts/skill_sync.py",
+        "scripts/surface_profile.py",
+        "scripts/local_launcher.py",
+        "scripts/dependency_manifest.py",
+        "scripts/environment_broker.py",
+        "start.command",
+        "start.bat",
+        "start.ps1",
+        "scripts/layer_manifest.py",
+        "scripts/managed_drift_check.py",
+        "scripts/doc_status_check.py",
+        "scripts/usability_check.py",
+        "scripts/eval_suite.py",
+        "scripts/type_registry_check.py",
+        "scripts/ai_interface_check.py",
+        "scripts/command_async_check.py",
+        "scripts/ai_effect_write_check.py",
+        "scripts/public_ai_surface_check.py",
+        "scripts/mod_backend_brand_check.py",
+        "scripts/mod_fixed_model_enum_check.py",
+        "scripts/mod_raw_secret_check.py",
+        "scripts/ai_requirements_check.py",
+        "scripts/STATUS_DISCIPLINE.md",
+        "scripts/test_skill_sync.py",
+        "scripts/test_deployment_profile.py",
+        "scripts/test_artifact_variant.py",
+        "scripts/test_release_builder.py",
+        "scripts/test_surface_profile.py",
+        "scripts/test_local_launcher.py",
+        "scripts/test_dependency_manifest.py",
+        "scripts/test_environment_broker.py",
+        "scripts/test_verify_all.py",
+        "scripts/test_layer_manifest.py",
+        "scripts/test_managed_drift_check.py",
+        "scripts/test_css_contract_check.py",
+        "scripts/test_mod_renderer_check.py",
+        "scripts/test_ops_contract_check.py",
+        "scripts/test_i18n_contract_check.py",
+        "scripts/test_i18n_english_check.py",
+        "scripts/test_i18n_audit.py",
+        "scripts/test_i18n_sync.py",
+        "scripts/test_doc_status_check.py",
+        "scripts/test_eval_suite.py",
+        "scripts/test_type_registry_check.py",
+        "scripts/test_ai_interface_check.py",
+        "scripts/test_command_async_check.py",
+        "scripts/test_ai_effect_write_check.py",
+        "scripts/_toolchain_contract.json"
+      ]
+    }
+  },
+  "product": {
+    "dirs": [
+      "webapp/src/product"
+    ],
+    "mod_dirs": [
+      "02-mod"
+    ],
+    "runtime_dirs": [
+      ".data"
+    ],
+    "metadata_files": [
+      "ZE_SURFACE.json",
+      "deploy.json",
+      "ZE_DEPENDENCIES.json",
+      "ZE_ARTIFACT_BUILD.json",
+      "ZE_ARTIFACT_VARIANT.json"
+    ]
+  },
+  "preserve": [
+    "02-mod",
+    "02-mod/_locks",
+    ".data",
+    "ZE_SURFACE.json",
+    "ZE_LAYER_MANIFEST.json",
+    "ZE_DEPENDENCIES.json",
+    "ZE_ARTIFACT_BUILD.json",
+    "ZE_ARTIFACT_VARIANT.json",
+    "deploy.json",
+    "commands/registry.json",
+    "demo"
+  ],
+  "rules": [
+    "Managed replace paths may be deleted and recopied from ZE Skill Build.",
+    "Managed merge paths must preserve every product.dirs entry.",
+    "Product, runtime, surface, deploy, dependency, artifact-build, release-manifest, and lock paths are target-owned.",
+    "Local changes under managed paths must move to ZE Skill Build or to a product/mod path before sync."
+  ]
+}

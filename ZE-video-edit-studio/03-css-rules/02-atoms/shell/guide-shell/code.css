@@ -1,0 +1,289 @@
+/*
+ * guide-shell/code.css — 引导精灵视觉(系统 4『变形体 v2』;替换 4 层 Siri 美术)。
+ *
+ * 设计真源:《ZE精灵变形体视觉设计-20260718》(用户 10 轮迭代定稿,参数照搬)。
+ * 权威契约:MOTION.md「引导精灵运动契约」。渲染引擎:webapp/src/lib/spriteEngine.ts。
+ *
+ * 本体 = 单实体变形虫:白芯蓝边(--ze-guide-fill 芯 + --ze-accent-500 边),球 ⇄ 三角光标 ⇄
+ * 环形矩形(evenodd 环带)严格连续变形(28 点系逐点插值,引擎驱动 path);光只有一层 = 移动
+ * 余晖(canvas 每帧重建)。飞行/变形/圈选的几何全部由引擎在 rAF 内驱动 —— 本文件只管静态
+ * 皮肤(填色/描边/层叠/涟漪/气泡/launcher)与 reduced-motion 降级,不含形态 keyframes。
+ *
+ * 结构:
+ *   stage/trail/glow/svg/shape/veil/wash = 变形体引擎宿主(几何由引擎写,颜色走令牌)。
+ *   rip = 幽灵点击涟漪(一次性,引擎按到点事件生成)。
+ *   mini = launcher 待机小球(静态白芯蓝边)。
+ *   bubble/launcher/picker = 气泡与待机角标(结构不变)。
+ *
+ * 令牌:--ze-guide-fill(白芯)/--ze-guide-veil(环外压暗)/--ze-guide-wash(环内洗色)/
+ * --ze-guide-trail-hi(余晖亮芯)/--ze-z-guide(层级)。旧 Siri 四层令牌(--ze-orb-a/b/c、
+ * --ze-guide-aura/core-hi/spark/edge)已废弃不再消费,令牌层保留至 css 20 随 G1 日落。
+ */
+
+.ze-guide {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ze-z-guide);         /* 引导专属层级(系统 4):压过 modal,低于 popover */
+  pointer-events: none;               /* 覆盖层不挡工具;交互子元素各自 opt-in */
+}
+.ze-guide__interactive { pointer-events: auto; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * § A · 变形体引擎宿主(几何/位移由 spriteEngine rAF 驱动,此处只管皮肤与层叠)
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+.ze-guide__stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 余晖层:整幅 canvas,每帧重建、按时长精确消散零残留 */
+.ze-guide__trail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 待机球柔光(只给球态;圈选/飞行/箭头态由引擎关) */
+.ze-guide__glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 90px;
+  height: 90px;
+  border-radius: var(--ze-radius-pill);
+  background: radial-gradient(closest-side, var(--ze-accent-500), transparent 72%);
+  filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 本体 SVG(球/光标/环共用一个 path;viewBox 与位姿由引擎写) */
+.ze-guide__svg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  overflow: visible;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+/* 白芯蓝边实体(--ze-guide-fill 近白芯 + accent 描边;圈选发光由引擎按参数加 drop-shadow) */
+.ze-guide__shape {
+  fill: var(--ze-guide-fill);
+  stroke: var(--ze-accent-500);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: var(--ze-guide-shadow);
+}
+
+/* 圈选:环外压暗(evenodd 挖空,环内天然可读) + 环内轻洗色 */
+.ze-guide__veil { fill: var(--ze-guide-veil); }
+.ze-guide__wash { fill: var(--ze-guide-wash); }
+
+/* 幽灵点击涟漪:act 到点时一次性生成(真执行经命令总线,此处纯视觉) */
+.ze-guide__rip {
+  position: fixed;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--ze-radius-pill);
+  border: 2px solid var(--ze-accent-500);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: ze-guide-rip 0.55s var(--ze-easing-standard) forwards;
+}
+@keyframes ze-guide-rip {
+  from { opacity: 0.9; scale: 0.4; }
+  to   { opacity: 0;   scale: 3.2; }
+}
+
+/* 单一助手待机热点:盖在停靠精灵上的透明可点区(点击=开合对话面板;
+   教学/回执期间精灵在忙,不渲染热点——不与内容抢指针) */
+/* W1-1(css 20.3):精灵**本体即按钮**。此前叫 __hotspot,是与引擎画的精灵并存的
+   第二个圆——实测点开面板时它瞬移到面板边、而精灵本体留在原地,屏幕上两个圆,
+   这是「分身」的第二处来源。现在它只是贴在精灵身上的命中区与可及性载体:
+   零视觉(全归引擎),同一 restPt 定位,不会单独跑掉。 */
+.ze-guide__self {
+  position: fixed;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: var(--ze-radius-pill);
+  background: transparent;
+  border: none;
+  padding: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.ze-guide__self:focus-visible {
+  outline: 2px solid var(--ze-accent-500);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * § B · launcher 待机小球(@deprecated 20.2:单一助手后独立「教我用」角标退役,
+ *   入口移入对话面板;类保留至 G1 日落,禁新增消费)
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+.ze-guide__mini {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-guide-fill);
+  border: 1.5px solid var(--ze-accent-500);
+  box-shadow: 0 0 6px color-mix(in oklab, var(--ze-accent-500) 45%, transparent);
+  animation: ze-guide-mini-breathe var(--ze-dur-breathe) ease-in-out infinite;
+}
+@keyframes ze-guide-mini-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * § C · 气泡锚点容器 + 气泡
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+.ze-guide__sprite {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  /* 气泡锚点滑动走 transform(合成层);精灵本体由引擎驱动,此容器只锚气泡。 */
+  transition: transform var(--ze-spring) 380ms, opacity var(--ze-dur-exit) var(--ze-easing-standard);
+}
+
+.ze-guide__bubble {
+  position: absolute;
+  width: max-content;
+  max-width: min(320px, calc(100vw - var(--ze-space-8)));
+  padding: var(--ze-space-3) var(--ze-space-4);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-lg);
+  box-shadow: var(--ze-shadow-floating);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+  animation: ze-guide-bubble-in var(--ze-dur-slow) var(--ze-spring) both;
+}
+@keyframes ze-guide-bubble-in {
+  from { transform: translateY(4px) scale(0.96); opacity: 0; }
+  to   { transform: translateY(0) scale(1);      opacity: 1; }
+}
+/* 尖角:朝精灵一侧 */
+.ze-guide__bubble::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--ze-surface-raised);
+  border-left: 1px solid var(--ze-overlay-soft);
+  border-top: 1px solid var(--ze-overlay-soft);
+}
+.ze-guide__bubble[data-hside="right"] { left: 46px; }
+.ze-guide__bubble[data-hside="left"]  { right: 46px; }
+.ze-guide__bubble[data-vside="down"]  { top: 0; }
+.ze-guide__bubble[data-vside="up"]    { bottom: 0; }
+.ze-guide__bubble[data-hside="right"]::after { left: -6px;  top: 14px; transform: rotate(-45deg); }
+.ze-guide__bubble[data-hside="left"]::after  { right: -6px; top: 14px; transform: rotate(135deg); }
+
+.ze-guide__meta {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  letter-spacing: 0;
+}
+.ze-guide__say {
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-primary);
+  line-height: 1.5;
+}
+.ze-guide__note {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+}
+.ze-guide__note[data-tone="danger"] { color: var(--ze-semantic-danger); }
+.ze-guide__actions {
+  display: flex;
+  gap: var(--ze-space-2);
+  justify-content: flex-end;
+  margin-top: var(--ze-space-1);
+}
+
+/* ── 待机启动:『教我用』角标 ────────────────────────────────────────── */
+.ze-guide__launcher {
+  position: fixed;
+  left: var(--ze-space-5);
+  bottom: var(--ze-space-5);
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+}
+
+/* ── tour 选择器 ────────────────────────────────────────────────────── */
+.ze-guide__picker {
+  position: fixed;
+  left: var(--ze-space-5);
+  bottom: calc(var(--ze-space-5) + 44px);
+}
+/* 单一助手:tour 选择器随对话面板停靠边呈现(右侧=默认停靠) */
+.ze-guide__picker[data-side="right"] { left: auto; right: var(--ze-space-5); }
+.ze-guide__picker[data-side="left"]  { left: var(--ze-space-5); right: auto; }
+.ze-guide__picker {
+  width: min(320px, calc(100vw - var(--ze-space-8)));
+  max-height: 46vh;
+  overflow-y: auto;
+  pointer-events: auto;
+  padding: var(--ze-space-2);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-lg);
+  box-shadow: var(--ze-shadow-floating);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+}
+.ze-guide__picker-empty {
+  padding: var(--ze-space-3);
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-tertiary);
+}
+.ze-guide__picker-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  border-radius: var(--ze-radius-md);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ze-ink-primary);
+}
+.ze-guide__picker-item:hover { background: var(--ze-overlay-accent-wash); }
+.ze-guide__picker-title { font-size: var(--ze-fs-sm); font-weight: var(--ze-fw-semibold); }
+.ze-guide__picker-when  { font-size: var(--ze-fs-xs); color: var(--ze-ink-tertiary); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * § D · reduced-motion 降级:关动效(引擎侧同步瞬移/关余晖/关拉伸/关变形动画);
+ *       位置·圈选压暗·气泡·信息全保留(MOTION.md §7)。
+ * ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .ze-guide__mini,
+  .ze-guide__bubble {
+    animation: none !important;
+  }
+  .ze-guide__sprite {
+    transition: none !important;      /* 气泡锚点直接切 */
+  }
+  .ze-guide__rip { display: none; }   /* 涟漪纯动效,静态无意义 */
+  .ze-guide__trail { display: none; } /* 余晖纯动效(引擎同步不采点) */
+  .ze-guide__glow { display: none; }
+}

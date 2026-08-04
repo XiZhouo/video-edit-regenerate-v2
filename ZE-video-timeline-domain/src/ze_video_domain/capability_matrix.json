@@ -1,0 +1,1031 @@
+{
+ "aliases": {
+  "gemini-omni": "gemini-omni-flash-preview",
+  "google-omni": "gemini-omni-flash-preview",
+  "grok": "grok-video",
+  "happyhorse": "happyhorse-1.0",
+  "kling": "kling-v3",
+  "kling-omni": "kling-v3-omni",
+  "omni": "gemini-omni-flash-preview",
+  "seedance": "seedance-2.0",
+  "seedance-fast": "seedance-2.0-fast",
+  "seedance-mini": "seedance-2.0-mini",
+  "veo": "veo-3.1",
+  "veo-fast": "veo-3.1-fast"
+ },
+ "generated_at": 1785033304,
+ "generated_from": "$ZE_VIDEOGEN_BASE_URL/discover",
+ "models": {
+  "gemini-omni-flash-preview": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "reference-to-video",
+    "edit"
+   ],
+   "description": "Gemini Omni Flash Preview — multimodal video generation",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16"
+    ],
+    "knobs": {
+     "delivery": {
+      "default": "uri",
+      "description": "输出交付方式",
+      "type": "string",
+      "values": [
+       "uri",
+       "inline"
+      ]
+     },
+     "previous_interaction_id": {
+      "description": "继续编辑上一次 Omni interaction",
+      "type": "string"
+     },
+     "store": {
+      "default": true,
+      "description": "是否保留 interaction 以支持后续编辑",
+      "type": "boolean"
+     }
+    }
+   },
+   "provider": "google-omni",
+   "ref_grammar": {
+    "note": "实测 reference-to-video 至少可提交 100 张图片；有图片时至少可提交 11 个视频；纯视频 reference 会被上游拒绝。",
+    "scope": "none",
+    "start": 0,
+    "token": null
+   },
+   "slots": {
+    "edit": {
+     "alt_param": "previous_interaction_id",
+     "kinds": [
+      "image",
+      "video"
+     ],
+     "max_by_kind": {
+      "image": 100,
+      "video": 1
+     },
+     "min_by_kind": {
+      "video": 1
+     },
+     "min_total": 0,
+     "note": "实测 edit 使用文件输入时必须正好 1 个视频，可附加图片；previous_interaction_id 编辑不传文件。",
+     "required_kinds": []
+    },
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image",
+      "video"
+     ],
+     "max_by_kind": {
+      "image": 100,
+      "video": 11
+     },
+     "min_total": 1,
+     "note": "实测 reference-to-video 至少可提交 100 张图片；有图片时至少可提交 11 个视频；纯视频 reference 会被上游拒绝。",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "grok-video": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "reference-to-video"
+   ],
+   "description": "Grok Imagine Video (via FAL)",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "4:3",
+     "3:2",
+     "1:1",
+     "2:3",
+     "3:4",
+     "9:16"
+    ],
+    "duration_options": [
+     6,
+     8
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒）",
+      "type": "integer",
+      "values": [
+       6,
+       8
+      ]
+     },
+     "resolution": {
+      "description": "视频分辨率",
+      "type": "string",
+      "values": [
+       "480p",
+       "720p"
+      ]
+     }
+    },
+    "resolutions": [
+     "480p",
+     "720p"
+    ]
+   },
+   "provider": "grok",
+   "ref_grammar": {
+    "note": "Use @Image1, @Image2 ... in prompt to reference uploaded images",
+    "scope": "per_kind",
+    "start": 1,
+    "token": "@Image{n}"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_by_kind": {
+      "image": 7
+     },
+     "min_total": 1,
+     "note": "Use @Image1, @Image2 ... in prompt to reference uploaded images",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "happyhorse-1.0": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "reference-to-video"
+   ],
+   "description": "HappyHorse 1.0 (Alibaba Cloud Bailian)",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16",
+     "1:1",
+     "4:3",
+     "3:4",
+     "4:5",
+     "5:4",
+     "9:21",
+     "21:9"
+    ],
+    "duration_range": [
+     3,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒）",
+      "range": [
+       3,
+       15
+      ],
+      "type": "integer"
+     },
+     "resolution": {
+      "description": "视频分辨率",
+      "type": "string",
+      "values": [
+       "720P",
+       "1080P"
+      ]
+     },
+     "seed": {
+      "description": "随机数种子",
+      "range": [
+       0,
+       2147483647
+      ],
+      "type": "integer"
+     },
+     "watermark": {
+      "default": false,
+      "description": "是否添加 Happy Horse 水印",
+      "type": "boolean"
+     }
+    },
+    "resolutions": [
+     "720P",
+     "1080P"
+    ]
+   },
+   "provider": "happyhorse",
+   "ref_grammar": {
+    "note": "Use [Image 1], [Image 2] ... in prompt to reference uploaded images",
+    "scope": "per_kind",
+    "start": 1,
+    "token": "[Image {n}]"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_by_kind": {
+      "image": 9
+     },
+     "min_pixels": [
+      300,
+      300
+     ],
+     "min_total": 1,
+     "note": "Use [Image 1], [Image 2] ... in prompt to reference uploaded images",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "happyhorse-1.1": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "reference-to-video"
+   ],
+   "description": "HappyHorse 1.1 (Alibaba Cloud Bailian)",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16",
+     "1:1",
+     "4:3",
+     "3:4",
+     "4:5",
+     "5:4",
+     "9:21",
+     "21:9"
+    ],
+    "duration_range": [
+     3,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒）",
+      "range": [
+       3,
+       15
+      ],
+      "type": "integer"
+     },
+     "resolution": {
+      "description": "视频分辨率",
+      "type": "string",
+      "values": [
+       "720P",
+       "1080P"
+      ]
+     },
+     "seed": {
+      "description": "随机数种子",
+      "range": [
+       0,
+       2147483647
+      ],
+      "type": "integer"
+     },
+     "watermark": {
+      "default": false,
+      "description": "是否添加 Happy Horse 水印",
+      "type": "boolean"
+     }
+    },
+    "resolutions": [
+     "720P",
+     "1080P"
+    ]
+   },
+   "provider": "happyhorse",
+   "ref_grammar": {
+    "note": "Use [Image 1], [Image 2] ... in prompt to reference uploaded images",
+    "scope": "per_kind",
+    "start": 1,
+    "token": "[Image {n}]"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_by_kind": {
+      "image": 9
+     },
+     "min_pixels": [
+      300,
+      300
+     ],
+     "min_total": 1,
+     "note": "Use [Image 1], [Image 2] ... in prompt to reference uploaded images",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "kling-v3": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video"
+   ],
+   "description": "Kling V3 — Text/Image to Video (1080p)",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16",
+     "1:1"
+    ],
+    "duration_range": [
+     3,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒），kling-v3 / kling-v3-omni 支持 3-15 秒",
+      "range": [
+       3,
+       15
+      ],
+      "type": "integer"
+     },
+     "sound": {
+      "description": "是否生成音频（仅 kling-v3/kling-v3-omni 支持；使用参考视频文件时必须 off）",
+      "type": "string",
+      "values": [
+       "on",
+       "off"
+      ]
+     }
+    }
+   },
+   "provider": "kling",
+   "ref_grammar": {
+    "note": "",
+    "scope": "none",
+    "start": 0,
+    "token": null
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "kling-v3-omni": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video",
+    "reference-to-video"
+   ],
+   "description": "Kling V3 Omni — Multi-reference, subject, frame control",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16",
+     "1:1"
+    ],
+    "duration_range": [
+     3,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒），kling-v3 / kling-v3-omni 支持 3-15 秒",
+      "range": [
+       3,
+       15
+      ],
+      "type": "integer"
+     },
+     "sound": {
+      "description": "是否生成音频（仅 kling-v3/kling-v3-omni 支持；使用参考视频文件时必须 off）",
+      "type": "string",
+      "values": [
+       "on",
+       "off"
+      ]
+     }
+    }
+   },
+   "provider": "kling",
+   "ref_grammar": {
+    "note": "Use <<<image_1>>>, <<<image_2>>> ... in prompt to reference uploaded images; <<<video_1>>> for reference video. Max 7 images without reference video, max 4 with.",
+    "scope": "per_kind",
+    "start": 1,
+    "token": "<<<{kind}_{n}>>>"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image",
+      "video"
+     ],
+     "max_total": 7,
+     "max_total_with_video": 4,
+     "min_total": 1,
+     "note": "Use <<<image_1>>>, <<<image_2>>> ... in prompt to reference uploaded images; <<<video_1>>> for reference video. Max 7 images without reference video, max 4 with.",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "seedance-2.0": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video",
+    "reference-to-video"
+   ],
+   "description": "Seedance 2.0 Pro",
+   "params": {
+    "aspect_ratios": [
+     "1:1",
+     "4:3",
+     "3:4",
+     "16:9",
+     "9:16",
+     "21:9"
+    ],
+    "duration_range": [
+     4,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒）",
+      "range": [
+       4,
+       15
+      ],
+      "type": "integer"
+     }
+    }
+   },
+   "provider": "seedance",
+   "ref_grammar": {
+    "note": "Use @file_0, @file_1 ... in prompt to reference uploaded files",
+    "scope": "flat",
+    "start": 0,
+    "token": "@file_{n}"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image",
+      "video",
+      "audio"
+     ],
+     "max_total": 12,
+     "min_total": 1,
+     "note": "Use @file_0, @file_1 ... in prompt to reference uploaded files",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "seedance-2.0-fast": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video",
+    "reference-to-video"
+   ],
+   "description": "Seedance 2.0 Fast",
+   "params": {
+    "aspect_ratios": [
+     "1:1",
+     "4:3",
+     "3:4",
+     "16:9",
+     "9:16",
+     "21:9"
+    ],
+    "duration_range": [
+     4,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒）",
+      "range": [
+       4,
+       15
+      ],
+      "type": "integer"
+     }
+    }
+   },
+   "provider": "seedance",
+   "ref_grammar": {
+    "note": "Use @file_0, @file_1 ... in prompt to reference uploaded files",
+    "scope": "flat",
+    "start": 0,
+    "token": "@file_{n}"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image",
+      "video",
+      "audio"
+     ],
+     "max_total": 12,
+     "min_total": 1,
+     "note": "Use @file_0, @file_1 ... in prompt to reference uploaded files",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "seedance-2.0-mini": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video",
+    "reference-to-video"
+   ],
+   "description": "Seedance 2.0 Mini",
+   "params": {
+    "aspect_ratios": [
+     "1:1",
+     "4:3",
+     "3:4",
+     "16:9",
+     "9:16",
+     "21:9"
+    ],
+    "duration_range": [
+     4,
+     15
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒）",
+      "range": [
+       4,
+       15
+      ],
+      "type": "integer"
+     }
+    }
+   },
+   "provider": "seedance",
+   "ref_grammar": {
+    "note": "Use @file_0, @file_1 ... in prompt to reference uploaded files",
+    "scope": "flat",
+    "start": 0,
+    "token": "@file_{n}"
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image",
+      "video",
+      "audio"
+     ],
+     "max_total": 12,
+     "min_total": 1,
+     "note": "Use @file_0, @file_1 ... in prompt to reference uploaded files",
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "veo-3.1": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video",
+    "reference-to-video"
+   ],
+   "description": "Google Veo 3.1 — High quality video generation",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16"
+    ],
+    "duration_by_resolution": {
+     "1080p": [
+      8
+     ],
+     "4k": [
+      8
+     ],
+     "720p": [
+      4,
+      6,
+      8
+     ]
+    },
+    "duration_options": [
+     4,
+     6,
+     8
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒），仅 text-to-video 模式可配；其他模式固定 8s",
+      "type": "integer",
+      "values": [
+       4,
+       6,
+       8
+      ]
+     },
+     "resolution": {
+      "description": "视频分辨率；1080p/4k 仅支持 8 秒",
+      "type": "string",
+      "values": [
+       "720p",
+       "1080p",
+       "4k"
+      ]
+     }
+    },
+    "resolutions": [
+     "720p",
+     "1080p",
+     "4k"
+    ]
+   },
+   "provider": "veo",
+   "ref_grammar": {
+    "note": "",
+    "scope": "none",
+    "start": 0,
+    "token": null
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_by_kind": {
+      "image": 3
+     },
+     "min_total": 1,
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  },
+  "veo-3.1-fast": {
+   "capabilities": [
+    "text-to-video",
+    "image-to-video",
+    "keyframe-to-video",
+    "reference-to-video"
+   ],
+   "description": "Google Veo 3.1 Fast — Faster generation",
+   "params": {
+    "aspect_ratios": [
+     "16:9",
+     "9:16"
+    ],
+    "duration_by_resolution": {
+     "1080p": [
+      8
+     ],
+     "4k": [
+      8
+     ],
+     "720p": [
+      4,
+      6,
+      8
+     ]
+    },
+    "duration_options": [
+     4,
+     6,
+     8
+    ],
+    "knobs": {
+     "duration": {
+      "description": "视频时长（秒），仅 text-to-video 模式可配；其他模式固定 8s",
+      "type": "integer",
+      "values": [
+       4,
+       6,
+       8
+      ]
+     },
+     "resolution": {
+      "description": "视频分辨率；1080p/4k 仅支持 8 秒",
+      "type": "string",
+      "values": [
+       "720p",
+       "1080p",
+       "4k"
+      ]
+     }
+    },
+    "resolutions": [
+     "720p",
+     "1080p",
+     "4k"
+    ]
+   },
+   "provider": "veo",
+   "ref_grammar": {
+    "note": "",
+    "scope": "none",
+    "start": 0,
+    "token": null
+   },
+   "slots": {
+    "image-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 1,
+     "min_total": 1,
+     "note": "首帧图,恰好 1 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "keyframe-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_total": 2,
+     "min_total": 2,
+     "note": "首帧 + 尾帧,恰好 2 张",
+     "required_kinds": [
+      "image"
+     ]
+    },
+    "reference-to-video": {
+     "kinds": [
+      "image"
+     ],
+     "max_by_kind": {
+      "image": 3
+     },
+     "min_total": 1,
+     "required_kinds": []
+    },
+    "text-to-video": {
+     "kinds": [],
+     "max_total": 0,
+     "min_total": 0,
+     "note": "文生视频不带文件",
+     "required_kinds": []
+    }
+   }
+  }
+ },
+ "modes": [
+  "text-to-video",
+  "image-to-video",
+  "keyframe-to-video",
+  "reference-to-video",
+  "edit"
+ ],
+ "schema": "ze.video_capability_matrix.v1",
+ "service_name": "Video Service",
+ "service_version": "1.0"
+}

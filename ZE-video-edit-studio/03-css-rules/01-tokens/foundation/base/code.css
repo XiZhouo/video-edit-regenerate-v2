@@ -1,0 +1,61 @@
+/*
+ * base.css — 文档基线(reset + body 默认外观)(01-tokens / L1 foundation)
+ *
+ * SPEC: 03-css-rules/01-tokens/SPEC.md · 总纲 ../DESIGN-SYSTEM.md(§2 L1)
+ * 入口: Web 端在 tokens.css 之后一次性 import(main.tsx / gallery/main.tsx)
+ *
+ * 为什么在 L1:这是「把令牌词表实例化到文档根」—— 与 tokens.css 的 `:root { --ze-* }` 定义令牌
+ * 是同一桩 foundation 事的两半:tokens.css 定义词表,base.css 把词表落成文档默认(底色/墨色/
+ * 字体/行高 + box reset + 整页不滚的高度链)。它既非可复用组件(L2 原子)、也非组合(L3/4/5),
+ * 而是地基:一切 .ze-* 原子与上层都继承自这个 body 基线。故「foundation 之上只有 L2 消费令牌」
+ * 的铁律不含本文件 —— L1 自身把令牌落到 body 是 foundation 内部实例化,不是上层消费。
+ *
+ * 整页不滚:滚动只发生在中区 editor 内部。不用 100vh(含横向滚动条/浏览器 chrome,常比可见
+ * 视口高 → 顶出整页滚动条),改走 html→body→#root→.ze-app 全链 100% + 这里锁死 overflow。
+ *
+ * [皮肤 · 晴空瓷釉] 本文件新增两件事:
+ *   1. 字体加载:皮肤身份字族 Geist / Geist Mono(Google Fonts)。离线/内网部署时把这行
+ *      换成本地 @font-face(见 SKIN-PORCELAIN.md 跟随调整清单 §字体)。
+ *   2. 环境光斑:玻璃面板必须有「可感的后面」。body 在 canvas 底色上铺两团极低彩度光斑
+ *      (引 accent 色相种子,跟 skill 主题色联动)。这是 L1 foundation 内部实例化,合法消费令牌。
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+/* [v5 · 工具字标重做] 衬线字标字族 Lora(领衔 --ze-font-display);离线/内网换本地 @font-face,同 SKIN-PORCELAIN 字体跟随清单。 */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&display=swap');
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html, body {
+  overflow: hidden;
+}
+
+body {
+  /* 环境 = canvas 底色 + 两团低彩光斑(左上偏 accent 色相、右下偏冷邻相);
+   * 色相相对色取自 --ze-accent-500(随 data-ze-theme 每工具不同),L/C 钉死保持克制——
+   * 旧式 var(--ze-accent-h) 自 css 16.3.0 起被冻结成静态别名(恒 252),光斑跟不上工具色,故改此。
+   * fixed attachment 让 footer/中区透出的环境在滚动时保持稳定。 */
+  background-color: var(--ze-surface-canvas);
+  background-image:
+    radial-gradient(46% 38% at 16% -6%, oklch(from var(--ze-accent-500) 88% 0.04 h / 0.5), transparent 70%),
+    radial-gradient(40% 36% at 94% 108%, oklch(from var(--ze-accent-500) 90% 0.03 calc(h - 35) / 0.42), transparent 70%);
+  background-attachment: fixed;
+  color: var(--ze-ink-primary);
+  font-family: var(--ze-font-sans);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="dark"] body,
+body[data-theme="dark"] {
+  background-image:
+    radial-gradient(46% 38% at 16% -6%, oklch(from var(--ze-accent-500) 34% 0.05 h / 0.42), transparent 70%),
+    radial-gradient(40% 36% at 94% 108%, oklch(from var(--ze-accent-500) 30% 0.04 calc(h - 35) / 0.36), transparent 70%);
+}

@@ -1,0 +1,56 @@
+/*
+ * switch.css — ze-switch 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 实现: 原生 <input type=checkbox role=switch> + appearance:none 自定义轨道 + ::after 滑块。
+ *   off = overlay-soft 轨道;on = accent 轨道 + 滑块右移。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-switch {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 28px;
+  height: 16px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+  cursor: pointer;
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+  transition: transform var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-switch:checked { background: var(--ze-accent-500); box-shadow: var(--ze-glow-accent); }
+.ze-switch:checked::after { transform: translateX(12px); }
+
+.ze-switch:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 2px; }
+.ze-switch:disabled { cursor: not-allowed; opacity: 0.55; }
+
+/* 尺寸 */
+.ze-switch[data-size="sm"] { width: 24px; height: 14px; }
+.ze-switch[data-size="sm"]::after { width: 10px; height: 10px; }
+.ze-switch[data-size="sm"]:checked::after { transform: translateX(10px); }
+.ze-switch[data-size="lg"] { width: 36px; height: 20px; }
+.ze-switch[data-size="lg"]::after { width: 16px; height: 16px; }
+.ze-switch[data-size="lg"]:checked::after { transform: translateX(16px); }
+
+/* 行包装 */
+.ze-switch__row { display: inline-flex; align-items: center; gap: var(--ze-space-2); cursor: pointer; }
+.ze-switch__label { font-size: var(--ze-fs-sm); color: var(--ze-ink-primary); }

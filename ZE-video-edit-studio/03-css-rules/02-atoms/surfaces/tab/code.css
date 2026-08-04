@@ -1,0 +1,97 @@
+/*
+ * tab.css — ze-tab / ze-tabs 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 规范 tab 组件。**这是 LayoutTree TabContainer 也复用的同一套类**
+ *   (.ze-tabs / __headers / .ze-tab / __body)—— 故 04-editors/layout.css 不再
+ *   重复定义这些类(由本文件统一供给),LayoutRenderer 的 class 名不变即生效。
+ *   默认 flex:1 充满容器(工作台常态);需内容高度的场景由消费方覆盖。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ze-tabs__headers {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-0-5);
+  height: var(--ze-space-7);                /* 28px,对齐 Header 节奏 */
+  padding-inline: var(--ze-space-1);
+  /* 玻璃面板自身是底,headers 不再压 raised,只留发丝分隔 */
+  background: transparent;
+  border-bottom: 1px solid var(--ze-line-soft);
+  flex-shrink: 0;
+}
+
+/* [皮肤 · 晴空瓷釉] tab 从「下划线」改为「釉面胶囊」:选中 = accent-wash 胶囊底 +
+ * accent 字;更贴玻璃语言,且在浮动面板内不依赖贴边线。class/data 词表不变。 */
+.ze-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  height: auto;
+  align-self: center;
+  padding-inline: var(--ze-space-3);
+  padding-block: var(--ze-space-0-5);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ze-radius-sm);
+  color: var(--ze-ink-tertiary);
+  font: inherit;
+  font-size: var(--ze-fs-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color var(--ze-dur-fast) var(--ze-easing-standard),
+    background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-tab:hover { color: var(--ze-ink-secondary); background: var(--ze-overlay-soft); }
+.ze-tab:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: -2px; }
+.ze-tab[data-active="true"] {
+  color: var(--ze-accent-500);
+  background: var(--ze-overlay-accent-wash);
+  font-weight: var(--ze-fw-medium);
+}
+.ze-tab[data-disabled="true"] { color: var(--ze-ink-disabled); cursor: not-allowed; background: transparent; }
+
+/* tab 内计数小徽标(对齐 footer tab-count)*/
+.ze-tab__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 14px;
+  padding-inline: 4px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-2xs);
+  font-weight: var(--ze-fw-medium);
+}
+.ze-tab[data-variant="danger"] .ze-tab__count { background: var(--ze-semantic-danger); color: var(--ze-ink-inverse); }
+
+/* compact 密度:24px 头 + 微字号紧凑 tab(footer 详情条等密集场景复用本组件,不再自造)*/
+.ze-tabs[data-density="compact"] > .ze-tabs__headers { height: var(--ze-space-6); padding-inline: var(--ze-space-2); }
+.ze-tabs[data-density="compact"] .ze-tab {
+  padding-inline: var(--ze-space-2);
+  font-size: var(--ze-fs-2xs);
+  font-weight: var(--ze-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.ze-tabs__body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}

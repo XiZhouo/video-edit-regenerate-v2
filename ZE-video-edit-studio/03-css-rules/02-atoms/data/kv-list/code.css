@@ -1,0 +1,59 @@
+/*
+ * kv-list.css — ze-kv-list 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 键值检视列表:左 key(次级)右 value(主)。对齐 footer 的 kv 行 / Header about kv。
+ *   data-editable 行给可编辑提示(铅笔);mono 变体值用等宽(trace-id / hash 等)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-kv-list {
+  display: flex;
+  flex-direction: column;
+}
+.ze-kv-list[data-layout="grid"] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--ze-size-panel-w) / 2), 1fr));
+  column-gap: var(--ze-space-3);
+  row-gap: var(--ze-space-0-5);
+}
+
+.ze-kv-list__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--ze-space-2);
+  align-items: baseline;
+  padding: var(--ze-space-1) 0;
+  font-size: var(--ze-fs-sm);
+  border-bottom: 1px solid var(--ze-overlay-soft);
+}
+.ze-kv-list__row:last-child { border-bottom: 0; }
+
+.ze-kv-list__key { color: var(--ze-ink-tertiary); }
+.ze-kv-list__value { color: var(--ze-ink-primary); word-break: break-word; }
+.ze-kv-list__value[data-monospace="true"] { font-family: var(--ze-font-mono); font-size: var(--ze-fs-xs); word-break: break-all; }
+
+/* 可编辑提示 */
+.ze-kv-list__row[data-editable="true"] { cursor: text; }
+.ze-kv-list__row[data-editable="true"] .ze-kv-list__value::after {
+  content: "✎";
+  margin-left: var(--ze-space-1);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  opacity: 0;
+  transition: opacity var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-kv-list__row[data-editable="true"]:hover .ze-kv-list__value::after { opacity: 1; }
+
+/* 紧凑变体(无边框,行距小)*/
+.ze-kv-list[data-variant="compact"] .ze-kv-list__row { border-bottom: 0; padding: var(--ze-space-0-5) 0; }
+.ze-kv-list[data-layout="grid"] .ze-kv-list__row {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--ze-space-1);
+  min-width: 0;
+}
+
+/* 窄列变体 */
+.ze-kv-list[data-size="sm"] .ze-kv-list__row { grid-template-columns: 88px 1fr; font-size: var(--ze-fs-xs); }

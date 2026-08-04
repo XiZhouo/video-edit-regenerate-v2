@@ -1,0 +1,126 @@
+/*
+ * themes.css — ZE 工具主题色 ×36(01-tokens)
+ *
+ * 「每个工具遵守同一套规范,只有主题色不同。」
+ * 本文件 = 36 个全手工设计的工具主题色。每个主题给 4 个设计值(500 主色 / 700 按下 /
+ * 200 浅块 / soft 大面积浅底),light + dark 各一组 —— 不是公式推导:L/C 按色相区手工锁定
+ * (红区收明度、黄区提明度降彩度、蓝紫区提彩度),保证任意主题下主按钮反白字对比 ≥4.5:1、
+ * 明暗一致的"通电感"。
+ *
+ * wash / tint / focus-ring / glow 在 tokens.css 由 accent-500 派生(相对色语法),
+ * 换主题自动跟随 —— 工具侧只声明一行:
+ *
+ *   <html data-ze-theme="22">        ← 安装位:每个 skill 占一个编号
+ *
+ * 编号即色环位置(每 10° 一档)。同族工具建议取相邻档;与语义色(success 152 /
+ * warn 78 / danger 26 / info 225)同相的档(02/08/16/23)慎用于重状态工具。
+ */
+
+/* 01 胭脂 · 0° */
+[data-ze-theme="01"] { --ze-accent-500: oklch(54% 0.17 0); --ze-accent-700: oklch(47% 0.17 0); --ze-accent-200: oklch(86% 0.06 0); --ze-accent-soft: oklch(90% 0.035 0); }
+[data-theme="dark"][data-ze-theme="01"] { --ze-accent-500: oklch(70% 0.15 0); --ze-accent-700: oklch(77% 0.13 0); --ze-accent-200: oklch(42% 0.11 0); --ze-accent-soft: oklch(34% 0.06 0); }
+/* 02 朱砂 · 10°(近 danger 26°,重状态工具慎用)*/
+[data-ze-theme="02"] { --ze-accent-500: oklch(54% 0.17 10); --ze-accent-700: oklch(47% 0.17 10); --ze-accent-200: oklch(86% 0.06 10); --ze-accent-soft: oklch(90% 0.035 10); }
+[data-theme="dark"][data-ze-theme="02"] { --ze-accent-500: oklch(70% 0.15 10); --ze-accent-700: oklch(77% 0.13 10); --ze-accent-200: oklch(42% 0.11 10); --ze-accent-soft: oklch(34% 0.06 10); }
+/* 03 赤陶 · 20° */
+[data-ze-theme="03"] { --ze-accent-500: oklch(54% 0.17 20); --ze-accent-700: oklch(47% 0.17 20); --ze-accent-200: oklch(86% 0.06 20); --ze-accent-soft: oklch(90% 0.035 20); }
+[data-theme="dark"][data-ze-theme="03"] { --ze-accent-500: oklch(70% 0.15 20); --ze-accent-700: oklch(77% 0.13 20); --ze-accent-200: oklch(42% 0.11 20); --ze-accent-soft: oklch(34% 0.06 20); }
+/* 04 柿红 · 30° */
+[data-ze-theme="04"] { --ze-accent-500: oklch(54% 0.17 30); --ze-accent-700: oklch(47% 0.17 30); --ze-accent-200: oklch(86% 0.06 30); --ze-accent-soft: oklch(90% 0.035 30); }
+[data-theme="dark"][data-ze-theme="04"] { --ze-accent-500: oklch(70% 0.15 30); --ze-accent-700: oklch(77% 0.13 30); --ze-accent-200: oklch(42% 0.11 30); --ze-accent-soft: oklch(34% 0.06 30); }
+/* 05 橘红 · 40° */
+[data-ze-theme="05"] { --ze-accent-500: oklch(58% 0.155 40); --ze-accent-700: oklch(51% 0.155 40); --ze-accent-200: oklch(86% 0.06 40); --ze-accent-soft: oklch(90% 0.035 40); }
+[data-theme="dark"][data-ze-theme="05"] { --ze-accent-500: oklch(75% 0.13 40); --ze-accent-700: oklch(81% 0.11 40); --ze-accent-200: oklch(42% 0.11 40); --ze-accent-soft: oklch(34% 0.06 40); }
+/* 06 琥珀 · 50° */
+[data-ze-theme="06"] { --ze-accent-500: oklch(58% 0.155 50); --ze-accent-700: oklch(51% 0.155 50); --ze-accent-200: oklch(86% 0.06 50); --ze-accent-soft: oklch(90% 0.035 50); }
+[data-theme="dark"][data-ze-theme="06"] { --ze-accent-500: oklch(75% 0.13 50); --ze-accent-700: oklch(81% 0.11 50); --ze-accent-200: oklch(42% 0.11 50); --ze-accent-soft: oklch(34% 0.06 50); }
+/* 07 蜜橙 · 60° */
+[data-ze-theme="07"] { --ze-accent-500: oklch(58% 0.155 60); --ze-accent-700: oklch(51% 0.155 60); --ze-accent-200: oklch(86% 0.06 60); --ze-accent-soft: oklch(90% 0.035 60); }
+[data-theme="dark"][data-ze-theme="07"] { --ze-accent-500: oklch(75% 0.13 60); --ze-accent-700: oklch(81% 0.11 60); --ze-accent-200: oklch(42% 0.11 60); --ze-accent-soft: oklch(34% 0.06 60); }
+/* 08 姜黄 · 70°(近 warn 78°,重状态工具慎用)*/
+[data-ze-theme="08"] { --ze-accent-500: oklch(62% 0.13 70); --ze-accent-700: oklch(55% 0.13 70); --ze-accent-200: oklch(86% 0.06 70); --ze-accent-soft: oklch(90% 0.035 70); }
+[data-theme="dark"][data-ze-theme="08"] { --ze-accent-500: oklch(76% 0.12 70); --ze-accent-700: oklch(82% 0.1 70); --ze-accent-200: oklch(42% 0.11 70); --ze-accent-soft: oklch(34% 0.06 70); }
+/* 09 缃黄 · 80° */
+[data-ze-theme="09"] { --ze-accent-500: oklch(62% 0.13 80); --ze-accent-700: oklch(55% 0.13 80); --ze-accent-200: oklch(86% 0.06 80); --ze-accent-soft: oklch(90% 0.035 80); }
+[data-theme="dark"][data-ze-theme="09"] { --ze-accent-500: oklch(76% 0.12 80); --ze-accent-700: oklch(82% 0.1 80); --ze-accent-200: oklch(42% 0.11 80); --ze-accent-soft: oklch(34% 0.06 80); }
+/* 10 芥末 · 90° */
+[data-ze-theme="10"] { --ze-accent-500: oklch(62% 0.13 90); --ze-accent-700: oklch(55% 0.13 90); --ze-accent-200: oklch(86% 0.06 90); --ze-accent-soft: oklch(90% 0.035 90); }
+[data-theme="dark"][data-ze-theme="10"] { --ze-accent-500: oklch(76% 0.12 90); --ze-accent-700: oklch(82% 0.1 90); --ze-accent-200: oklch(42% 0.11 90); --ze-accent-soft: oklch(34% 0.06 90); }
+/* 11 橄榄 · 100° */
+[data-ze-theme="11"] { --ze-accent-500: oklch(62% 0.13 100); --ze-accent-700: oklch(55% 0.13 100); --ze-accent-200: oklch(86% 0.06 100); --ze-accent-soft: oklch(90% 0.035 100); }
+[data-theme="dark"][data-ze-theme="11"] { --ze-accent-500: oklch(76% 0.12 100); --ze-accent-700: oklch(82% 0.1 100); --ze-accent-200: oklch(42% 0.11 100); --ze-accent-soft: oklch(34% 0.06 100); }
+/* 12 苔绿 · 110° */
+[data-ze-theme="12"] { --ze-accent-500: oklch(58% 0.14 110); --ze-accent-700: oklch(51% 0.14 110); --ze-accent-200: oklch(86% 0.06 110); --ze-accent-soft: oklch(90% 0.035 110); }
+[data-theme="dark"][data-ze-theme="12"] { --ze-accent-500: oklch(72% 0.12 110); --ze-accent-700: oklch(79% 0.1 110); --ze-accent-200: oklch(42% 0.11 110); --ze-accent-soft: oklch(34% 0.06 110); }
+/* 13 嫩竹 · 120° */
+[data-ze-theme="13"] { --ze-accent-500: oklch(58% 0.14 120); --ze-accent-700: oklch(51% 0.14 120); --ze-accent-200: oklch(86% 0.06 120); --ze-accent-soft: oklch(90% 0.035 120); }
+[data-theme="dark"][data-ze-theme="13"] { --ze-accent-500: oklch(72% 0.12 120); --ze-accent-700: oklch(79% 0.1 120); --ze-accent-200: oklch(42% 0.11 120); --ze-accent-soft: oklch(34% 0.06 120); }
+/* 14 竹青 · 130° */
+[data-ze-theme="14"] { --ze-accent-500: oklch(58% 0.14 130); --ze-accent-700: oklch(51% 0.14 130); --ze-accent-200: oklch(86% 0.06 130); --ze-accent-soft: oklch(90% 0.035 130); }
+[data-theme="dark"][data-ze-theme="14"] { --ze-accent-500: oklch(72% 0.12 130); --ze-accent-700: oklch(79% 0.1 130); --ze-accent-200: oklch(42% 0.11 130); --ze-accent-soft: oklch(34% 0.06 130); }
+/* 15 松绿 · 140° */
+[data-ze-theme="15"] { --ze-accent-500: oklch(58% 0.14 140); --ze-accent-700: oklch(51% 0.14 140); --ze-accent-200: oklch(86% 0.06 140); --ze-accent-soft: oklch(90% 0.035 140); }
+[data-theme="dark"][data-ze-theme="15"] { --ze-accent-500: oklch(72% 0.12 140); --ze-accent-700: oklch(79% 0.1 140); --ze-accent-200: oklch(42% 0.11 140); --ze-accent-soft: oklch(34% 0.06 140); }
+/* 16 翠绿 · 150°(近 success 152°,重状态工具慎用)*/
+[data-ze-theme="16"] { --ze-accent-500: oklch(58% 0.14 150); --ze-accent-700: oklch(51% 0.14 150); --ze-accent-200: oklch(86% 0.06 150); --ze-accent-soft: oklch(90% 0.035 150); }
+[data-theme="dark"][data-ze-theme="16"] { --ze-accent-500: oklch(72% 0.12 150); --ze-accent-700: oklch(79% 0.1 150); --ze-accent-200: oklch(42% 0.11 150); --ze-accent-soft: oklch(34% 0.06 150); }
+/* 17 碧玉 · 160° */
+[data-ze-theme="17"] { --ze-accent-500: oklch(58% 0.14 160); --ze-accent-700: oklch(51% 0.14 160); --ze-accent-200: oklch(86% 0.06 160); --ze-accent-soft: oklch(90% 0.035 160); }
+[data-theme="dark"][data-ze-theme="17"] { --ze-accent-500: oklch(72% 0.12 160); --ze-accent-700: oklch(79% 0.1 160); --ze-accent-200: oklch(42% 0.11 160); --ze-accent-soft: oklch(34% 0.06 160); }
+/* 18 青瓷 · 170° */
+[data-ze-theme="18"] { --ze-accent-500: oklch(55% 0.13 170); --ze-accent-700: oklch(48% 0.13 170); --ze-accent-200: oklch(86% 0.06 170); --ze-accent-soft: oklch(90% 0.035 170); }
+[data-theme="dark"][data-ze-theme="18"] { --ze-accent-500: oklch(72% 0.12 170); --ze-accent-700: oklch(79% 0.1 170); --ze-accent-200: oklch(42% 0.11 170); --ze-accent-soft: oklch(34% 0.06 170); }
+/* 19 孔雀 · 180° */
+[data-ze-theme="19"] { --ze-accent-500: oklch(55% 0.13 180); --ze-accent-700: oklch(48% 0.13 180); --ze-accent-200: oklch(86% 0.06 180); --ze-accent-soft: oklch(90% 0.035 180); }
+[data-theme="dark"][data-ze-theme="19"] { --ze-accent-500: oklch(72% 0.12 180); --ze-accent-700: oklch(79% 0.1 180); --ze-accent-200: oklch(42% 0.11 180); --ze-accent-soft: oklch(34% 0.06 180); }
+/* 20 青焰 · 190° */
+[data-ze-theme="20"] { --ze-accent-500: oklch(55% 0.13 190); --ze-accent-700: oklch(48% 0.13 190); --ze-accent-200: oklch(86% 0.06 190); --ze-accent-soft: oklch(90% 0.035 190); }
+[data-theme="dark"][data-ze-theme="20"] { --ze-accent-500: oklch(72% 0.12 190); --ze-accent-700: oklch(79% 0.1 190); --ze-accent-200: oklch(42% 0.11 190); --ze-accent-soft: oklch(34% 0.06 190); }
+/* 21 湖蓝 · 200° */
+[data-ze-theme="21"] { --ze-accent-500: oklch(55% 0.13 200); --ze-accent-700: oklch(48% 0.13 200); --ze-accent-200: oklch(86% 0.06 200); --ze-accent-soft: oklch(90% 0.035 200); }
+[data-theme="dark"][data-ze-theme="21"] { --ze-accent-500: oklch(72% 0.12 200); --ze-accent-700: oklch(79% 0.1 200); --ze-accent-200: oklch(42% 0.11 200); --ze-accent-soft: oklch(34% 0.06 200); }
+/* 22 晴空 · 210° */
+[data-ze-theme="22"] { --ze-accent-500: oklch(54% 0.16 210); --ze-accent-700: oklch(47% 0.16 210); --ze-accent-200: oklch(86% 0.06 210); --ze-accent-soft: oklch(90% 0.035 210); }
+[data-theme="dark"][data-ze-theme="22"] { --ze-accent-500: oklch(72% 0.14 210); --ze-accent-700: oklch(79% 0.12 210); --ze-accent-200: oklch(42% 0.11 210); --ze-accent-soft: oklch(34% 0.06 210); }
+/* 23 钴蓝 · 220°(近 info 225°,重状态工具慎用)*/
+[data-ze-theme="23"] { --ze-accent-500: oklch(54% 0.16 220); --ze-accent-700: oklch(47% 0.16 220); --ze-accent-200: oklch(86% 0.06 220); --ze-accent-soft: oklch(90% 0.035 220); }
+[data-theme="dark"][data-ze-theme="23"] { --ze-accent-500: oklch(72% 0.14 220); --ze-accent-700: oklch(79% 0.12 220); --ze-accent-200: oklch(42% 0.11 220); --ze-accent-soft: oklch(34% 0.06 220); }
+/* 24 群青 · 230° */
+[data-ze-theme="24"] { --ze-accent-500: oklch(54% 0.16 230); --ze-accent-700: oklch(47% 0.16 230); --ze-accent-200: oklch(86% 0.06 230); --ze-accent-soft: oklch(90% 0.035 230); }
+[data-theme="dark"][data-ze-theme="24"] { --ze-accent-500: oklch(72% 0.14 230); --ze-accent-700: oklch(79% 0.12 230); --ze-accent-200: oklch(42% 0.11 230); --ze-accent-soft: oklch(34% 0.06 230); }
+/* 25 藏蓝 · 240° */
+[data-ze-theme="25"] { --ze-accent-500: oklch(54% 0.16 240); --ze-accent-700: oklch(47% 0.16 240); --ze-accent-200: oklch(86% 0.06 240); --ze-accent-soft: oklch(90% 0.035 240); }
+[data-theme="dark"][data-ze-theme="25"] { --ze-accent-500: oklch(72% 0.14 240); --ze-accent-700: oklch(79% 0.12 240); --ze-accent-200: oklch(42% 0.11 240); --ze-accent-soft: oklch(34% 0.06 240); }
+/* 26 海蓝 · 250°(默认安装位 = tokens.css 出厂值)*/
+[data-ze-theme="26"] { --ze-accent-500: oklch(54% 0.16 250); --ze-accent-700: oklch(47% 0.16 250); --ze-accent-200: oklch(86% 0.06 250); --ze-accent-soft: oklch(90% 0.035 250); }
+[data-theme="dark"][data-ze-theme="26"] { --ze-accent-500: oklch(72% 0.14 250); --ze-accent-700: oklch(79% 0.12 250); --ze-accent-200: oklch(42% 0.11 250); --ze-accent-soft: oklch(34% 0.06 250); }
+/* 27 靛青 · 260° */
+[data-ze-theme="27"] { --ze-accent-500: oklch(54% 0.165 260); --ze-accent-700: oklch(47% 0.165 260); --ze-accent-200: oklch(86% 0.06 260); --ze-accent-soft: oklch(90% 0.035 260); }
+[data-theme="dark"][data-ze-theme="27"] { --ze-accent-500: oklch(72% 0.14 260); --ze-accent-700: oklch(79% 0.12 260); --ze-accent-200: oklch(42% 0.11 260); --ze-accent-soft: oklch(34% 0.06 260); }
+/* 28 靛紫 · 270° */
+[data-ze-theme="28"] { --ze-accent-500: oklch(54% 0.165 270); --ze-accent-700: oklch(47% 0.165 270); --ze-accent-200: oklch(86% 0.06 270); --ze-accent-soft: oklch(90% 0.035 270); }
+[data-theme="dark"][data-ze-theme="28"] { --ze-accent-500: oklch(72% 0.14 270); --ze-accent-700: oklch(79% 0.12 270); --ze-accent-200: oklch(42% 0.11 270); --ze-accent-soft: oklch(34% 0.06 270); }
+/* 29 紫藤 · 280° */
+[data-ze-theme="29"] { --ze-accent-500: oklch(54% 0.165 280); --ze-accent-700: oklch(47% 0.165 280); --ze-accent-200: oklch(86% 0.06 280); --ze-accent-soft: oklch(90% 0.035 280); }
+[data-theme="dark"][data-ze-theme="29"] { --ze-accent-500: oklch(72% 0.14 280); --ze-accent-700: oklch(79% 0.12 280); --ze-accent-200: oklch(42% 0.11 280); --ze-accent-soft: oklch(34% 0.06 280); }
+/* 30 青莲 · 290° */
+[data-ze-theme="30"] { --ze-accent-500: oklch(54% 0.165 290); --ze-accent-700: oklch(47% 0.165 290); --ze-accent-200: oklch(86% 0.06 290); --ze-accent-soft: oklch(90% 0.035 290); }
+[data-theme="dark"][data-ze-theme="30"] { --ze-accent-500: oklch(72% 0.14 290); --ze-accent-700: oklch(79% 0.12 290); --ze-accent-200: oklch(42% 0.11 290); --ze-accent-soft: oklch(34% 0.06 290); }
+/* 31 紫水晶 · 300° */
+[data-ze-theme="31"] { --ze-accent-500: oklch(54% 0.165 300); --ze-accent-700: oklch(47% 0.165 300); --ze-accent-200: oklch(86% 0.06 300); --ze-accent-soft: oklch(90% 0.035 300); }
+[data-theme="dark"][data-ze-theme="31"] { --ze-accent-500: oklch(72% 0.14 300); --ze-accent-700: oklch(79% 0.12 300); --ze-accent-200: oklch(42% 0.11 300); --ze-accent-soft: oklch(34% 0.06 300); }
+/* 32 木槿 · 310° */
+[data-ze-theme="32"] { --ze-accent-500: oklch(54% 0.165 310); --ze-accent-700: oklch(47% 0.165 310); --ze-accent-200: oklch(86% 0.06 310); --ze-accent-soft: oklch(90% 0.035 310); }
+[data-theme="dark"][data-ze-theme="32"] { --ze-accent-500: oklch(70% 0.15 310); --ze-accent-700: oklch(77% 0.13 310); --ze-accent-200: oklch(42% 0.11 310); --ze-accent-soft: oklch(34% 0.06 310); }
+/* 33 紫红 · 320° */
+[data-ze-theme="33"] { --ze-accent-500: oklch(54% 0.165 320); --ze-accent-700: oklch(47% 0.165 320); --ze-accent-200: oklch(86% 0.06 320); --ze-accent-soft: oklch(90% 0.035 320); }
+[data-theme="dark"][data-ze-theme="33"] { --ze-accent-500: oklch(70% 0.15 320); --ze-accent-700: oklch(77% 0.13 320); --ze-accent-200: oklch(42% 0.11 320); --ze-accent-soft: oklch(34% 0.06 320); }
+/* 34 洋红 · 330° */
+[data-ze-theme="34"] { --ze-accent-500: oklch(54% 0.165 330); --ze-accent-700: oklch(47% 0.165 330); --ze-accent-200: oklch(86% 0.06 330); --ze-accent-soft: oklch(90% 0.035 330); }
+[data-theme="dark"][data-ze-theme="34"] { --ze-accent-500: oklch(70% 0.15 330); --ze-accent-700: oklch(77% 0.13 330); --ze-accent-200: oklch(42% 0.11 330); --ze-accent-soft: oklch(34% 0.06 330); }
+/* 35 莓红 · 340° */
+[data-ze-theme="35"] { --ze-accent-500: oklch(54% 0.165 340); --ze-accent-700: oklch(47% 0.165 340); --ze-accent-200: oklch(86% 0.06 340); --ze-accent-soft: oklch(90% 0.035 340); }
+[data-theme="dark"][data-ze-theme="35"] { --ze-accent-500: oklch(70% 0.15 340); --ze-accent-700: oklch(77% 0.13 340); --ze-accent-200: oklch(42% 0.11 340); --ze-accent-soft: oklch(34% 0.06 340); }
+/* 36 玫红 · 350° */
+[data-ze-theme="36"] { --ze-accent-500: oklch(54% 0.165 350); --ze-accent-700: oklch(47% 0.165 350); --ze-accent-200: oklch(86% 0.06 350); --ze-accent-soft: oklch(90% 0.035 350); }
+[data-theme="dark"][data-ze-theme="36"] { --ze-accent-500: oklch(70% 0.15 350); --ze-accent-700: oklch(77% 0.13 350); --ze-accent-200: oklch(42% 0.11 350); --ze-accent-soft: oklch(34% 0.06 350); }

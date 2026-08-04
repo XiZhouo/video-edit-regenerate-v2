@@ -1,0 +1,78 @@
+/*
+ * checkbox.css — ze-checkbox 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 实现: 原生 <input type=checkbox> 上 appearance:none 全自定义 + ::after 画 ✓。
+ *   不用 accent-color —— 紧凑尺度下 accent-color 跨浏览器盒子/圆角/focus 难控。
+ *   14px 盒是图标几何字面量;勾使用微字号令牌,对齐 v3 header 14px 图标先例。
+ *   radio 本批缓做,故无共享 form-control 基类(下一批 radio/switch 落地时再抽)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 1px solid var(--ze-ink-tertiary);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-raised);
+  cursor: pointer;
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    border-color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-checkbox:hover { border-color: var(--ze-accent-500); }
+.ze-checkbox:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+
+.ze-checkbox:checked,
+.ze-checkbox:indeterminate { background: var(--ze-accent-500); border-color: var(--ze-accent-500); }
+
+.ze-checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ze-ink-inverse);
+  font-size: var(--ze-fs-2xs);
+  font-weight: var(--ze-fw-bold);
+  line-height: 1;
+}
+.ze-checkbox:indeterminate::after {
+  content: "–";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ze-ink-inverse);
+  font-weight: var(--ze-fw-bold);
+  line-height: 1;
+}
+
+.ze-checkbox:disabled {
+  border-color: var(--ze-ink-disabled);
+  background: var(--ze-surface-sunken);
+  cursor: not-allowed;
+}
+.ze-checkbox:disabled:checked,
+.ze-checkbox:disabled:indeterminate { background: var(--ze-ink-disabled); border-color: var(--ze-ink-disabled); }
+
+.ze-checkbox[aria-invalid="true"] { border-color: var(--ze-semantic-danger); }
+
+/* 可选行包装:checkbox + 文案 */
+.ze-checkbox__row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  cursor: pointer;
+}
+.ze-checkbox__label { font-size: var(--ze-fs-sm); color: var(--ze-ink-primary); }

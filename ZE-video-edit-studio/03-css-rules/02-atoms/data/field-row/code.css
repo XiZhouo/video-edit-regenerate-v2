@@ -1,0 +1,131 @@
+/*
+ * field-row.css — ze-field-row 表单字段行组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:「label + 控件」的字段行是框架级共享 primitive(FormZone schema 驱动表单 +
+ * ParamPanel 参数面板复用)。它承载行高系统(SPEC §4):单行字段统一 min-height=row-h、控件
+ * 垂直居中不撑高行;唯一例外多行控件(textarea/JSON)挂 data-multiline → 高度 = n×row-h、顶
+ * 对齐。还含 run-phase 骨架等高占位 + @container 响应式单列。这套「grid 列宽(--ze-field-label-w)
+ * + row-h 行模型 + 多行 calc(row-h*n) + 状态分支」的令牌依赖,非通用 utility 原子(.ze-grid/
+ * .ze-gap 没有 label-w 列 / row-h 行的档)能表达,故收成 L2 组件原子(同 .ze-table/.ze-thumb)。
+ * 原 04-editors/form.css 迁来(P4 batch10),旧名 .ze-editor__field* → .ze-field-row*。
+ *
+ * 控件列统一几何法:一切控件从控件列起点齐平起笔 —— 撑满型(input/select/textarea/滑杆行)
+ * 占满列宽;固有尺寸型(checkbox/取色块)左对齐、禁拉伸禁居中;数值读数住固定宽右槽
+ * .ze-field-row__value,不内联漂浮。窄容器(<320px 单列)同法,起点 = 行起点。
+ *
+ * 全部值引 令牌(var(--ze-*)),禁字面量;@container 断点 px 为结构。
+ */
+
+/* 单行字段:统一行高单位,内层控件居中适配 */
+.ze-field-row {
+  display: grid;
+  grid-template-columns: var(--ze-field-label-w) 1fr;
+  align-items: center;
+  gap: var(--ze-space-2);
+  min-height: var(--ze-row-h);
+}
+.ze-field-row[data-density="compact"] {
+  grid-template-columns: calc(var(--ze-field-label-w) - var(--ze-space-4)) 1fr;
+  gap: var(--ze-space-1);
+  min-height: var(--ze-control-h-sm);
+}
+.ze-field-row__label {
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-tight);
+}
+.ze-field-row[data-density="compact"] .ze-field-row__label {
+  font-size: var(--ze-fs-xs);
+}
+/* 取色器:固定小色块,≤ 行高、随行居中(不撑高行 — 符合行高系统)。滑杆撑满 1fr 控件列。 */
+.ze-field-row__color {
+  width: var(--ze-space-8);
+  height: var(--ze-space-6);
+  padding: 0;
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+/* 参数栈作为滚动归属点(竖排/间距/内距由 .ze-stack[data-gap][data-pad] 提供)。 */
+.ze-param { overflow: auto; }
+.ze-param.ze-stack {
+  gap: var(--ze-space-1);
+  padding: var(--ze-space-2);
+}
+.ze-param .ze-field-row {
+  grid-template-columns: calc(var(--ze-field-label-w) - var(--ze-space-4)) 1fr;
+  gap: var(--ze-space-1);
+}
+
+/* 控件列几何法:固有尺寸控件在控件列内左对齐(禁 stretch/居中 —— 裸原生 checkbox 在
+ * grid stretch 下整盒拉伸、原生勾形居中如表格单元格)。撑满型控件靠 grid 默认 stretch 占满列。 */
+.ze-field-row > .ze-checkbox,
+.ze-field-row > .ze-field-row__color { justify-self: start; }
+
+/* 滑杆行:轨道撑满控件列;读数住固定宽右槽(替代 JSX 内联 minWidth/textAlign;
+ * 宽窄容器同几何 —— 槽永远紧贴轨道右端)。tabular-nums:拖动时数字不抖。 */
+.ze-field-row[data-control="slider"] > .ze-row { width: 100%; }
+.ze-field-row__value {
+  flex-shrink: 0;
+  min-width: var(--ze-space-8);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 多行控件例外(textarea/JSON):显式 data-multiline → 高度 = n×row-h、label 顶对齐。
+ * 这是行高系统唯一允许"行变高"的口子,且高度仍是 row-h 的整数倍,不写裸 px。 */
+.ze-field-row[data-multiline="true"] {
+  align-items: start;
+  min-height: calc(var(--ze-row-h) * 4);
+}
+.ze-field-row[data-multiline="true"][data-density="compact"] {
+  min-height: calc(var(--ze-row-h) * 3);
+}
+.ze-field-row[data-multiline="true"] .ze-field-row__label {
+  padding-top: var(--ze-space-1);   /* 与首行文本基线对齐 */
+}
+.ze-field-row[data-multiline="true"] .ze-textarea {
+  height: calc(var(--ze-row-h) * 4);
+  resize: vertical;
+}
+.ze-field-row[data-multiline="true"][data-density="compact"] .ze-textarea {
+  height: calc(var(--ze-row-h) * 3);
+}
+
+/* 加载 / 占位(骨架本体在 placeholder.css;此处只放字段内占位布局):
+ *   pending/running 时只把控件位换成等高骨架(字段壳/行高不变 → 与加载后零 reflow)。
+ *   单行控件 → text 骨架填满行高;textarea/JSON → block 骨架,高度对齐 textarea(rows=4)盒高。 */
+.ze-field-row[data-run-phase] .ze-skeleton[data-variant="text"] { width: 100%; }
+.ze-field-row[data-run-phase] .ze-skeleton[data-variant="block"] {
+  width: 100%;
+  min-height: calc(var(--ze-row-h) * 4);   /* 对齐多行控件 n×row-h,加载前后零 reflow */
+}
+
+/* 响应式(SPEC §2.8 M1)。容器查询(根 .ze-editor 设 container-type)。
+ * xs (<320px): label 上下排(堆叠时放开行高,避免挤压) */
+@container (max-width: 320px) {
+  .ze-field-row { grid-template-columns: 1fr; gap: var(--ze-space-1); min-height: 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * W1-6 一次性定位高亮:变更卡的字段 chip 把用户送到这一行时闪一下。
+ * 属性由 App.tsx 加、1.4s 后摘掉 —— 不留常亮态,免得用户以为这行有问题。
+ * 用 outline 不用 background:后者会盖掉行自身的 run-phase/mixed 状态色。
+ * ══════════════════════════════════════════════════════════════════════════ */
+.ze-field-row[data-ze-flash] {
+  outline: 2px solid var(--ze-accent-500);
+  outline-offset: 2px;
+  border-radius: var(--ze-radius-sm);
+  animation: ze-field-row-flash var(--ze-dur-slow) ease-out 2;
+}
+@keyframes ze-field-row-flash {
+  from { outline-color: var(--ze-accent-500); }
+  to   { outline-color: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ze-field-row[data-ze-flash] { animation: none; }
+}

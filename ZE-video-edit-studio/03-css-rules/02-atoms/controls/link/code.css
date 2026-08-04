@@ -1,0 +1,39 @@
+/*
+ * link.css — ze-link 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: accent-700 resting(对齐 v3 editor__btn 的链接色)→ hover accent-500 + 下划线。
+ *   链接继承字号,无 data-size。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-link {
+  color: var(--ze-accent-700);
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: var(--ze-radius-sm);
+  font-size: inherit;
+  transition: color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-link:hover { color: var(--ze-accent-500); text-decoration: underline; text-underline-offset: var(--ze-space-0-5); }
+.ze-link:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: var(--ze-space-0-5); }
+
+.ze-link[data-variant="subtle"] { color: var(--ze-ink-secondary); }
+.ze-link[data-variant="subtle"]:hover { color: var(--ze-ink-primary); }
+.ze-link[data-variant="danger"] { color: var(--ze-semantic-danger); }
+
+.ze-link[aria-disabled="true"] {
+  color: var(--ze-ink-disabled);
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.ze-link[data-external="true"]::after {
+  content: "↗";
+  margin-left: var(--ze-space-0-5);
+  font-size: 0.85em;                /* 相对字号,跟随上下文,非颜色/绝对字面量 */
+  color: var(--ze-ink-tertiary);
+}

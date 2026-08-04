@@ -1,0 +1,50 @@
+/*
+ * table.css — ze-table 数据表组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么是 L2 组件原子:表格样式天然靠 th/td/tr + :hover + 后代选择器(每个单元格贴 className 不
+ * 现实),无法拆成可贴的小原子。故整张表收成一个 `.ze-table` 组件原子(同 .ze-card/.ze-badge):
+ * 容器贴 .ze-table,内部 th/td/tr/选中/run-phase 由本原子经后代选择器统一给样式。令牌消费收敛此层,
+ * 上层(L4 table.css)只留无令牌的响应式 max-width 覆盖。
+ *
+ * 行高系统(SPEC §4):语义同类行统一 min row-h;height 在 table 布局里作最小高,内容垂直居中。
+ * 全部值引令牌(var(--ze-*)),禁字面量。
+ */
+.ze-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ze-fs-sm);
+}
+.ze-table th,
+.ze-table td {
+  height: var(--ze-row-h);
+  padding: 0 var(--ze-space-3);
+  vertical-align: middle;
+  line-height: var(--ze-lh-tight);
+  text-align: left;
+  border-bottom: 1px solid var(--ze-overlay-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ze-table th {
+  color: var(--ze-ink-secondary);
+  font-weight: var(--ze-fw-medium);
+  position: sticky;
+  top: 0;
+  background: var(--ze-surface-raised);
+}
+.ze-table tbody tr { cursor: pointer; }
+.ze-table tbody tr:hover { background: var(--ze-overlay-soft); }
+.ze-table tbody tr.is-selected { background: var(--ze-overlay-accent-wash); }
+.ze-table th[data-sortable="true"] { cursor: pointer; user-select: none; }
+.ze-table th[data-sortable="true"]:hover { color: var(--ze-ink-primary); }
+.ze-table tr[data-multi-selected="true"] { background: var(--ze-overlay-accent-wash); }
+
+/* 运行态:pending/running 行降明度(色,不抢眼);error 行淡红底。运行行仍可选择/查看。 */
+.ze-table tr[data-run-phase] td { vertical-align: middle; }
+.ze-table tr[data-run-phase="error"] { background: color-mix(in oklab, var(--ze-semantic-danger) 6%, transparent); }
+.ze-table tr[data-run-phase="pending"],
+.ze-table tr[data-run-phase="running"] { color: var(--ze-ink-tertiary); }

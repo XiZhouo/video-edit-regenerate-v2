@@ -1,0 +1,14 @@
+/*
+ * header.css — 工作台顶部固定栏视觉(04-editors · 已迁空 stub)
+ *
+ * 协议:03-css-rules 契约。
+ *
+ * 绝对严格分层(L5 chrome 轮 batch4):顶部栏(.ze-header* 块)是框架级工作台 shell chrome
+ * (HeaderShell + LeftSegment / MiddleSegment / RightSegment + menus / controls),含状态化
+ * hover(menu-trigger / theme-toggle / avatar)、data-state 选择器、脉冲动画、popover / submenu
+ * 绝对定位,令牌样式无法降为 L4 无令牌结构,已整组上移 L2 组件原子 →
+ * 见 03-css-rules/02-atoms/header-shell.css(经 index.css @import)。
+ *
+ * 本文件无残留(全是该顶栏 shell),清空为指针 stub:零规则、零 var(--ze-*)。HeaderShell.tsx
+ * 保留 import 本文件不牵连;类名 / 消费方无变化(02-atoms/index.css 已全局提供 header-shell 样式)。
+ */

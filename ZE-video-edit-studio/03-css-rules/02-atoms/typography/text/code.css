@@ -1,0 +1,132 @@
+/*
+ * text.css — ze-text 角色文字原子 (02-atoms / L2 实用原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么有它:绝对严格分层后,L3 功能区 / L4 编辑器的 CSS 不准再直接用
+ * var(--ze-fs-*) / var(--ze-ink-*) 写"次要标签 / 元数据小字 / 分组标题"。
+ * 把这几档高频角色文字封成 L2 原子,角色 = data-role 闭集,令牌消费收敛到本层。
+ *
+ * 视觉原子里有自己文字的(button/input/card 标题…)各管各的;.ze-text 只补
+ * "裸文字片段"这一类(zone 里的标签 / 段标题 / 计数 / 说明)。
+ * 全部值引 令牌(var(--ze-*)),禁字面量。
+ *
+ * data-* 闭集:role(secondary/tertiary/title)· size(xs/sm)· weight(medium/semibold/bold)·
+ *   mono · truncate · leading(normal)· prose · tone(accent/danger/info/success/warn/inverse/
+ *   secondary/muted)。另含富文本容器 .ze-rich(见下)。用法对照表 + 扩展规则见 SPEC §3.5 / §3.6
+ *   —— 加新 role/tone 在此加规则 + SPEC 补行 + 契约 MINOR。
+ */
+
+/* base:默认正文 UI 字号 + 主色;角色覆盖字号/色/重量 */
+.ze-text {
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-primary);
+}
+
+/* 次要文字:标签 / 字段名 / 节点文字(fs-sm + 次墨)*/
+.ze-text[data-role="secondary"] {
+  font-size: var(--ze-fs-sm);
+  color: var(--ze-ink-secondary);
+}
+
+/* 三级文字:占位 / 计数 / 元数据 / 状态条小字 / 菜单分组标题(fs-xs + 三级墨)*/
+.ze-text[data-role="tertiary"] {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+}
+
+/* 分组 / 区块小标题:与 .ze-editor__title 同一配方(fs-sm + semibold + 主墨)——
+ * 「编辑器标题 / 面板段头」全系列统一,改标题视觉只许改 editor-shell 与此两处。 */
+.ze-text[data-role="title"] {
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-semibold);
+  color: var(--ze-ink-primary);
+  letter-spacing: 0;
+}
+
+/* 修饰:可叠加在任意 role 上 */
+.ze-text[data-weight="medium"]   { font-weight: var(--ze-fw-medium); }
+.ze-text[data-weight="semibold"] { font-weight: var(--ze-fw-semibold); }
+.ze-text[data-weight="bold"]     { font-weight: var(--ze-fw-bold); }
+.ze-text[data-truncate="true"] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 等宽:时码 / 代码行号 / 最近操作等机器文本 */
+.ze-text[data-mono="true"] { font-family: var(--ze-font-mono); }
+/* 字号修饰(只改字号,不动色;给"主色但要小一档"的场景,如代码正文)*/
+.ze-text[data-size="xs"] { font-size: var(--ze-fs-xs); }
+.ze-text[data-size="sm"] { font-size: var(--ze-fs-sm); }
+/* 行高修饰(代码 gutter 与正文对齐需统一行高)*/
+.ze-text[data-leading="normal"] { line-height: var(--ze-lh-normal); }
+
+/* 富文本/正文排版(data-prose):容器接管"动态生成的 HTML"(markdown 预览等)里 p/code/strong
+ * 的排版 —— 这些子节点由 dangerouslySetInnerHTML 注入,贴不上 className,故由本原子经后代选择器统一
+ * 给样式。极简正文:段距 + 行内代码底色。容器自身字号/色由叠加的 data-role / base 决定。 */
+.ze-text[data-prose="true"] { line-height: var(--ze-lh-normal); }
+.ze-text[data-prose="true"] p { margin: 0 0 var(--ze-space-2); }
+.ze-text[data-prose="true"] code {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  background: var(--ze-surface-sunken);
+  border-radius: var(--ze-radius-sm);
+  padding: 0 var(--ze-space-1);
+}
+/* markdown 阅读视图块级排版(text 预览 / document 块渲染注入的 标题/列表/引用/代码块/分隔线/链接)——
+ * 由本原子经后代选择器统一给样式,块视觉只住 L2(L4 编辑器零样式;渲染器见 03-editor/lib/markdown.ts)。 */
+.ze-text[data-prose="true"] :first-child { margin-top: 0; }
+.ze-text[data-prose="true"] h1,
+.ze-text[data-prose="true"] h2,
+.ze-text[data-prose="true"] h3,
+.ze-text[data-prose="true"] h4,
+.ze-text[data-prose="true"] h5,
+.ze-text[data-prose="true"] h6 {
+  margin: var(--ze-space-4) 0 var(--ze-space-2);
+  font-weight: var(--ze-fw-semibold);
+  line-height: var(--ze-lh-normal);
+  color: var(--ze-ink-primary);
+}
+.ze-text[data-prose="true"] h1 { font-size: var(--ze-fs-2xl); font-weight: var(--ze-fw-bold); }
+.ze-text[data-prose="true"] h2 { font-size: var(--ze-fs-xl); }
+.ze-text[data-prose="true"] h3 { font-size: var(--ze-fs-lg); }
+.ze-text[data-prose="true"] h4 { font-size: var(--ze-fs-sm); }
+.ze-text[data-prose="true"] h5,
+.ze-text[data-prose="true"] h6 { font-size: var(--ze-fs-xs); color: var(--ze-ink-secondary); }
+.ze-text[data-prose="true"] ul,
+.ze-text[data-prose="true"] ol { margin: 0 0 var(--ze-space-2); padding-inline-start: var(--ze-space-6); }
+.ze-text[data-prose="true"] li { margin-bottom: var(--ze-space-0-5); }
+.ze-text[data-prose="true"] li[data-task="true"] { list-style: none; }
+.ze-text[data-prose="true"] li[data-task="true"] input { margin-inline-end: var(--ze-space-1); }
+.ze-text[data-prose="true"] blockquote {
+  margin: 0 0 var(--ze-space-2);
+  padding-inline-start: var(--ze-space-3);
+  border-inline-start: 2px solid var(--ze-overlay-soft);
+  color: var(--ze-ink-secondary);
+}
+.ze-text[data-prose="true"] pre {
+  margin: 0 0 var(--ze-space-2);
+  padding: var(--ze-space-2) var(--ze-space-3);
+  background: var(--ze-surface-sunken);
+  border-radius: var(--ze-radius-md);
+  overflow-x: auto;
+}
+/* 代码块内的 code 复位:不叠加行内 code 的底色/内距,纯等宽块。 */
+.ze-text[data-prose="true"] pre code { background: none; padding: 0; }
+.ze-text[data-prose="true"] hr { margin: var(--ze-space-3) 0; border: 0; border-top: 1px solid var(--ze-line-soft); }
+.ze-text[data-prose="true"] a { color: var(--ze-accent-500); text-decoration: underline; }
+.ze-text[data-prose="true"] strong { font-weight: var(--ze-fw-semibold); }
+.ze-text[data-prose="true"] em { font-style: italic; }
+/* 富文本内联标记(Trans 的 **bold** / <kbd>):容器贴 .ze-rich,子 <b> 由后代选择器给固定主墨
+ * (脱离上下文次要色而突出);<kbd> 贴 .ze-kbd 键帽原子(见 kbd.css)。面向 inline 标记,
+ * 与 data-prose(面向块级注入 HTML)互补。扩展:要支持新 inline 标记,在此加 .ze-rich <tag> 规则。 */
+.ze-rich b { color: var(--ze-ink-primary); }
+
+/* 语义/强调前景色(可叠加在任意 role 上;与 .ze-tone 同义,贴 .ze-text 时省一个类)*/
+.ze-text[data-tone="accent"]  { color: var(--ze-accent-500); }
+.ze-text[data-tone="danger"]  { color: var(--ze-semantic-danger); }
+.ze-text[data-tone="info"]    { color: var(--ze-semantic-info); }
+.ze-text[data-tone="success"] { color: var(--ze-semantic-success); }
+.ze-text[data-tone="warn"]    { color: var(--ze-semantic-warn); }
+.ze-text[data-tone="inverse"] { color: var(--ze-ink-inverse); }
+/* 墨色档(纯改色、不动字号;给"要某档字号但只改墨色"的位 —— 与 data-role 不同:role 同时改字号。
+ * 例:dialog 表格 KEY 要 fs-sm(继承父行) + 三级墨,用 data-tone=muted 而非 data-role=tertiary(后者会连字号一起降到 fs-xs)。*/
+.ze-text[data-tone="secondary"] { color: var(--ze-ink-secondary); }
+.ze-text[data-tone="muted"]     { color: var(--ze-ink-tertiary); }

@@ -1,0 +1,553 @@
+/*
+ * editor-shell.css — ze-editor 编辑器外壳组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:`.ze-editor` 及其外壳子件(toolbar 槽 / statusbar / 空态 / 加载壳 + 空间编辑器
+ * 家族共享的 __canvas-body 脚手架)是**全 15 编辑器共享的外壳 chrome**(EditorFrame 统一组装,
+ * 见 01-core/.../EditorFrame.tsx)。它是 ZE 里复用面最广的 shell 组件,视觉走令牌(底色/墨色/字体/
+ * 内距/分隔线/状态条/空态)且靠后代选择器与 data-* 分支(statusbar-reveal hover/active 等),
+ * 同 .ze-card/.ze-table 的组件原子模式 —— 令牌消费合法收敛 L2。类名沿用 `.ze-editor*`(它就是
+ * 编辑器外壳、命名正确,不同于 form 那个误名的 .ze-editor__field 字段行,故不重命名)。
+ * 原 04-editors/editor.css 迁来(P4 batch13);各编辑器类型专属内容画法仍在各自文件。
+ *
+ * 响应式(SPEC §2.8):根 .ze-editor 设 container-type=inline-size,各类型文件在自己内部声明
+ * @container 规则(中区 EditorSlot 可被 LayoutTree 拉到比窗口窄)。全部值引 令牌(var(--ze-*))。
+ */
+
+.ze-editor {
+  container-type: inline-size;
+  container-name: ze-editor;   /* 具名:让 zone 降级 @container ze-editor 精确命中「编辑器宽」(传导跳3 前置);匿名 @container 仍匹配最近 container=本元素,行为不变 */
+  display: flex;
+  flex-direction: column;
+  /* 编辑器 = 带横栏的面板:顶/底横栏(header/statusbar)贯通编辑器宽(chrome,不是功能区),
+   * 横栏之间是 __work 工作区(内含按语义绘制边界的功能区);padding/gap 在 __work 上,
+   * 不在容器上 —— 横栏不内缩。 */
+  height: 100%;
+  /* 最小可用尺寸地板:与 .ze-split__pane / --ze-min-slot 对齐成链,父塌时编辑器顶住地板、
+   * 把「放不下」转交上层滚动(窄栏整列滚),而非被 overflow:clip 在 0 尺寸下静默吞光内容。 */
+  min-width: var(--ze-min-slot-w);
+  min-height: var(--ze-min-slot-h);
+  /* [皮肤 · 晴空瓷釉] 编辑器 = 浮在环境上的玻璃面板:半透釉面 + 背景模糊 + 大圆角 +
+   * 面板海拔 + 顶缘高光。配套:layout-tree.css 给 pane 之间留空气缝、分割条透明化。
+   * overflow:clip 让内部满铺背景(表头/状态条)贴合圆角;clip 不产生滚动容器,
+   * 内部滚动仍归各 editor body。 */
+  background: var(--ze-surface-glass);
+  -webkit-backdrop-filter: blur(var(--ze-glass-blur)) saturate(var(--ze-glass-saturate));
+  backdrop-filter: blur(var(--ze-glass-blur)) saturate(var(--ze-glass-saturate));
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-lg);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-panel);
+  overflow: clip;
+  color: var(--ze-ink-primary);
+  font-family: var(--ze-font-sans);
+  font-size: var(--ze-fs-sm);
+}
+/* editor 根可聚焦(tabIndex)以承接局部快捷键(⌘A/Esc 等);容器本身不显焦点环,
+ * 焦点反馈交给内部控件。 */
+.ze-editor:focus { outline: none; }
+
+/* ---- toolbar 槽(zone slot;legacy 工具条,新代码优先用 header + zones)---- */
+.ze-editor__toolbar {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  height: var(--ze-row-h);
+  min-height: var(--ze-row-h);
+  max-height: var(--ze-row-h);
+  padding: 0 var(--ze-space-2);
+  /* legacy 工具行是控制组承载槽,不是默认视觉块;按钮/分段控件自己形成边界。 */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+/* 统一编辑器标题(全 14+ 编辑器唯一标题样式;zones/卡片的段头走 .ze-text[data-role=title],
+ * 二者取值一致 = fs-sm + semibold + 主墨。改标题视觉只许改这里与 text.css 的 title 两处。 */
+.ze-editor__title {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-semibold);
+  color: var(--ze-ink-primary);
+  line-height: var(--ze-lh-tight);
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ze-editor__count {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: var(--ze-space-5);
+  line-height: 1;
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  background: var(--ze-surface-sunken);
+  border-radius: var(--ze-radius-pill);
+  padding: 0 var(--ze-space-2);
+}
+/* 右侧动作组:一个**逻辑容器**承载 toolbar 右半(搜索 / 新增 / 对比 / 筛选 / 工具),
+ * 用容器结构表达"靠右",不再用 per-item inline margin-left:auto 硬凑。 */
+.ze-editor__toolbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-height: 100%;
+  gap: var(--ze-space-2);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.ze-editor__toolbar-actions::-webkit-scrollbar { display: none; }
+/* 搜索框承担行内弹性:窄行主动 shrink 让位(min-width 兜底可用),组(不可压)保持完整——
+ * 弹性归输入件,不归组;防"行恰好压线"时取整误差去咬组名。 */
+.ze-editor__search { flex: 0 1 auto; min-width: 96px; max-width: var(--ze-size-panel-w); }
+.ze-editor__toolbar .ze-button[data-size="sm"],
+.ze-editor__toolbar .ze-input[data-size="sm"],
+.ze-editor__toolbar .ze-select[data-size="sm"] .ze-select__control {
+  box-sizing: border-box;
+  height: var(--ze-space-6);
+  min-height: var(--ze-space-6);
+  font-size: var(--ze-fs-xs);
+  line-height: 1;
+}
+.ze-editor__toolbar .ze-select[data-size="sm"] {
+  flex: 0 1 var(--ze-size-panel-w);
+  width: auto;
+  min-width: 0;
+  max-width: var(--ze-size-panel-w);
+}
+.ze-editor__toolbar .ze-bar {
+  min-height: var(--ze-space-6);
+  padding-block: 0;
+}
+/* 按钮改用 .ze-button(data-variant/data-size);本文件不再定义 __btn。 */
+
+/* ---- 空态 ---- */
+.ze-editor__empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-sm);
+}
+
+/* ---- 整 editor 初始加载:复用 __empty 居中容器放骨架行 / spinner ---- */
+.ze-editor__loading {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--ze-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+}
+
+/* ---- 编辑器局部状态条(EditorStatusBar;本槽 running/queued + 最近操作 + 取消)---- */
+.ze-editor__statusbar {
+  flex: 0 0 auto; /* chrome-fixed(01-layout SPEC §2.10 C2c):底部横栏不参与 flex 压缩 */
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  min-height: var(--ze-row-h);
+  padding: 0 var(--ze-space-2);
+  /* 底部横栏(编辑器状态 chrome):贯通编辑器宽、上缘发丝线;同顶部横栏,是横栏不是功能区块。 */
+  border-top: 1px solid var(--ze-overlay-soft);
+  background: transparent;
+  font-size: var(--ze-fs-xs);
+}
+.ze-editor__statusbar-counts { display: inline-flex; gap: var(--ze-space-1); flex-shrink: 0; }
+.ze-editor__statusbar-op {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ze-ink-tertiary);
+  font-family: var(--ze-font-mono);
+}
+/* 收起把手(可关闭功能区契约 SPEC §7):toggle 只摆位(视觉来自 .ze-icon-button 原子)*/
+.ze-editor__statusbar-toggle { flex-shrink: 0; }
+/* 折叠态的极简复原条:永远可见、点一下展开;只用令牌 */
+.ze-editor__statusbar-reveal {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  width: 100%;
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  border: 0;
+  border-top: 1px solid var(--ze-overlay-soft);
+  background: transparent;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard),
+              color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-editor__statusbar-reveal:hover { background: var(--ze-overlay-soft); color: var(--ze-ink-secondary); }
+.ze-editor__statusbar-reveal[data-active="true"] { color: var(--ze-semantic-info); }
+
+/* ---- 空间编辑器家族(canvas2d / scene3d / asset / media)共享的 body 脚手架 ----
+ *   内容画法分文件:spatial.css / scene3d.css / asset.css / media.css。
+ *   这里只定 body 盒 + overlay/skeleton/hint 的共享位置。 */
+/* 工作区:横栏之间的功能区容器。padding(功能区与编辑器内距)+ gap(功能区之间间距)在此;
+ * 横栏(header/statusbar)在工作区之外、贯通宽不受内距影响。toolbar/zone/content 按语义
+ * 选择 control group / panel / viewport / pass-through 边界。
+ *
+ * [间距两轴](tokens/SPEC §3.2 的编辑器内落法,两轴独立、不得互相挪用):
+ *   轴A 编辑器行距(intra-editor):功能区行之间/行与内容区 = space-1(此处 gap/padding,v4 高密度);
+ *     行内组内间距由组容器自管(.ze-row/.ze-cluster data-gap,组内 1、组间靠件边界不靠 gap 对比)。
+ *   轴B 页面区距(inter-zone):编辑器与编辑器/面板与面板(分屏 splitter、页面框架层)= §3.2 space-6;
+ *     不在本文件,由 layout 层持有 —— 在编辑器内把行距加大到 space-6 或在页面层压到 space-1 都是错拿轴。 */
+.ze-editor__work {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  padding: var(--ze-space-1);
+}
+
+/* 内容区 = viewport 边界:line-mid 四边 + radius-sm + sunken surface,保护画布/预览/主工作面
+ * 不裸奔;flex:1 占满剩余高。所有编辑器的内容脚手架(canvas-body/form-body/list/...)
+ * 由 EditorFrame 统一裹在 .ze-editor__content 内。若内部首层已有完整 rows/panel/unit 边界,
+ * 才用 pass-through 只保留 flex/scroll 职责。 */
+.ze-editor__content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-line-mid);
+  border-radius: var(--ze-radius-sm);
+}
+/* 内容面直通:当 editor 主体本身由多个功能块(unit/canvas/list)组成时,__content 只保留
+ * flex/滚动归属,不再额外画一层 sunken 容器。防止 content -> stack/card/unit 的冗余壳链。 */
+.ze-editor__content[data-content-mode="pass-through"] {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.ze-editor__content[data-content-layout="stack"],
+.ze-editor__content[data-content-layout="padded-stack"] {
+  gap: var(--ze-space-1);
+}
+.ze-editor__content[data-content-layout="padded-stack"] {
+  padding: var(--ze-space-1);
+}
+.ze-editor__content[data-content-scroll="true"] {
+  overflow: auto;
+}
+/* 内容区滚动淡出状态化(EditorFrame 挂 useScrollAffordance('y') 写 data-scroll-y):
+ * 不溢出/无 state → 不画;start=只淡尾(下方还有)/ end=只淡首 / middle=两端(同 hug-scroll 语义)。 */
+.ze-editor__content:not([data-content-mode="pass-through"])[data-content-scroll="true"][data-scroll-y="start"] {
+  -webkit-mask-image: linear-gradient(to bottom, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to bottom, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-editor__content:not([data-content-mode="pass-through"])[data-content-scroll="true"][data-scroll-y="middle"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-editor__content:not([data-content-mode="pass-through"])[data-content-scroll="true"][data-scroll-y="end"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4));
+  mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4));
+}
+/* afterZones 落位(content 之后、__work 内):纵向尺寸语言,与 content 的 flex:1 对称。
+ * hug = 内容高贴底(默认,= 旧裸渲染行为,如 PromptZone 一句输入条);
+ * share = 与 content 按 --ze-after-grow 比例【瓜分剩余高】(随容器变矮等比缩,替代 mod 写死 vh)。
+ * 透明无边框/无海拔——内部功能区自带边界(不触发 ELEVATION_LADDER)。 */
+.ze-editor__after {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ze-editor__after[data-size="hug"] { flex: 0 0 auto; }
+.ze-editor__after[data-size="share"] {
+  flex: var(--ze-after-grow, 1) 1 0;
+  min-height: calc(var(--ze-row-h) * 3);   /* 底线:够 composer + 一两行消息,不塌成 0 */
+  overflow: hidden;                         /* 超高归内部功能区自己滚 */
+}
+/* 内容脚手架(裹在 __content 块内的实际画布/表单/列表):占位填满,边框/海拔归 __content 块。 */
+.ze-editor__canvas-body { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.ze-editor__canvas-overlay {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  background: var(--ze-overlay-soft);
+  pointer-events: none;
+}
+/* 内容形骨架:填满整个 body 盒(在 overlay 内、进度环之下),pending/running 统一用 */
+.ze-editor__canvas-skeleton { position: absolute; inset: 0; }
+.ze-editor__canvas-hint {
+  padding: var(--ze-space-1) var(--ze-space-3);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  border-top: 1px solid var(--ze-overlay-soft);
+}
+
+
+/* [v4 · 精密瓷釉] 线条系统:编辑器外缘 line-mid 实线,面内分隔 line-soft */
+.ze-editor { border-color: var(--ze-line-mid); }
+.ze-editor__statusbar,
+.ze-editor__statusbar-reveal,
+.ze-editor__canvas-hint { border-top-color: var(--ze-line-soft); }
+
+
+/* ════════════════════════════════════════════════════════════
+ * [v2 · 功能区行栈] 身份行(__header)+ 操作区行(__zone[data-role])
+ *   editor = header(身份) + zones(操作区行:toolbar/filterbar/control) + content + statusbar。
+ *   行几何令牌(行高/隐滚/控件锁高)住本 L2(同 __toolbar);data-role 语义规则逐编辑器在
+ *   03-zones/SPEC 沉淀。旧 __toolbar 保活(未迁编辑器);全迁后 ⊘defer 待 MAJOR 清理。
+ * ════════════════════════════════════════════════════════════ */
+
+/* 身份行:几何 = 现 __toolbar 同款(1×row-h 三连锁 + 发丝下缘);只放 title/count(只读) */
+.ze-editor__header {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  height: var(--ze-row-h);
+  min-height: var(--ze-row-h);
+  max-height: var(--ze-row-h);
+  padding: 0 var(--ze-space-1);
+  /* 顶部横栏(编辑器标题/身份 chrome):贯通编辑器宽、下缘发丝线分隔工作区。**是横栏不是功能区块** ——
+   * 只把横栏里的工具按钮挪出成工具功能区,横栏本身保留(用户口径)。 */
+  background: transparent;
+  border-bottom: 1px solid var(--ze-line-soft);
+  overflow: hidden;
+}
+
+/* 操作区行通用骨架:toolbar/filterbar/control 共享;策略=data-layout,行高=data-lines,钉底=data-edge */
+.ze-editor__zone {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  min-width: 0;
+  padding: 0 var(--ze-space-1);
+  /* 边界语法:操作行默认是 control group 承载槽,不画同款四边块;内部控件/分段按钮自带边界。
+   * 真正需要面板/视口边界时必须显式声明 data-boundary,避免所有功能区被压成同一视觉形式。 */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+/* 组=不可拆单元(行>组>件):zone 直接子组不参与 flex 压缩——flex wrap 里 shrink 优先于换行,
+ * 可压缩的组会先被压变形(按钮叠字/label 竖排)而不换行。禁 shrink 后:wrap-cluster 里整组换行、
+ * hug-scroll 里整行横滚。长值集组靠自身内部 wrap 消化,max-width 拦在 zone 内。 */
+.ze-editor__zone > .ze-row { flex: 0 0 auto; }
+/* 长值集组(pill 筛选)基础排布:原住 L4 gallery.css,随「行几何住 L2」法理上移收口
+ * (避免 L4 重定义 02-atoms 原子,LAYER_ATOM_REDEFINED)。 */
+.ze-editor__filtergroup {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+.ze-editor__zone > .ze-editor__filtergroup { flex: 0 0 auto; max-width: 100%; }
+/* 组名恒完整:zone 组内短标签(truncate 语法带 min-width:0,会成为组内唯一可压项)锁 max-content
+ * ——组的弹性归控件(select/input minW 0 可压),不归名;放不下整组换行,不咬字。 */
+.ze-editor__zone .ze-row > .ze-text[data-truncate="true"],
+.ze-editor__zone .ze-editor__filtergroup > .ze-text[data-truncate="true"] {
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.ze-editor__zone[data-boundary="panel"] {
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-line-mid);
+  border-radius: var(--ze-radius-sm);
+}
+.ze-editor__zone[data-boundary="viewport"] {
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-line-mid);
+  border-radius: var(--ze-radius-sm);
+  overflow: hidden;
+}
+.ze-editor__zone[data-boundary="separator"] {
+  border-bottom: 1px solid var(--ze-line-soft);
+}
+.ze-editor__zone[data-lines="1"] {
+  height: var(--ze-row-h);
+  min-height: var(--ze-row-h);
+  max-height: var(--ze-row-h);
+  overflow: hidden;
+}
+.ze-editor__zone[data-layout="hug-scroll"] {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+/* 横向溢出淡出状态化(useScrollAffordance('x') 写 data-scroll-x):工具栏不溢出→不淡出;
+ * start=只淡尾(右,后面还有)/ end=只淡首(左)/ middle=两端。不溢出/无 state 则裸选择子不画。 */
+.ze-editor__zone[data-layout="hug-scroll"][data-scroll-x="start"] {
+  -webkit-mask-image: linear-gradient(to right, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to right, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-editor__zone[data-layout="hug-scroll"][data-scroll-x="middle"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-editor__zone[data-layout="hug-scroll"][data-scroll-x="end"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4));
+  mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4));
+}
+.ze-editor__zone[data-layout="hug-scroll"]::-webkit-scrollbar { display: none; }
+/* 控制类操作区行(data-role=control):对象/过程生命周期命令(暂停/继续/重试/导出)。
+ * 几何复用上面的 __zone 通用骨架,本规则只标语义(无额外几何令牌);字面供
+ * editor_manifest_check 子串匹配该 selector。 */
+.ze-editor__zone[data-role="control"] { justify-content: flex-start; min-height: var(--ze-row-h); }
+.ze-editor__zone[data-function-zone="tool"] { justify-content: flex-start; min-height: var(--ze-row-h); }
+
+/* 筛选类操作区行(data-role=filterbar):状态 pill 视图筛选(改 view_state 即时无 confirm)。
+ * 行高基线(轴1):单行 = 1×row-h(min-height,控件居中)。**不靠 padding 撑高** —— 旧版
+ * padding-block:space-1 让 24 控件 + 8 内距 = 34 破了 row-h 基线(用户实测的"功能条高度不一")。
+ * pill 多则 wrap-cluster 换行,每行 row-h 节奏(见下 row-gap)。字面供 editor_manifest_check
+ * 子串匹配 FilterBarZone selector。 */
+.ze-editor__zone[data-role="filterbar"] {
+  justify-content: flex-start;
+  min-height: var(--ze-row-h);
+}
+.ze-editor__zone[data-function-zone="manage"] {
+  justify-content: flex-start;
+  min-height: var(--ze-row-h);
+}
+/* 换行成簇布局:pill 横向铺、超宽换行;最小高=行高(空/单行时不塌)。
+ * row-gap=space-1:两行 = 24(控件) + 4(行距) + 24 = 52 = 2×row-h → 换行后每行仍 row-h 节奏
+ * (横向 column-gap 仍随基类 space-2,不动)。 */
+.ze-editor__zone[data-layout="wrap-cluster"] {
+  flex-wrap: wrap;
+  row-gap: var(--ze-space-1);
+  min-height: var(--ze-row-h);
+  /* 上限 3 行(SPEC §7「矮了怎么办」):pill 暴增不无限纵向生长吃光 content 区,超出本区纵滚 */
+  max-height: calc(var(--ze-row-h) * 3);
+  overflow-y: auto;
+}
+/* 充满 + 比例拉伸(data-layout=flex-fill):子项横向铺满、超宽换行,每行内按 flex-grow 比例
+ * 分配剩余宽 —— 左右占满 + 比例拉伸 + 每行项数/行数随条宽动态(纯 CSS,无 JS 量算,对齐"砍 JS clamp")。
+ * 用于"功能区横条律"的筛选/控制条。不与 data-lines=1 并用(它换行,非单行锁)。
+ * row-gap=space-1 同 wrap-cluster 行距节奏;子项 min-width 是换行真正阈值。 */
+.ze-editor__zone[data-layout="flex-fill"] {
+  flex-wrap: wrap;
+  row-gap: var(--ze-space-1);
+  align-content: flex-start;
+  min-height: var(--ze-row-h);
+}
+.ze-editor__zone[data-layout="flex-fill"] > * {
+  flex: 1 1 var(--ze-bar-item-basis);   /* grow 占满 + 可缩 + 理想基准宽 */
+  min-width: var(--ze-bar-item-min);    /* 缩到此即换行 */
+}
+/* 比例档(用户「比例设置」):data-flex 覆盖 grow,在当前行宽内成比例;icon-only 钮 data-flex=0 不拉伸。 */
+.ze-editor__zone[data-layout="flex-fill"] > [data-flex="0"] { flex-grow: 0; flex-basis: auto; }  /* 不拉伸 = 贴合内容宽(不占 basis 档,如选择簇/图标钮) */
+.ze-editor__zone[data-layout="flex-fill"] > [data-flex="2"] { flex-grow: 2; }
+.ze-editor__zone[data-layout="flex-fill"] > [data-flex="3"] { flex-grow: 3; }
+.ze-editor__zone[data-layout="flex-fill"] > [data-flex="full"] { flex-basis: 100%; }  /* 占整行(强制换行,如结果/说明行) */
+
+/* 右侧动作容器(同 __toolbar-actions:靠右 + nowrap + 隐滚) */
+.ze-editor__zone-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: var(--ze-space-1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* 横向溢出淡出由 .ze-scroll-fade-x 工具类承接(状态化,见 useScrollAffordance);
+   * 动作不溢出时不淡出 —— 此处不再自画无条件横向 mask。 */
+  scrollbar-width: none;
+}
+.ze-editor__zone-actions::-webkit-scrollbar { display: none; }
+
+/* 功能区组间分隔:细竖线,把工具区里的语义组(工具 / 参数 / 编辑)分开。
+ * 自身高 = space-4(< row-h,居中不撑行);色用 line-soft(发丝级,弱于块边)。 */
+.ze-editor__zone-sep {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 1px;
+  height: var(--ze-space-4);
+  background: var(--ze-line-soft);
+}
+
+/* 行内控件锁高:zone 内一律锁 control-h-sm(24≤row-h),不限 data-size ——
+ * 防 md(28)误入 row-h 行被 overflow:hidden 裁 2px(真浏览器验证 md_clipped_by_zone=true)。 */
+.ze-editor__zone .ze-button,
+.ze-editor__zone .ze-input,
+.ze-editor__zone .ze-select .ze-select__control {
+  box-sizing: border-box;
+  height: var(--ze-control-h-sm);
+  min-height: var(--ze-control-h-sm);
+  font-size: var(--ze-fs-xs);
+  line-height: 1;
+}
+.ze-editor__zone .ze-select[data-size="sm"] {
+  flex: 0 0 auto;
+  width: auto;
+}
+.ze-editor__zone .ze-select[data-size="sm"] .ze-select__control { width: auto; }
+.ze-editor__zone .ze-bar { min-height: var(--ze-space-6); padding-block: 0; }
+
+/* 操作行降级序(SPEC §7)第一级:编辑器窄(<480)→有 icon 的命令按钮隐藏 label 只留 icon,省横向空间。
+ * :has(.ze-icon) 保守匹配 —— 无 icon 按钮保留 label(不变空),仍靠 hug-scroll 隐滚兜底(第二级)。
+ * 具名 @container ze-editor 精确命中「编辑器宽」(传导跳3:editor 宽变 → zone 响应);断点 canonical 480。 */
+@container ze-editor (max-width: 480px) {
+  /* :not([data-kind=cycle]) —— cycle 按钮 label 是「当前值」状态指示(如档位 LG),非冗余说明,窄时不隐藏 */
+  .ze-editor__zone .ze-button:has(.ze-icon):not([data-kind="cycle"]) .ze-button__label { display: none; }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+ * [v2 · 信息+控制单元] 属性面板的核心砖块(InfoControlUnit)
+ *   单元 = 竖排卡:标题 + 信息区(data-role=info)+ 控制区(data-role=control)。
+ *   信息/控制固定二分:信息区竖流字段,控制区钮组(border-top 发丝线作二分边界);
+ *   单元间发丝线分隔。行几何令牌住本 L2(同 __zone 法理);data-role 语义在 03-zones/SPEC。
+ * ════════════════════════════════════════════════════════════ */
+
+/* [v2.1 功能区成块] 单元竖排卡 = raised 块:同 __zone 配方(不透明乳釉 + line-mid 边 + radius-sm)。
+ * 单元在内容区列表内(pipeline .ze-pipeline__cells / inspector 单元列表),块间距由父列表 gap 负责,
+ * 故本身不加 margin。overflow:hidden 让内部 unit-control 的 border-top 二分线贴合圆角(防方角穿出)。
+ * 删原单元间 border-bottom 发丝线(块边已自成边界,无需 last-child 复位)。 */
+.ze-editor__unit {
+  flex: 0 0 auto; /* hug 不可压(01-layout SPEC §2.10 C2b):滚动归父列(form-body/cells);overflow:hidden 块必须成对锁,否则 automatic minimum size 归 0 被压瘪 */
+  display: flex;
+  flex-direction: column;
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-line-mid);
+  border-radius: var(--ze-radius-sm);
+  overflow: hidden;
+}
+
+/* 信息区:字段竖流(字段行各自 1×row-h 居中)。内距对称 space-2(轴2:块内内距统一,
+ * 旧版 8/12 不对称已收口);字段间距 space-1(块内"字段↔字段"关系,比块间距 space-2 紧一档)。 */
+.ze-editor__unit-info[data-role="info"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  padding: var(--ze-space-1);
+}
+
+.ze-editor__unit-info[data-role="info"] > p.ze-text {
+  margin: 0;
+  line-height: var(--ze-lh-snug);
+}
+
+/* 控制区:钮组靠左,border-top 发丝线作 信息↔控制 二分边界 */
+.ze-editor__unit-control[data-role="control"] {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-height: var(--ze-row-h);
+  border-top: 1px solid var(--ze-line-soft);
+}

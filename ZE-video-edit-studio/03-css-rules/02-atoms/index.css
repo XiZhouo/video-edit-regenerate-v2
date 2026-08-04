@@ -1,0 +1,77 @@
+/*
+ * index.css — L2 UI 对象聚合入口。
+ *
+ * 本文件只做 public import；每个 UI 对象自己的代码、规则、校验、说明、扩展规则
+ * 都在对应对象文件夹内。消费端继续 import @ze/css/02-atoms/index.css。
+ */
+
+/* controls */
+@import "./controls/button/code.css";
+@import "./controls/icon-button/code.css";
+@import "./controls/link/code.css";
+@import "./controls/disclosure/code.css";
+@import "./controls/input/code.css";
+@import "./controls/textarea/code.css";
+@import "./controls/asset-input/code.css";
+@import "./controls/select/code.css";
+@import "./controls/checkbox/code.css";
+@import "./controls/radio/code.css";
+@import "./controls/switch/code.css";
+@import "./controls/slider/code.css";
+@import "./controls/kbd/code.css";
+
+/* surfaces */
+@import "./surfaces/card/code.css";
+@import "./surfaces/dialog/code.css";
+@import "./surfaces/popover/code.css";
+@import "./surfaces/divider/code.css";
+@import "./surfaces/tab/code.css";
+@import "./surfaces/chip/code.css";
+@import "./surfaces/tooltip/code.css";
+
+/* feedback */
+@import "./feedback/interaction/code.css";
+@import "./feedback/callout/code.css";
+@import "./feedback/badge/code.css";
+@import "./feedback/feedback/code.css";
+@import "./feedback/placeholder/code.css";
+@import "./feedback/state-frame/code.css";
+@import "./feedback/toast/code.css";
+@import "./feedback/progress/code.css";
+@import "./feedback/status-tile/code.css";
+
+/* navigation */
+@import "./navigation/menu-item/code.css";
+
+/* data */
+@import "./data/kv-list/code.css";
+@import "./data/table/code.css";
+@import "./data/thumb/code.css";
+@import "./data/chart/code.css";
+@import "./data/field-row/code.css";
+@import "./data/spatial/code.css";
+@import "./data/timeline/code.css";
+
+/* shell */
+@import "./shell/editor-shell/code.css";
+@import "./shell/auth-shell/code.css";
+@import "./shell/header-shell/code.css";
+@import "./shell/footer-shell/code.css";
+@import "./shell/copilot-shell/code.css";
+@import "./shell/guide-shell/code.css";
+
+/* layout */
+@import "./layout/layout/code.css";
+@import "./layout/layout-tree/code.css";
+
+/* typography */
+@import "./typography/text/code.css";
+@import "./typography/type-roles/code.css";
+@import "./typography/operation-manual/code.css";
+
+/* media */
+@import "./media/icon/code.css";
+@import "./media/icon-map/code.css";
+
+/* utility */
+@import "./utility/utility/code.css";

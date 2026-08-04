@@ -1,0 +1,55 @@
+/*
+ * progress.css — ze-progress 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 进度条:轨道 + 填充。对齐 footer 的进度条视觉(内嵌阴影 + accent 填充)。
+ *   data-indeterminate 走平移动画;语义变体改填充色。fill 宽度由 inline width 给(数据)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-progress {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-pill);
+  overflow: hidden;
+}
+
+.ze-progress__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--ze-accent-500);
+  /* 「通电」感:accent 填充带辉光(语义变体换色时去辉光,避免蓝光渗色)*/
+  box-shadow: var(--ze-glow-accent);
+  border-radius: var(--ze-radius-pill);
+  transition: width var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-progress[data-variant="success"]   .ze-progress__fill { background: var(--ze-semantic-success); box-shadow: none; }
+.ze-progress[data-variant="warn"]       .ze-progress__fill { background: var(--ze-semantic-warn); box-shadow: none; }
+.ze-progress[data-variant="danger"]     .ze-progress__fill { background: var(--ze-semantic-danger); box-shadow: none; }
+.ze-progress[data-variant="cancelled"]  .ze-progress__fill { background: var(--ze-ink-tertiary); box-shadow: none; }
+
+/* 尺寸 */
+.ze-progress[data-size="sm"] { height: 4px; }
+.ze-progress[data-size="lg"] { height: 8px; }
+
+/* indeterminate:无明确进度,30% 块来回平移 */
+.ze-progress[data-indeterminate="true"] .ze-progress__fill {
+  width: 30% !important;
+  animation: ze-progress-shift 1.4s linear infinite;
+}
+
+@keyframes ze-progress-shift {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(333%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ze-progress[data-indeterminate="true"] .ze-progress__fill { animation-duration: 2.4s; }
+}

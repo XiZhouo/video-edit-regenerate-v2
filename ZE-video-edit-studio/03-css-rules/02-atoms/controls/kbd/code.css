@@ -1,0 +1,32 @@
+/*
+ * kbd.css — .ze-kbd 键帽原子(02-atoms / L2 视觉原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 用途:把「键盘按键」渲成带边框/微底的键帽样式(快捷键提示、富文本里的 <kbd> 标记)。
+ *   贴在 <kbd> 元素上即可:<kbd class="ze-kbd">⌘↵</kbd>。
+ *   字号用 0.85em(相对周围文字,键帽惯例自适应),不锁绝对档。
+ *
+ * 为什么是原子:键帽是跨组件复用的视觉 primitive(Trans 富文本 + 帮助菜单快捷键面板都要),
+ *   且是「视觉单一真相源」的一部分 —— JSX 不再内联 border/background/font 等键帽视觉
+ *   (旧 Trans.tsx 曾内联,已迁来本原子;见 DESIGN-SYSTEM「视觉单一真相源」+ css_layer_guard 规则 8)。
+ *
+ * 如何扩展:本原子目前单形态,无 data-* 变体。若将来要尺寸/语义变体,加 data-* 闭集
+ *   (如 [data-size="sm"]),并在 02-atoms/SPEC.md 记一行 + 契约 MINOR bump。
+ *
+ * 全部值引 令牌(var(--ze-*));几何 px 字面量(键帽内距/1px 边)按原子惯例放行。
+ */
+
+.ze-kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ze-font-mono);
+  font-size: 0.85em;
+  padding: 1px 5px;
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-secondary);
+  white-space: nowrap;
+}

@@ -1,0 +1,66 @@
+/*
+ * slider.css — ze-slider 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 实现: 原生 <input type=range> + appearance:none,自定义轨道 + 拇指(thumb)。
+ *   轨道 overlay-soft;thumb accent 圆点。注:已填充进度的"左段着色"需 JS 设
+ *   background gradient,本批只做轨道 + thumb 基础视觉(纯 CSS 不依赖值)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* 轨道 — WebKit */
+.ze-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+}
+/* 轨道 — Firefox */
+.ze-slider::-moz-range-track {
+  height: 4px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+}
+.ze-slider::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+}
+
+/* thumb — WebKit */
+.ze-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  margin-top: -5px;                       /* (track 4 - thumb 14)/2 居中 */
+  width: 14px;
+  height: 14px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+  border: 2px solid var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+}
+/* thumb — Firefox */
+.ze-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+  border: 2px solid var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+}
+
+.ze-slider:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+.ze-slider:focus-visible::-moz-range-thumb { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+
+.ze-slider:disabled { cursor: not-allowed; opacity: 0.55; }

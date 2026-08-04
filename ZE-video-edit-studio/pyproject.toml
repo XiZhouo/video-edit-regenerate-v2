@@ -1,0 +1,14 @@
+[project]
+name = "ze-video-edit-studio"
+version = "0.1.0"
+description = "ZE Skill Build — core 框架定义与新 ZE 工具的标准模板"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+# 叶子平铺布局: 各叶子用 sys.path 自注入互相 import, test_*.py 在不同叶子里重名.
+# importlib 导入模式按文件路径载入, 避免重名 basename 冲突, 让跨叶子收集成为可能.
+# 注: 权威门禁仍是 01-core/_protocol/audit_gates.py --all; 本配置只方便本地批量跑测试.
+addopts = "--import-mode=importlib"
+markers = [
+    "slow: 墙钟型慢测试(sleep/TTL 过期/线程压测)。pytest-fast 门排除,pytest-slow 门单跑;全量 evidence 两门都必须绿(C3)。",
+]

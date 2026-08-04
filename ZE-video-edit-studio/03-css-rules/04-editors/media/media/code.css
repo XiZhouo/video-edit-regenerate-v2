@@ -1,0 +1,27 @@
+/*
+ * media.css — media 编辑器内容视觉 (04-editors)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ * 消费: 01-core 的 MediaEditor(.ze-editor--media;视频/音频播放器 + 底部传输条)。
+ * 共享 body 脚手架(.ze-editor__canvas-body)在 editor.css。
+ *
+ * 绝对严格分层(P4 去令牌):本文件 **零令牌(无 var())** —— 边框/底色/倒角/内距/时码等宽 全部由
+ * React 贴 L2 实用原子(.ze-bar/.ze-surface/.ze-round/.ze-text[data-mono]/.ze-pad)承载;
+ * 本层只留无令牌的结构(flex 链 / 定位 / 撑满 / 收缩)。
+ */
+
+/* media 播放器:元素撑满 + 底部自定义传输条 */
+.ze-media__player { display: flex; flex-direction: column; width: 100%; height: 100%; }
+.ze-media__player[data-audio="true"] { place-content: center; }
+/* 视口底色由 React .ze-surface[data-surface="inverse"] 给;audio 变体反相为透明(无令牌覆盖)*/
+.ze-media__el { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
+.ze-media__player[data-audio="true"] .ze-media__el { flex: none; height: auto; background: transparent; }
+
+/* 传输条骨架走 .ze-bar(gap/pad/min-h)+ .ze-surface raised + .ze-edge;本层只留"不收缩"结构 */
+.ze-media__controls { flex-shrink: 0; }
+.ze-media__scrubber-wrap { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; }
+.ze-media__scrubber { flex: 1; }
+/* 标记段:底色/倒角由 React .ze-surface[accent-wash] + .ze-round[pill] 给;本层只留定位结构 */
+.ze-media__mark-region { position: absolute; top: 50%; height: 4px; transform: translateY(-50%); pointer-events: none; }
+.ze-media__time { white-space: nowrap; flex-shrink: 0; }
+.ze-media__marks { flex-shrink: 0; }

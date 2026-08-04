@@ -1,0 +1,217 @@
+/*
+ * operation-manual — sanitized operation-manual typography/media atom (L2).
+ *
+ * The fragment contributes semantic HTML and `.ze-om*` classes only.  This
+ * core-owned atom is the sole visual owner; every visual value comes from L1
+ * tokens so themes can upgrade the whole manual without downstream CSS forks.
+ */
+
+.ze-operation-manual {
+  color: var(--ze-ink-primary);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-normal);
+  overflow-wrap: anywhere;
+}
+.ze-operation-manual .ze-om {
+  display: flow-root;
+}
+
+.ze-operation-manual .ze-om > :first-child {
+  margin-block-start: 0;
+}
+
+.ze-operation-manual .ze-om > :last-child {
+  margin-block-end: 0;
+}
+
+.ze-operation-manual .ze-om h1,
+.ze-operation-manual .ze-om h2,
+.ze-operation-manual .ze-om h3,
+.ze-operation-manual .ze-om h4,
+.ze-operation-manual .ze-om h5,
+.ze-operation-manual .ze-om h6 {
+  margin: var(--ze-space-5) 0 var(--ze-space-2);
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-semibold);
+  line-height: var(--ze-lh-snug);
+}
+
+.ze-operation-manual .ze-om h1 {
+  font-size: var(--ze-fs-2xl);
+  font-weight: var(--ze-fw-bold);
+}
+
+.ze-operation-manual .ze-om h2 {
+  font-size: var(--ze-fs-xl);
+}
+
+.ze-operation-manual .ze-om h3 {
+  font-size: var(--ze-fs-lg);
+}
+
+.ze-operation-manual .ze-om h4,
+.ze-operation-manual .ze-om h5,
+.ze-operation-manual .ze-om h6 {
+  font-size: var(--ze-fs-sm);
+}
+
+.ze-operation-manual .ze-om p,
+.ze-operation-manual .ze-om ul,
+.ze-operation-manual .ze-om ol,
+.ze-operation-manual .ze-om dl,
+.ze-operation-manual .ze-om blockquote,
+.ze-operation-manual .ze-om figure,
+.ze-operation-manual .ze-om table,
+.ze-operation-manual .ze-om pre,
+.ze-operation-manual .ze-om details,
+.ze-operation-manual .ze-om__callout {
+  margin: 0 0 var(--ze-space-3);
+}
+
+.ze-operation-manual .ze-om ul,
+.ze-operation-manual .ze-om ol {
+  padding-inline-start: var(--ze-space-6);
+}
+
+.ze-operation-manual .ze-om li + li,
+.ze-operation-manual .ze-om dd + dt {
+  margin-block-start: var(--ze-space-1);
+}
+
+.ze-operation-manual .ze-om dt {
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-semibold);
+}
+
+.ze-operation-manual .ze-om dd {
+  margin-inline-start: var(--ze-space-4);
+  color: var(--ze-ink-secondary);
+}
+
+.ze-operation-manual .ze-om a {
+  color: var(--ze-accent-500);
+  text-decoration: underline;
+  text-underline-offset: var(--ze-space-0-5);
+}
+
+.ze-operation-manual .ze-om strong {
+  font-weight: var(--ze-fw-semibold);
+}
+
+.ze-operation-manual .ze-om blockquote,
+.ze-operation-manual .ze-om__callout {
+  padding: var(--ze-space-3);
+  border: 1px solid var(--ze-line-soft);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-raised);
+  color: var(--ze-ink-secondary);
+}
+
+.ze-operation-manual .ze-om__callout {
+  border-color: var(--ze-accent-soft);
+  background: var(--ze-overlay-accent-wash);
+}
+
+.ze-operation-manual .ze-om code,
+.ze-operation-manual .ze-om kbd,
+.ze-operation-manual .ze-om samp,
+.ze-operation-manual .ze-om pre {
+  font-family: var(--ze-font-mono);
+}
+
+.ze-operation-manual .ze-om code,
+.ze-operation-manual .ze-om kbd,
+.ze-operation-manual .ze-om samp {
+  padding: 0 var(--ze-space-1);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  font-size: var(--ze-fs-xs);
+}
+
+.ze-operation-manual .ze-om pre {
+  overflow-x: auto;
+  padding: var(--ze-space-3);
+  border: 1px solid var(--ze-line-soft);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-primary);
+  font-size: var(--ze-fs-xs);
+  line-height: var(--ze-lh-normal);
+}
+
+.ze-operation-manual .ze-om pre code,
+.ze-operation-manual .ze-om pre samp {
+  padding: 0;
+  background: transparent;
+  font-size: inherit;
+}
+
+.ze-operation-manual .ze-om table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.ze-operation-manual .ze-om th,
+.ze-operation-manual .ze-om td {
+  padding: var(--ze-space-2) var(--ze-space-3);
+  border-bottom: 1px solid var(--ze-line-soft);
+  text-align: start;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.ze-operation-manual .ze-om th {
+  background: var(--ze-surface-raised);
+  color: var(--ze-ink-secondary);
+  font-weight: var(--ze-fw-semibold);
+}
+
+.ze-operation-manual .ze-om caption,
+.ze-operation-manual .ze-om figcaption {
+  padding-block: var(--ze-space-2);
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-xs);
+  text-align: start;
+}
+
+.ze-operation-manual .ze-om img,
+.ze-operation-manual .ze-om video,
+.ze-operation-manual .ze-om audio {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-sunken);
+}
+
+.ze-operation-manual .ze-om img,
+.ze-operation-manual .ze-om video {
+  height: auto;
+}
+
+.ze-operation-manual .ze-om audio {
+  width: 100%;
+}
+
+.ze-operation-manual .ze-om details {
+  padding: var(--ze-space-3);
+  border: 1px solid var(--ze-line-soft);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-raised);
+}
+
+.ze-operation-manual .ze-om summary {
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-semibold);
+  cursor: pointer;
+}
+
+.ze-operation-manual .ze-om details[open] summary {
+  margin-block-end: var(--ze-space-2);
+}
+
+.ze-operation-manual .ze-om hr {
+  margin: var(--ze-space-4) 0;
+  border: 0;
+  border-top: 1px solid var(--ze-line-soft);
+}

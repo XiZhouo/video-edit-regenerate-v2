@@ -1,0 +1,68 @@
+/*
+ * card.css — ze-card 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: 对齐 v3 footer 的 pipeline 卡 —— raised 底 + 1px line-soft 边 + raised 阴影,
+ *   data-interactive hover 转 accent 浅边 + floating 阴影。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-3);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-line-soft);
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-raised);
+  color: var(--ze-ink-primary);
+  transition:
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    box-shadow var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-card[data-interactive="true"] { cursor: pointer; }
+.ze-card[data-interactive="true"]:hover {
+  border-color: var(--ze-accent-200);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-floating);
+}
+.ze-card[data-interactive="true"]:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+
+.ze-card[data-active="true"] { border-color: var(--ze-accent-500); background: var(--ze-overlay-accent-wash); }
+
+/* ---- 变体 ---- */
+.ze-card[data-variant="flat"] { box-shadow: var(--ze-shadow-flat); background: var(--ze-surface-canvas); }
+.ze-card[data-variant="sunken"] { box-shadow: var(--ze-shadow-flat); background: var(--ze-surface-sunken); }
+
+/* ---- 尺寸 ---- */
+.ze-card[data-size="xs"] {
+  padding: var(--ze-space-1) var(--ze-space-2);
+  gap: var(--ze-space-0-5);
+  border-radius: var(--ze-radius-sm);
+  box-shadow: var(--ze-shadow-flat);
+}
+.ze-card[data-size="sm"] { padding: var(--ze-space-2); gap: var(--ze-space-1); }
+.ze-card[data-size="lg"] { padding: var(--ze-space-4); gap: var(--ze-space-3); border-radius: var(--ze-radius-lg); }
+
+/* ---- parts ---- */
+.ze-card__header { display: flex; align-items: center; gap: var(--ze-space-2); min-width: 0; }
+.ze-card__title {
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-medium);
+  line-height: var(--ze-lh-tight);
+  color: var(--ze-ink-primary);
+}
+.ze-card__body { font-size: var(--ze-fs-sm); color: var(--ze-ink-secondary); line-height: var(--ze-lh-normal); }
+.ze-card__footer { display: flex; align-items: center; justify-content: flex-end; gap: var(--ze-space-2); }
+.ze-card[data-size="xs"] .ze-card__header { gap: var(--ze-space-1); }
+.ze-card[data-size="xs"] .ze-card__title {
+  font-weight: var(--ze-fw-medium);
+  line-height: var(--ze-lh-tight);
+}
+.ze-card[data-size="xs"] .ze-card__body {
+  font-size: var(--ze-fs-xs);
+  line-height: var(--ze-lh-snug);
+}

@@ -1,0 +1,971 @@
+/*
+ * footer-shell.css — 工作台底部固定栏 框架 shell 组件原子(02-atoms · L2)
+ *
+ * 协议:03-css-rules 契约。消费方:01-core/04-user-facing/01-layout/02-footer/(FooterShell + 子件)。
+ *
+ * 绝对严格分层(L5 chrome 轮 batch5,收官):底部栏(.ze-footer* 块)是框架级工作台 shell chrome
+ *   —— 折叠态 segment 行(状态/同步/进度/错误/trace)+ 拖拽把手/resizer + 展开主体 section
+ *   (op log / pipelines / details tabs / 错误列表 / trace 链)。含状态化 hover(handle / segment /
+ *   oplog-entry / pipeline / error-entry)、大量 data-state/data-source/data-level 选择器、
+ *   @keyframes ze-footer-pulse 脉冲、把手伪元素与 section 竖条边界,无法降为 L4 无令牌结构,
+ *   按 §0.5 整组 verbatim 上移本层(类名不变、0 JSX 改动)。
+ *
+ * 经 02-atoms/index.css @import 全局加载。footer 复用的通用原子(.ze-tabs[data-density=compact] /
+ * .ze-progress / .ze-icon-button[data-size=xs] / .ze-kv-list)由各自原子文件供给,本文件不重复;
+ * 只含 footer 专属 chrome。注意 .ze-editor-footer*(03-zones,L3)是不同 block,不在此。
+ *
+ * 全部走 令牌 (var(--ze-*));禁止字面量;主题切换仅靠 token。
+ */
+
+
+/* ============================================================
+ * § 1 根容器
+ *   - 折叠态(默认): height = 1×--ze-row-h(28px)
+ *   - 展开态:       height = props 算出来的(240..max),由 inline style 给
+ * ============================================================ */
+
+.ze-footer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  width: auto;
+  flex-shrink: 0;
+
+  /* [皮肤 · 晴空瓷釉] 底栏 = 浮动玻璃条(与 Header 同一套釉面模型);
+   * overflow:clip 让展开态的内部 section 贴合圆角。 */
+  margin: 0 var(--ze-workspace-gutter) var(--ze-workspace-gutter);
+  background: var(--ze-surface-glass);
+  -webkit-backdrop-filter: blur(var(--ze-glass-blur)) saturate(var(--ze-glass-saturate));
+  backdrop-filter: blur(var(--ze-glass-blur)) saturate(var(--ze-glass-saturate));
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-panel);
+  overflow: clip;
+  color: var(--ze-ink-secondary);
+
+  font-family: var(--ze-font-sans);
+  font-size: var(--ze-fs-xs);
+
+  z-index: var(--ze-z-sticky);
+
+  /* 工作台 chrome 不变量:Header / Footer 折叠条 / Editor toolbar 均为 1×row-h。 */
+  height: var(--ze-row-h);
+  min-height: var(--ze-row-h);
+
+  transition: height var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+/* 展开态:宽放 — 实际像素由 inline style 控制,这里只做声明 */
+.ze-footer[data-expanded="true"] {
+  /* height 由 React 写 inline; min-height 保留 */
+  min-height: calc(var(--ze-row-h) + var(--ze-space-12)); /* chrome row + 48 = 至少容下一节 */
+}
+
+
+/* ============================================================
+ * § 2 拖拽把手 + 折叠态 segment 行
+ *
+ * 折叠态:整条 footer = 把手 = segment 行
+ * 展开态:把手 = 顶部 1×row-h,后面跟展开主体
+ * ============================================================ */
+
+.ze-footer__handle {
+  height: var(--ze-row-h);
+  min-height: var(--ze-row-h);
+  display: flex;
+  align-items: center;
+  cursor: pointer;                       /* 折叠态:点击 toggle */
+  user-select: none;
+  position: relative;
+  background: transparent;
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+/* [统一手柄语言] 拉伸职责整体移到缝上的 __resizer(同 .ze-split__divider 语言);
+ * handle 只剩 click/双击 toggle(按钮语义),hover 反馈保留;
+ * 旧「展开态 ns-resize + 灰横杠提示」删除 —— 内部高亮不再暗示拉伸。 */
+.ze-footer__handle:hover {
+  background: var(--ze-overlay-soft);
+}
+
+
+/* ============================================================
+ * § 3 折叠态 segment 行(在 __handle 内)
+ * ============================================================ */
+
+.ze-footer__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  width: 100%;
+  height: 100%;
+  padding-inline: var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+}
+
+/* 单个 segment 公共形态 */
+.ze-footer__segment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  height: 100%;
+  padding-inline: var(--ze-space-1);
+
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: default;
+
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 可点 segment(trace 复制 / 错误展开等)*/
+.ze-footer__segment[data-interactive="true"] {
+  cursor: pointer;
+  border-radius: var(--ze-radius-sm);
+}
+
+.ze-footer__segment[data-interactive="true"]:hover {
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-primary);
+}
+
+.ze-footer__segment-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--ze-overlay-soft);
+  flex-shrink: 0;
+}
+
+/* segment 内部的圆点状态指示(server / sync 等)*/
+.ze-footer__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-ink-tertiary);
+}
+
+.ze-footer__dot[data-state="online"]      { background: var(--ze-semantic-success); }
+.ze-footer__dot[data-state="offline"]     { background: var(--ze-semantic-danger); }
+.ze-footer__dot[data-state="connecting"]  {
+  background: var(--ze-semantic-info);
+  animation: ze-footer-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite;
+}
+
+.ze-footer__dot[data-state="in-sync"]     { background: var(--ze-semantic-success); }
+.ze-footer__dot[data-state="syncing"]     {
+  background: var(--ze-semantic-info);
+  animation: ze-footer-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite;
+}
+.ze-footer__dot[data-state="delayed"]     { background: var(--ze-semantic-warn); }
+.ze-footer__dot[data-state="conflict"]    {
+  background: var(--ze-semantic-danger);
+  animation: ze-footer-pulse var(--ze-dur-breathe) var(--ze-easing-standard) infinite;
+}
+
+@keyframes ze-footer-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* segment 文字次级标签 */
+.ze-footer__segment-label {
+  color: var(--ze-ink-secondary);
+}
+
+.ze-footer__segment-value {
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-medium);
+}
+
+/* 错误计数态色 */
+.ze-footer__segment[data-state="warn"]   .ze-footer__segment-value { color: var(--ze-semantic-warn);   }
+.ze-footer__segment[data-state="danger"] .ze-footer__segment-value { color: var(--ze-semantic-danger); }
+
+/* trace-id 短码 mono */
+.ze-footer__trace {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  letter-spacing: 0;
+  padding: 1px 4px;
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-line-soft);
+}
+
+
+/* 把手右端的 expand/collapse 折叠按钮 */
+.ze-footer__expand-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+ * § 4 展开态:顶部 resizer + 主体
+ * ============================================================ */
+
+/* [统一手柄语言] footer 与中区之间的缝 = 可拖边界,视觉/交互逐字对齐
+ * .ze-split__divider(layout-tree.css):透明空气缝,hover/拖拽时中心点亮
+ * 2px accent 胶囊线;命中区 ±3px 加宽;折叠态同样可拖(拖即自动展开,逻辑不变)。
+ * header 与中区之间无此手柄:header 高度是 SPEC 红线(固定 1×row-h,不可拖)。
+ *
+ * 结构:footer 的「前置兄弟」flex 项(缝即元素,同 divider 模型),负 margin 叠在
+ * 中区 .ze-layout-root 的底 padding(同为 workspace chrome gutter)上、净占位 0。不可做 .ze-footer
+ * 子元素:footer 的 overflow:clip 会把悬出部分连绘制带命中一起裁掉(实测)。 */
+.ze-footer__resizer {
+  position: relative;                   /* 给伪元素定位;z-index 生效 */
+  flex: 0 0 auto;
+  height: var(--ze-workspace-gutter);
+  margin-top: calc(-1 * var(--ze-workspace-gutter));  /* 叠进空气缝,footer 位置不动 */
+  cursor: ns-resize;
+  background: transparent;
+  user-select: none;
+  /* 压过 footer(z-sticky):±3px 命中扩展的下沿盖到 footer 顶缘时缝优先,同 divider
+   * 对两侧 pane 边缘的语义 */
+  z-index: calc(var(--ze-z-sticky) + 1);
+}
+.ze-footer__resizer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  top: -3px;
+  bottom: -3px;                         /* 命中区加宽,同 divider(有意吃进两侧 3px) */
+}
+.ze-footer__resizer::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  translate: 0 -50%;
+  left: var(--ze-workspace-gutter);
+  right: var(--ze-workspace-gutter);
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+  opacity: 0;
+  transition: opacity var(--ze-dur-fast) var(--ze-easing-standard);
+  pointer-events: none;
+}
+.ze-footer__resizer:hover::after,
+.ze-footer__resizer[data-dragging="true"]::after {
+  opacity: 1;
+}
+
+
+/* 展开主体 */
+.ze-footer__expanded {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--ze-overlay-soft);
+  background: transparent;
+  overflow: hidden;
+}
+
+
+/* ============================================================
+ * § 5 展开主体内的 section
+ * ============================================================ */
+
+.ze-footer__section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-bottom: 1px solid var(--ze-overlay-soft);
+}
+
+.ze-footer__section:last-child {
+  border-bottom: 0;
+}
+
+.ze-footer__section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  height: var(--ze-space-6);                /* 24px,跟单行 op log 行高对齐 */
+  padding-inline: var(--ze-space-3);
+  background: transparent;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  flex-shrink: 0;
+  position: relative;
+  border-bottom: 1px solid var(--ze-line-soft);
+}
+
+/* 左侧 1px 竖条提示节边界 */
+.ze-footer__section-header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-pill);
+}
+
+.ze-footer__section[data-flex="oplog"]     .ze-footer__section-header::before { background: var(--ze-accent-500); opacity: 0.5; }
+.ze-footer__section[data-flex="pipelines"] .ze-footer__section-header::before { background: var(--ze-semantic-info); opacity: 0.5; }
+.ze-footer__section[data-flex="details"]   .ze-footer__section-header::before { background: var(--ze-ink-tertiary); opacity: 0.35; }
+
+.ze-footer__section-header-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding-inline: 4px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-secondary);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-semibold);
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.ze-footer__section-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--ze-surface-sunken);
+}
+
+.ze-footer__section[data-flex="oplog"]     { flex: 1 1 35%;  min-height: 80px;  }
+.ze-footer__section[data-flex="pipelines"] { flex: 1 1 40%;  min-height: 80px;  }
+
+/* 展开主体改为标签切换:一次只显一段。上面 [data-flex] 的 flex-basis(35/40/25%)是旧「三段同时堆叠」
+ * 布局的残留,现被下面规则覆盖(已死);data-flex 属性本身仍用于 header 左侧强调色,故保留。*/
+.ze-footer__expanded > .ze-tabs { flex: 1; min-height: 0; }
+.ze-footer__expanded .ze-tabs__body > .ze-footer__section {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 0;
+}
+.ze-footer__section[data-flex="details"]   { flex: 0 1 25%;  min-height: 64px;  }
+
+
+/* ============================================================
+ * § 6 Op Log(最近 30 条,最新在顶)
+ * ============================================================ */
+
+.ze-footer__oplog {
+  display: flex;
+  flex-direction: column;
+}
+
+.ze-footer__oplog-entry {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: var(--ze-space-2);
+  align-items: center;
+  height: var(--ze-space-6);                  /* 24px 行 */
+  padding-inline: var(--ze-space-3);
+  border-bottom: 1px solid var(--ze-overlay-soft);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+  background: transparent;
+  flex-shrink: 0;
+  border-left: 2px solid transparent;
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard),
+              border-color var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-footer__oplog-entry[data-source="user"]   { border-left-color: var(--ze-accent-500); }
+.ze-footer__oplog-entry[data-source="ai"]     { border-left-color: var(--ze-semantic-info); }
+.ze-footer__oplog-entry[data-source="sync"]   { border-left-color: var(--ze-semantic-success); }
+.ze-footer__oplog-entry[data-source="system"] { border-left-color: var(--ze-ink-tertiary); }
+
+.ze-footer__oplog-entry:hover {
+  background: var(--ze-overlay-soft);
+}
+
+.ze-footer__oplog-entry:last-child {
+  border-bottom: 0;
+}
+
+.ze-footer__oplog-time {
+  font-family: var(--ze-font-mono);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  min-width: 60px;
+}
+
+.ze-footer__oplog-source {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--ze-radius-sm);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-bold);
+  text-transform: uppercase;
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-tertiary);
+}
+
+.ze-footer__oplog-source[data-source="user"]   { color: var(--ze-accent-500);     }
+.ze-footer__oplog-source[data-source="ai"]     { color: var(--ze-semantic-info);  }
+.ze-footer__oplog-source[data-source="sync"]   { color: var(--ze-semantic-success); }
+.ze-footer__oplog-source[data-source="system"] { color: var(--ze-ink-tertiary);    }
+
+.ze-footer__oplog-label {
+  color: var(--ze-ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.ze-footer__oplog-status {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-ink-tertiary);
+}
+
+.ze-footer__oplog-status[data-status="success"]   { background: var(--ze-semantic-success); }
+.ze-footer__oplog-status[data-status="failure"]   { background: var(--ze-semantic-danger);  }
+.ze-footer__oplog-status[data-status="cancelled"] { background: var(--ze-ink-tertiary);     }
+
+.ze-footer__oplog-duration {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  min-width: 44px;
+  text-align: right;
+}
+
+/* 空态 — icon + 文字两行,居中显示 */
+.ze-footer__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ze-space-1);
+  height: 100%;
+  min-height: 56px;
+  padding: var(--ze-space-3);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  text-align: center;
+}
+
+.ze-footer__empty::before {
+  content: "·";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-lg);
+  line-height: 1;
+  font-weight: var(--ze-fw-bold);
+  opacity: 0.7;
+}
+
+
+/* ============================================================
+ * § 7 Pipeline 列表
+ * ============================================================ */
+
+.ze-footer__pipelines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  padding: var(--ze-space-2);
+}
+
+.ze-footer__pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-2);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  transition: border-color var(--ze-dur-fast) var(--ze-easing-standard),
+              box-shadow var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-footer__pipeline:hover {
+  border-color: var(--ze-overlay-accent-wash);
+  box-shadow: var(--ze-shadow-raised);
+}
+
+.ze-footer__pipeline-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: var(--ze-space-2);
+  align-items: center;
+}
+
+.ze-footer__pipeline-name {
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-medium);
+  color: var(--ze-ink-primary);
+}
+
+.ze-footer__pipeline-stage {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ze-footer__pipeline-percent {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* P2d 可观测:ETA(剩余预估)+ 每 stage 完成统计 */
+.ze-footer__pipeline-eta {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  white-space: nowrap;
+}
+
+.ze-footer__pipeline-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ze-space-1);
+  margin-top: var(--ze-space-1);
+}
+
+.ze-footer__pipeline-stage-chip {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  padding: 0 var(--ze-space-1);
+  border: 1px solid var(--ze-line-soft);
+  border-radius: var(--ze-radius-sm);
+  white-space: nowrap;
+}
+
+.ze-footer__pipeline-stage-chip[data-complete="true"] {
+  color: var(--ze-semantic-success);
+  border-color: var(--ze-semantic-success);
+}
+
+/* 进度条:用 .ze-progress(data-variant 语义色 / data-indeterminate);footer 不再自造 */
+
+/* pipeline 行内控制按钮组 */
+.ze-footer__pipeline-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-0-5);
+}
+
+/* pipeline 日志折叠区(默认折叠,点 toggle 展开)*/
+.ze-footer__pipeline-log-toggle {
+  align-self: flex-start;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ze-footer__pipeline-log-toggle:hover {
+  color: var(--ze-ink-secondary);
+}
+
+.ze-footer__pipeline-log-toggle::before {
+  content: "▸";
+  display: inline-block;
+  font-size: var(--ze-fs-xs);
+  transition: transform var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-footer__pipeline-log-toggle[data-open="true"]::before {
+  transform: rotate(90deg);
+}
+
+.ze-footer__pipeline-log {
+  max-height: 120px;
+  overflow: auto;
+  margin: 0;
+  padding: var(--ze-space-1) var(--ze-space-2);
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+  white-space: pre-wrap;
+}
+
+.ze-footer__pipeline-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ze-space-2);
+  max-height: 180px;
+  overflow: auto;
+  padding: var(--ze-space-2);
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+}
+
+.ze-footer__pipeline-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  min-width: 0;
+}
+
+.ze-footer__pipeline-detail-title {
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-semibold);
+  color: var(--ze-ink-tertiary);
+}
+
+.ze-footer__pipeline-items,
+.ze-footer__pipeline-log-events,
+.ze-footer__pipeline-artifacts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-0-5);
+  min-width: 0;
+}
+
+.ze-footer__pipeline-item,
+.ze-footer__pipeline-log-event,
+.ze-footer__pipeline-artifact {
+  display: grid;
+  align-items: center;
+  gap: var(--ze-space-2);
+  min-width: 0;
+  min-height: var(--ze-space-6);
+  padding: var(--ze-space-1) var(--ze-space-2);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-raised);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+}
+
+.ze-footer__pipeline-item {
+  grid-template-columns: minmax(72px, 1fr) minmax(64px, 1fr) auto auto;
+}
+
+.ze-footer__pipeline-item[data-phase="running"] {
+  border-color: var(--ze-semantic-info);
+}
+
+.ze-footer__pipeline-item[data-phase="error"] {
+  border-color: var(--ze-semantic-danger);
+}
+
+.ze-footer__pipeline-item-id,
+.ze-footer__pipeline-item-stage,
+.ze-footer__pipeline-item-code,
+.ze-footer__pipeline-log-locus,
+.ze-footer__pipeline-log-message,
+.ze-footer__pipeline-log-code,
+.ze-footer__pipeline-artifact-item,
+.ze-footer__pipeline-artifact-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ze-footer__pipeline-item-id,
+.ze-footer__pipeline-log-locus,
+.ze-footer__pipeline-artifact-item {
+  font-family: var(--ze-font-mono);
+  color: var(--ze-ink-primary);
+}
+
+.ze-footer__pipeline-item-progress,
+.ze-footer__pipeline-log-time {
+  font-family: var(--ze-font-mono);
+  color: var(--ze-ink-tertiary);
+  text-align: right;
+}
+
+.ze-footer__pipeline-item-code,
+.ze-footer__pipeline-log-code {
+  font-family: var(--ze-font-mono);
+  color: var(--ze-semantic-danger);
+}
+
+.ze-footer__pipeline-log-event {
+  grid-template-columns: auto auto minmax(72px, 0.7fr) minmax(120px, 1fr) auto;
+}
+
+.ze-footer__pipeline-log-event[data-level="error"] {
+  border-color: var(--ze-semantic-danger);
+}
+
+.ze-footer__pipeline-log-event[data-level="warn"] {
+  border-color: var(--ze-semantic-warn);
+}
+
+.ze-footer__pipeline-log-level {
+  font-family: var(--ze-font-mono);
+  color: var(--ze-ink-tertiary);
+  text-transform: uppercase;
+}
+
+.ze-footer__pipeline-log-event[data-level="error"] .ze-footer__pipeline-log-level {
+  color: var(--ze-semantic-danger);
+}
+
+.ze-footer__pipeline-log-event[data-level="warn"] .ze-footer__pipeline-log-level {
+  color: var(--ze-semantic-warn);
+}
+
+.ze-footer__pipeline-log-message {
+  color: var(--ze-ink-primary);
+}
+
+.ze-footer__pipeline-artifact {
+  grid-template-columns: minmax(72px, 0.5fr) minmax(120px, 1fr) auto;
+}
+
+.ze-footer__pipeline-artifact[data-present="true"] {
+  border-color: var(--ze-semantic-success);
+}
+
+.ze-footer__pipeline-artifact-state {
+  color: var(--ze-ink-tertiary);
+  white-space: nowrap;
+}
+
+.ze-footer__pipeline-artifact[data-present="true"] .ze-footer__pipeline-artifact-state {
+  color: var(--ze-semantic-success);
+}
+
+.ze-footer__pipeline-artifact[data-present="false"] .ze-footer__pipeline-artifact-state {
+  color: var(--ze-ink-tertiary);
+}
+
+
+/* § 8 行内 icon 按钮(pause/resume/cancel/undo/redo 等):用 .ze-icon-button[data-size="xs"]
+ *    + data-variant(warn/success/danger);footer 不再自造 __icon-btn。 */
+
+/* ============================================================
+ * § 9 详情 tabs:用 .ze-tabs[data-density="compact"] / .ze-tab / .ze-tab__count / .ze-tabs__body
+ *    (紧凑头由 compact 密度给);footer 不再自造 __tabs。下接 errors / trace 详情。
+ * ============================================================ */
+
+/* 错误列表 */
+.ze-footer__errors {
+  display: flex;
+  flex-direction: column;
+}
+
+.ze-footer__error-entry {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: var(--ze-space-2);
+  align-items: center;
+  padding: var(--ze-space-1) var(--ze-space-3);
+  border-bottom: 1px solid var(--ze-overlay-soft);
+  font-size: var(--ze-fs-xs);
+  background: transparent;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  border-right: 0;
+  border-top: 0;
+}
+
+.ze-footer__error-entry[data-level="error"] {
+  border-left-color: var(--ze-semantic-danger);
+}
+
+.ze-footer__error-entry[data-level="warn"] {
+  border-left-color: var(--ze-semantic-warn);
+}
+
+.ze-footer__error-entry:hover {
+  background: var(--ze-overlay-soft);
+}
+
+.ze-footer__error-time {
+  font-family: var(--ze-font-mono);
+  color: var(--ze-ink-tertiary);
+  min-width: 60px;
+}
+
+.ze-footer__error-level {
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.ze-footer__error-entry[data-level="error"] .ze-footer__error-level { color: var(--ze-semantic-danger); }
+.ze-footer__error-entry[data-level="warn"]  .ze-footer__error-level { color: var(--ze-semantic-warn);   }
+
+.ze-footer__error-message {
+  color: var(--ze-ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.ze-footer__error-trace {
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+}
+
+
+/* ============================================================
+ * § 10 同步详情 / trace 链:kv 行用 .ze-kv-list / __row / __key / __value(data-monospace);
+ *    footer 不再自造 __kv-*。trace 层级链(下)是 footer 专有结构,保留。
+ * ============================================================ */
+
+/* trace 层级链 */
+.ze-footer__trace-chain {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  gap: var(--ze-space-1);
+}
+
+.ze-footer__trace-layer {
+  display: grid;
+  grid-template-columns: 16px 80px 1fr auto;
+  gap: var(--ze-space-2);
+  align-items: center;
+  font-size: var(--ze-fs-xs);
+  padding: var(--ze-space-0-5) 0;
+  border-bottom: 1px dashed var(--ze-overlay-soft);
+}
+
+.ze-footer__trace-layer:last-child { border-bottom: 0; }
+
+.ze-footer__trace-layer-marker {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-accent-500);
+  justify-self: center;
+}
+
+.ze-footer__trace-layer-name {
+  color: var(--ze-ink-tertiary);
+  font-weight: var(--ze-fw-medium);
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.ze-footer__trace-layer-detail {
+  color: var(--ze-ink-primary);
+  font-family: var(--ze-font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ze-footer__trace-layer-duration {
+  color: var(--ze-ink-secondary);
+  font-family: var(--ze-font-mono);
+}
+
+
+/* ============================================================
+ * § 11 响应式(R6/R-MEDIA:一律 @container 不用 @media;断点走 canonical 集,
+ *    见 DESIGN-SYSTEM 规则注册表)。按 .ze-app 容器宽触发(container 声明在 app-shell.css)。
+ * ============================================================ */
+
+@container ze-app (max-width: 768px) {
+  /* 窄栏拖拽改高无意义,缝手柄随 .ze-split__divider 同断点隐藏(统一手柄语言) */
+  .ze-footer__resizer { display: none; }
+  .ze-footer__segment-divider { display: none; }
+  .ze-footer__bar { gap: var(--ze-space-1); }
+  .ze-footer__oplog-time { min-width: 44px; }
+  .ze-footer__pipeline-header { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .ze-footer__pipeline-stage { grid-column: 1 / -1; }
+  .ze-footer__pipeline-log-event {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+  .ze-footer__pipeline-log-message,
+  .ze-footer__pipeline-log-code {
+    grid-column: 1 / -1;
+  }
+  .ze-footer__pipeline-artifact {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ze-footer__pipeline-artifact-path {
+    grid-column: 1 / -1;
+  }
+}
+
+@container ze-app (max-width: 480px) {
+  /* 折叠态收起部分次要信息 */
+  .ze-footer__segment[data-priority="low"] { display: none; }
+  .ze-footer__pipeline-detail { max-height: 220px; }
+  .ze-footer__pipeline-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ze-footer__pipeline-item-stage,
+  .ze-footer__pipeline-item-code {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+ * [v4 · 精密瓷釉] Footer 重排 — 左事件 / 右状态
+ *   折叠条语义分区:左 = 最近一次操作(__op,"刚发生了什么"),
+ *   右 = 状态灯组(server/同步/任务/错误/trace,"系统现在怎么样")。
+ *   边线换 line 实线档。
+ * ════════════════════════════════════════════════════════════ */
+.ze-footer { border-color: var(--ze-line-mid); }
+.ze-footer__bar { gap: var(--ze-space-2); }
+.ze-footer__segment { gap: var(--ze-space-1); }
+.ze-footer__segment-divider { background: var(--ze-line-soft); }
+.ze-footer__expanded { border-top-color: var(--ze-line-soft); }
+.ze-footer__section,
+.ze-footer__section-header,
+.ze-footer__oplog-entry { border-color: var(--ze-line-soft); }
+.ze-footer__trace { border-color: var(--ze-line-soft); }
+.ze-footer__op {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ze-space-1);
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--ze-font-mono);
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+  white-space: nowrap;
+}
+.ze-footer__op b  { color: var(--ze-ink-primary); font-weight: var(--ze-fw-semibold); }
+.ze-footer__op em { color: var(--ze-accent-500); font-style: normal; font-weight: var(--ze-fw-medium); }
+.ze-footer__op span { overflow: hidden; text-overflow: ellipsis; }

@@ -1,0 +1,66 @@
+/*
+ * interaction — 微交互族谱 + 选中/海拔配方 + 全局动效降级(T5/T6/T8/T9/T10;css 19.9.0)。
+ *
+ * 来源:iOS 基线包 13 项已验证手感(design-baselines/20260714-ios-workbench)提炼为
+ * 通用 atom 配方。缓动分工铁律:standard 给一切状态过渡与入场;spring **只给手直接
+ * 操作的件**(switch 旋钮/slider thumb/拖拽/sheet)——弹簧用在自动入场上是廉价 Q 弹感。
+ * 抬升只给 ≥32px 行卡;26px 密行 hover 只换底不位移(高频交互不加动效,防抖动)。
+ */
+
+/* ── T5 选中态单一配方:accent 1px 边 + wash 底 + glow 辉光(行/卡/片段/列表通用;
+      禁浮动选择框)。挂类或 data-selected 均可;边色经 border-color 生效的前提是
+      元素本身已有 1px 边(卡/行原子皆有)。 */
+[data-selected="true"],
+.ze-sel {
+  border-color: var(--ze-accent-500);
+  background: var(--ze-overlay-accent-wash);
+  box-shadow: var(--ze-glow-accent);
+}
+
+/* ── T6 海拔纪律:raised 卡片带瓷釉顶缘高光(「瓷」的签名贯穿到最小单元;
+      hover 只换描边与底色,不换阴影 —— v4 方向不逆转)。 */
+.ze-card-hi { box-shadow: var(--ze-shadow-raised), var(--ze-edge-highlight); }
+
+/* ── T8 微交互族谱 ── */
+/* 图标按钮按压:scale(.9),120ms(即时感) */
+.ze-press-sm { transition: transform var(--ze-dur-fast) var(--ze-easing-standard); }
+.ze-press-sm:active { transform: scale(0.9); }
+
+/* 行/卡抬升(仅 ≥32px 行卡挂本类;26px 密行不挂,只换底色) */
+.ze-lift { transition: transform var(--ze-dur-fast) var(--ze-easing-standard), background var(--ze-dur-fast), border-color var(--ze-dur-fast), box-shadow var(--ze-dur-fast); }
+.ze-lift:hover { transform: translateY(-1px); }
+.ze-lift:active { transform: scale(0.99); }
+
+/* 面板/卡片组错峰入场:enter 档 240ms standard,delay 60ms 阶梯 ≤5 个 */
+@keyframes ze-panel-in { from { opacity: 0; transform: translateY(10px) scale(0.99); } }
+.ze-enter { animation: ze-panel-in var(--ze-dur-enter) var(--ze-easing-standard) both; }
+.ze-enter-1 { animation-delay: 60ms; }
+.ze-enter-2 { animation-delay: 120ms; }
+.ze-enter-3 { animation-delay: 180ms; }
+.ze-enter-4 { animation-delay: 240ms; }
+
+/* 弹簧:只给手直接操作的件(switch 旋钮/slider thumb/拖拽 ghost/sheet 弹层) */
+.ze-springy { transition: transform var(--ze-dur-slow) var(--ze-spring); }
+
+/* 呼吸:仅「同步中/进行中」状态灯,2.4s */
+@keyframes ze-breathe { 0%, 100% { opacity: .5; transform: scale(.82); } 50% { opacity: 1; transform: scale(1); } }
+.ze-breathe { animation: ze-breathe var(--ze-dur-breathe) var(--ze-easing-standard) infinite; }
+
+/* ── T9-a 全局动效降级(皮肤根级;门禁部分随美学批2)──
+      [data-motion="off"] 手动关;prefers-reduced-motion 全局同效,
+      可用 :root[data-motion="on"] 显式豁免(保信息的简单合同,精细降级留 v2)。 */
+[data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="on"]) *,
+  :root:not([data-motion="on"]) *::before,
+  :root:not([data-motion="on"]) *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ── T10 焦点可见环(键盘可达性,全体系统一) ── */
+:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; border-radius: var(--ze-radius-sm); }

@@ -1,0 +1,65 @@
+/*
+ * toast.css — ze-toast 组件视觉 (02-atoms) — CSS-only shell
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 瞬时通知条:raised 底 + 左语义条 + 文案 + 可选关闭。toast 层级。
+ *   .ze-toast__viewport 是右下角堆叠容器。**出现/自动消失时机 = React 交互层(运行时),本批只给静态视觉**。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+/* 堆叠容器(固定右下角)*/
+.ze-toast__viewport {
+  position: fixed;
+  right: var(--ze-space-4);
+  bottom: var(--ze-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+  z-index: var(--ze-z-toast);
+  pointer-events: none;
+}
+.ze-toast__viewport > .ze-toast { pointer-events: auto; }
+
+.ze-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ze-space-2);
+  min-width: 240px;
+  max-width: 360px;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  /* [浮层瓷盘] 实底(R-FLOAT) */
+  background: var(--ze-surface-float);
+  border: 1px solid var(--ze-overlay-soft);
+  border-left: 3px solid var(--ze-ink-tertiary);
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-floating);
+  color: var(--ze-ink-primary);
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-snug);
+}
+
+.ze-toast[data-variant="info"]    { border-left-color: var(--ze-semantic-info); }
+.ze-toast[data-variant="success"] { border-left-color: var(--ze-semantic-success); }
+.ze-toast[data-variant="warn"]    { border-left-color: var(--ze-semantic-warn); }
+.ze-toast[data-variant="danger"]  { border-left-color: var(--ze-semantic-danger); }
+
+.ze-toast__icon { flex-shrink: 0; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; color: var(--ze-ink-tertiary); }
+.ze-toast[data-variant="info"]    .ze-toast__icon { color: var(--ze-semantic-info); }
+.ze-toast[data-variant="success"] .ze-toast__icon { color: var(--ze-semantic-success); }
+.ze-toast[data-variant="warn"]    .ze-toast__icon { color: var(--ze-semantic-warn); }
+.ze-toast[data-variant="danger"]  .ze-toast__icon { color: var(--ze-semantic-danger); }
+
+.ze-toast__content { flex: 1; min-width: 0; }
+.ze-toast__title { font-weight: var(--ze-fw-semibold); color: var(--ze-ink-primary); }
+.ze-toast__body { color: var(--ze-ink-secondary); }
+.ze-toast__close {
+  flex-shrink: 0;
+  width: 16px; height: 16px;
+  border: 0; background: transparent;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs); line-height: 1; cursor: pointer;
+  border-radius: var(--ze-radius-sm);
+}
+.ze-toast__close:hover { background: var(--ze-overlay-soft); color: var(--ze-ink-primary); }

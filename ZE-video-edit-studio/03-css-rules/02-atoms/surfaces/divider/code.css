@@ -1,0 +1,50 @@
+/*
+ * divider.css — ze-divider 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: 对齐 v3 footer 的 segment-divider —— 1px overlay-soft 细线。
+ *   支持水平/竖直/虚线/带标签四态;无 data-size。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-divider {
+  border: 0;
+  height: 1px;
+  margin: var(--ze-space-2) 0;
+  background: var(--ze-overlay-soft);
+}
+
+.ze-divider[data-orientation="vertical"] {
+  width: 1px;
+  height: auto;
+  margin: 0 var(--ze-space-2);
+  align-self: stretch;
+}
+
+.ze-divider[data-variant="strong"] { background: var(--ze-ink-tertiary); opacity: 0.4; }
+.ze-divider[data-variant="dashed"] {
+  height: 0;
+  background: transparent;
+  border-top: 1px dashed var(--ze-overlay-soft);
+}
+
+/* 带文字的分隔线:标签文字放 DOM 子节点(不是 attr() 注入),data-label 仅作开关。
+ * 用法:<div class="ze-divider" data-label="true">OR</div> */
+.ze-divider[data-label] {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  height: auto;
+  background: transparent;
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+}
+.ze-divider[data-label]::before,
+.ze-divider[data-label]::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--ze-overlay-soft);
+}

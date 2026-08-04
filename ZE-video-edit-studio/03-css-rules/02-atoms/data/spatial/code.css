@@ -1,0 +1,330 @@
+/*
+ * spatial.css — ze-canvas/ze-spatial/ze-gizmo/ze-mask 空间编辑基元组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:CanvasViewport(.ze-canvas)/ SpatialCanvas(.ze-spatial)/ TransformGizmo
+ * (.ze-gizmo)/ MaskCanvas(.ze-mask)是框架级共享 primitive(canvas2d / asset / image-cleanup
+ * 多编辑器复用,见 01-core/.../primitives/)。其视觉核心是「多态 SVG stroke」:bbox 选中切
+ * accent-500、error 切 danger、running/pending 切 info 虚线;gizmo frame/arm/handle 描边、
+ * marquee 框选 + 棋盘格 checkerboard 多档令牌渐变。SVG 的 fill/stroke + 状态分支不是通用
+ * utility 原子(.ze-surface/.ze-text 管 background/color 非 SVG stroke)能贴,故整组 4 primitive
+ * 收成 L2 组件原子(同 .ze-table/.ze-thumb/.ze-chart)。box/gizmo 描边恒定 1px(画在 overlay,
+ * 不随 zoom 糊)。原 04-editors/spatial.css 迁来(P4 batch11)。
+ *
+ * 全部值引 令牌(var(--ze-*)),禁字面色(SVG 几何 stroke-width / dasharray / 棋盘格 px 为结构)。
+ */
+
+/* ---- CanvasViewport:基础图像视口(平移/缩放)---- */
+.ze-canvas {
+  position: relative;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--ze-surface-sunken);
+  cursor: grab;
+}
+.ze-canvas[data-dragover="true"] { outline: 2px dashed var(--ze-accent-500); outline-offset: -4px; }
+.ze-canvas__stage { transform-origin: 0 0; position: absolute; top: 0; left: 0; }
+.ze-canvas__img { display: block; max-width: none; user-select: none; }
+.ze-canvas__empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ze-ink-tertiary); font-size: var(--ze-fs-sm); }
+.ze-canvas__hud {
+  position: absolute; bottom: var(--ze-space-2); right: var(--ze-space-2);
+  display: flex; align-items: center; gap: var(--ze-space-2);
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-pill);
+  font-size: var(--ze-fs-xs); color: var(--ze-ink-secondary);
+}
+
+/* ============================================================
+ * SpatialCanvas —— 图像 stage + 屏幕空间 SVG overlay(bbox / marquee / HUD)
+ * ============================================================ */
+.ze-spatial {
+  position: relative;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--ze-surface-sunken);
+  cursor: default;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+.ze-spatial[data-kind="pan"] { cursor: grabbing; }
+.ze-spatial[data-kind="move"] { cursor: move; }
+
+.ze-spatial__checkerboard {
+  position: absolute; top: 0; left: 0;
+  transform-origin: 0 0;
+  /* 透明区棋盘格:两色对角块,均走令牌 */
+  background-color: var(--ze-surface-raised);
+  background-image:
+    linear-gradient(45deg, var(--ze-overlay-soft) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--ze-overlay-soft) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--ze-overlay-soft) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--ze-overlay-soft) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+.ze-spatial__img { display: block; max-width: none; }
+
+.ze-spatial__overlay {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ze-spatial__box { fill: transparent; stroke: var(--ze-ink-tertiary); stroke-width: 1; }
+.ze-spatial__box[data-selected="true"] { stroke: var(--ze-accent-500); stroke-width: 1.5; }
+.ze-spatial__box[data-status="error"] { stroke: var(--ze-semantic-danger); }
+.ze-spatial__box[data-status="running"],
+.ze-spatial__box[data-status="pending"] { stroke: var(--ze-semantic-info); stroke-dasharray: 4 3; }
+
+.ze-spatial__marquee {
+  fill: var(--ze-overlay-accent-wash);
+  stroke: var(--ze-accent-500);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.ze-spatial__hud {
+  position: absolute; bottom: var(--ze-space-2); right: var(--ze-space-2);
+  display: flex; align-items: center; gap: var(--ze-space-2);
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  background: var(--ze-surface-raised);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-pill);
+  font-size: var(--ze-fs-xs); color: var(--ze-ink-secondary);
+}
+
+/* ---- TransformGizmo ---- */
+.ze-gizmo { pointer-events: none; }
+.ze-gizmo__frame { fill: none; stroke: var(--ze-accent-500); stroke-width: 1; }
+.ze-gizmo__arm { stroke: var(--ze-accent-500); stroke-width: 1; }
+.ze-gizmo__handle {
+  fill: var(--ze-surface-raised);
+  stroke: var(--ze-accent-500);
+  stroke-width: 1;
+}
+.ze-gizmo__handle[data-active="true"] { fill: var(--ze-accent-500); }
+
+/* ============================================================
+ * MaskCanvas —— 底图 + 可绘半透明光栅 mask 叠加(W1a;opt-in)
+ *   纯逻辑(笔画累积/seed)在 03-editor/primitives/maskRaster.ts。全令牌,无字面色。
+ * ============================================================ */
+.ze-mask {
+  display: flex; flex-direction: column;
+  width: 100%; height: 100%; min-height: 0;
+}
+.ze-mask__toolbar {
+  flex: none;
+  display: flex; align-items: center; gap: var(--ze-space-2);
+  padding: var(--ze-space-2);
+  border-bottom: 1px solid var(--ze-overlay-soft);
+}
+.ze-mask__brush { display: inline-flex; align-items: center; gap: var(--ze-space-2); min-width: 0; }
+.ze-mask__brush-label { font-size: var(--ze-fs-xs); color: var(--ze-ink-secondary); white-space: nowrap; }
+.ze-mask__stage {
+  position: relative; flex: 1; min-height: 0;
+  overflow: hidden;
+  padding: var(--ze-space-2);
+  background: var(--ze-surface-sunken);
+}
+.ze-mask__frame {
+  position: absolute; top: 0; left: 0;
+  display: inline-block; line-height: 0;
+  transform-origin: 0 0;
+}
+.ze-mask__bg { display: block; width: 100%; height: 100%; max-width: none; user-select: none; }
+.ze-mask__overlay {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  cursor: crosshair; touch-action: none;
+  opacity: 0.55;
+}
+.ze-mask__overlay[data-mode="eraser"] { cursor: cell; }
+.ze-mask__cursor {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ze-ink-primary);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px var(--ze-surface-raised);
+}
+.ze-mask__cursor span {
+  display: block;
+  border: 1px dashed var(--ze-ink-primary);
+  border-radius: 999px;
+}
+.ze-mask__empty { color: var(--ze-ink-tertiary); font-size: var(--ze-fs-sm); }
+
+/* ============================================================
+ * Canvas2dLayerStage —— PS-lite layered 合成/绘制舞台(16.0.0 纯化:
+ * 图层列表/属性面板已摘除——那是 cardlist/outline + property 的职责,
+ * 经 L5 layered_canvas 预设组合;舞台只剩单列视口)
+ * ============================================================ */
+.ze-layered-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.ze-layered-canvas__workbench {
+  min-width: 0;
+  min-height: 0;
+}
+.ze-layered-canvas__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ze-surface-sunken);
+  touch-action: none;
+  outline: none;
+}
+.ze-layered-canvas__viewport[data-tool="pan"] { cursor: grab; }
+.ze-layered-canvas__viewport[data-tool="brush"],
+.ze-layered-canvas__viewport[data-tool="eraser"] { cursor: crosshair; }
+.ze-layered-canvas__stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+  background-color: var(--ze-surface-raised);
+  background-image:
+    linear-gradient(45deg, var(--ze-overlay-soft) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--ze-overlay-soft) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--ze-overlay-soft) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--ze-overlay-soft) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+.ze-layered-canvas__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  user-select: none;
+}
+.ze-layered-canvas__layer {
+  position: absolute;
+  transform-origin: 50% 50%;
+  display: grid;
+  place-items: stretch;
+  pointer-events: none;
+  opacity: var(--ze-layer-alpha, 1);
+}
+.ze-layered-canvas__layer[data-visible="false"] { display: none; }
+.ze-layered-canvas__layer[data-active="true"] {
+  outline: 1px solid var(--ze-accent-500);
+  outline-offset: 0;
+}
+.ze-layered-canvas__layer > img,
+.ze-layered-canvas__paint {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+.ze-layered-canvas__text {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: var(--ze-space-1) var(--ze-space-2);
+  color: var(--ze-layer-text-color, var(--ze-ink-primary));
+  font-size: var(--ze-layer-font-size, var(--ze-fs-xl));
+  line-height: var(--ze-lh-tight);
+  overflow: hidden;
+}
+.ze-layered-canvas__shape,
+.ze-layered-canvas__bbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ze-layered-canvas__shape {
+  border: var(--ze-layer-stroke-width, 2px) solid var(--ze-layer-stroke, var(--ze-ink-secondary));
+  border-radius: var(--ze-layer-radius, 0);
+  background: var(--ze-layer-fill, var(--ze-overlay-soft));
+}
+.ze-layered-canvas__shape[data-shape="ellipse"] { border-radius: var(--ze-radius-pill); }
+.ze-layered-canvas__bbox {
+  border: var(--ze-layer-stroke-width, 2px) dashed var(--ze-layer-stroke, var(--ze-accent-500));
+  border-radius: var(--ze-layer-radius, 0);
+  background: var(--ze-overlay-accent-wash);
+}
+.ze-layered-canvas__cursor {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: var(--ze-brush-size, var(--ze-space-6));
+  height: var(--ze-brush-size, var(--ze-space-6));
+  border: 1px solid var(--ze-ink-primary);
+  border-radius: var(--ze-radius-pill);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px var(--ze-surface-raised);
+}
+.ze-layered-canvas__cursor span {
+  display: block;
+  width: var(--ze-brush-hardness, 80%);
+  height: var(--ze-brush-hardness, 80%);
+  border: 1px dashed var(--ze-ink-primary);
+  border-radius: var(--ze-radius-pill);
+}
+.ze-layered-canvas__crop {
+  position: absolute;
+  border: 1px dashed var(--ze-accent-500);
+  background: var(--ze-overlay-accent-wash);
+  pointer-events: none;
+}
+/* lasso/polygon 选区进行中的路径预览(SVG 覆盖层,世界坐标);只描线不落盘,落盘走 paint canvas。 */
+.ze-layered-canvas__selpath {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.ze-layered-canvas__selpath polyline {
+  fill: var(--ze-overlay-accent-wash);
+  stroke: var(--ze-accent-500);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+/* 笔刷 HUD(画布底缘浮条):活动层可绘时出现,size/hardness 双滑杆;视觉贴原子,自身只结构 */
+.ze-layered-canvas__hud-brush {
+  position: absolute;
+  left: var(--ze-space-2);
+  right: var(--ze-space-2);
+  bottom: var(--ze-space-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ze-space-3);
+  padding: var(--ze-space-1) var(--ze-space-2);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+}
+.ze-layered-canvas__hud-brush label {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  flex: 1;
+  min-width: 0;
+}
+.ze-layered-canvas__hud-brush .ze-slider { flex: 1; min-width: 0; }
+
+
+/* [v4 · 精密瓷釉] 画布 HUD 徽章贴实底 + 实线边,浮于画布更清晰 */
+.ze-spatial__hud .ze-badge,
+.ze-canvas__hud .ze-badge { background: var(--ze-surface-raised); border: 1px solid var(--ze-line-soft); }

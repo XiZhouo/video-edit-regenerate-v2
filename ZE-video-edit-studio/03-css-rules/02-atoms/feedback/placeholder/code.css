@@ -1,0 +1,140 @@
+/*
+ * placeholder.css — ze-skeleton-lines / ze-progress-ring / ze-error-placeholder (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * Block1 加载 / 管线 / 占位系统的可复用视觉:
+ *   - skeleton-lines: 多行文本骨架容器(单行 .ze-skeleton 已在 feedback.css)
+ *   - progress-ring : 圆环进度(viewport / 缩略图叠加;0..1 或 indeterminate 旋转)
+ *   - error-placeholder: 单 entity 错误占位(红框 + 消息 + 重试),compact 行内态
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ * 复用 feedback.css 托管的 @keyframes ze-spin。
+ */
+
+/* ============================================================
+ * skeleton-lines(多行文本骨架)
+ * ============================================================ */
+.ze-skeleton-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-2);
+  width: 100%;
+}
+
+
+/* ============================================================
+ * progress-ring(圆环进度)
+ * ============================================================ */
+.ze-progress-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ze-accent-500);
+}
+.ze-progress-ring svg { display: block; transform: rotate(-90deg); }
+.ze-progress-ring__track {
+  stroke: var(--ze-overlay-soft);
+  stroke-width: 3;
+}
+.ze-progress-ring__fill {
+  stroke: var(--ze-accent-500);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-progress-ring__pct {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-medium);
+  color: var(--ze-ink-secondary);
+}
+.ze-progress-ring__label {
+  position: absolute;
+  top: 100%;
+  margin-top: var(--ze-space-1);
+  white-space: nowrap;
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-tertiary);
+}
+/* indeterminate:整环旋转(已画 1/4 弧) */
+.ze-progress-ring[data-indeterminate="true"] svg {
+  animation: ze-spin var(--ze-dur-slow) linear infinite;
+}
+
+
+/* ============================================================
+ * error-placeholder(单 entity 错误占位)
+ * ============================================================ */
+.ze-error-placeholder {
+  display: flex;
+  align-items: center;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-3);
+  border: 1px solid color-mix(in oklab, var(--ze-semantic-danger) 40%, transparent);
+  border-radius: var(--ze-radius-md);
+  background: color-mix(in oklab, var(--ze-semantic-danger) 8%, var(--ze-surface-raised));
+  color: var(--ze-ink-primary);
+  font-size: var(--ze-fs-sm);
+}
+.ze-error-placeholder__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--ze-space-4);
+  height: var(--ze-space-4);
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-semantic-danger);
+  color: var(--ze-ink-inverse);
+  font-size: var(--ze-fs-xs);
+  font-weight: var(--ze-fw-bold);
+}
+.ze-error-placeholder__msg {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ze-semantic-danger);
+}
+.ze-error-placeholder__msg + .ze-button { flex-shrink: 0; }
+
+/* compact:表格行内 / 卡片内,去框、缩 padding */
+.ze-error-placeholder[data-compact="true"] {
+  padding: var(--ze-space-1) var(--ze-space-2);
+  border: 0;
+  background: transparent;
+}
+
+
+/* ============================================================
+ * entity-frame(尺寸稳定的加载/处理态外壳)+ entity-busy(AI 处理叠加)
+ *   盒子尺寸由内联 aspect-ratio/height/minHeight 定死;骨架/内容/错误/busy 共用同一盒子 → 零 reflow。
+ *   busy:保留内容、同尺寸盖一层 veil + 进度环(不塌缩)。EntityLoadingFrame primitive 消费。
+ * ============================================================ */
+.ze-entity-frame {
+  position: relative;
+  display: grid;
+  place-items: stretch;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+/* pending 骨架 / 内容都铺满盒子(grid 单格);错误占位也落在盒内 */
+.ze-entity-frame > * { min-width: 0; min-height: 0; }
+.ze-entity-frame[data-run-phase="error"] { place-items: center; }
+
+.ze-entity-busy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--ze-overlay-soft);
+  backdrop-filter: blur(1px);
+  pointer-events: none;          /* 不硬锁:用户仍可操作下层内容 */
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "ze.surface_profile.v1",
+  "primary": "web",
+  "surfaces": [
+    "cli",
+    "api",
+    "web",
+    "mcp"
+  ],
+  "human_control": "web_workbench",
+  "entrypoints": {
+    "cli": "scripts/ze_command.py",
+    "api": "server.py",
+    "web": "webapp"
+  },
+  "cli": {
+    "entrypoint": "scripts/ze_command.py",
+    "supports": [
+      "list",
+      "describe",
+      "run",
+      "inspect"
+    ]
+  },
+  "api": {
+    "server": "server.py",
+    "healthcheck_path": "/health",
+    "port_required": true,
+    "exposure": "app-internal",
+    "authentication": "session",
+    "contract": "openapi.json",
+    "versioning": "path"
+  },
+  "web": {
+    "dir": "webapp",
+    "product_dir": "webapp/src/product",
+    "healthcheck_path": "/health"
+  },
+  "mcp": {
+    "endpoint": "/mcp",
+    "transport": "http",
+    "host_surface": "web"
+  }
+}

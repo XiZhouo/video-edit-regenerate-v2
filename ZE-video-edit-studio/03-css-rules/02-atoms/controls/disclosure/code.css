@@ -1,0 +1,47 @@
+/*
+ * disclosure.css — ze-disclosure 折叠组头原子 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.2 / §3.1(折叠头≠按钮≠select)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 层级编码:组头是"文字型"行(透明底/无边框/无 sunken 盒),静息必须比它治下的控件更轻;
+ *   标题排版由子节点 .ze-text[data-role=title] 供给 —— 统一标题配方仍只住
+ *   editor-shell.css 与 text.css 两处,本文件零复制。
+ * 语义防撞:▾ 字形保留给 select 的下拉指示(select.css ::after);披露 caret 用固定 ▸
+ *   字形 + [aria-expanded=true] 旋转 90°,永不与 select 撞形。
+ * 几何:1×row-h 标准行(行高系统);caret 列宽 = space-3(12px)= 段体 data-pad=3 内距,
+ *   令组头标题与组内字段 label 左缘精确对齐。
+ * 全部值引 令牌(var(--ze-*)),禁字面量 hex。
+ */
+
+.ze-disclosure {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--ze-row-h);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+  border-radius: var(--ze-radius-sm);
+  transition: background var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-disclosure:hover { background: var(--ze-overlay-soft); }
+.ze-disclosure:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+.ze-disclosure:disabled { color: var(--ze-ink-disabled); cursor: not-allowed; }
+
+/* caret:固定 ▸,展开转 90°(纯转向不换字形 → 永不渲染 select 的 ▾) */
+.ze-disclosure__caret {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ze-space-3);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  line-height: 1;
+  transition: transform var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-disclosure[aria-expanded="true"] .ze-disclosure__caret { transform: rotate(90deg); }

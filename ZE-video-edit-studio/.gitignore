@@ -1,0 +1,22 @@
+# 数据目录 (运行时 Document 持久化; 默认 <skill>/.data, 或 $ZE_DATA_DIR)
+.data/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 前端
+node_modules/
+dist/
+webapp/node_modules/
+webapp/dist/
+.vite-temp/
+
+# 本机代理运行态与常见系统/日志文件
+.ze-runtime/
+*.log
+.DS_Store

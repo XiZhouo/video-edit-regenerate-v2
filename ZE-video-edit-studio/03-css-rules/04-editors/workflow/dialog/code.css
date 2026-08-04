@@ -1,0 +1,31 @@
+/*
+ * dialog.css — dialog 编辑器(AI 对话)结构 (04-editors)
+ *
+ * 消费: 01-core 的 DialogEditor(.ze-editor--dialog)。transcript 气泡流 + 底部 composer。
+ * 分层(css_layer_guard:L2 以上禁直接用 L1 令牌):本文件 **零令牌** —— 视觉/间距全走 L2 原子
+ *   (气泡 .ze-surface[data-surface=sunken|accent-wash] + .ze-edge + .ze-round + .ze-pad,
+ *    文字 .ze-text,间距 .ze-gap/.ze-pad,由 DialogEditor 贴)。本文件只留无令牌结构:
+ *   flex 链 / 滚动归属 / 气泡左右对位(data-self)/ 正文换行 / 角色名首字母大写。
+ *   transcript + composer 直接做 EditorFrame .ze-editor__content(已 flex 竖排)的子,无额外容器。
+ */
+.ze-dialog__transcript {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ze-dialog__bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  align-self: flex-start;
+}
+.ze-dialog__bubble[data-self="true"] { align-self: flex-end; }
+.ze-dialog__bubble[data-pending="true"] { opacity: 0.7; }
+.ze-dialog__role { text-transform: capitalize; }
+.ze-dialog__text { white-space: pre-wrap; word-break: break-word; }
+
+.ze-dialog__composer { display: flex; align-items: flex-end; }
+.ze-dialog__input { flex: 1; resize: none; }

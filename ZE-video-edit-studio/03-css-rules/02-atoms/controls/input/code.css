@@ -1,0 +1,89 @@
+/*
+ * input.css — ze-input 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: 对齐 v2 input + v3 editor__input —— sunken 底 + 1px overlay-soft 边 + accent focus。
+ *   约定:表单类 focus 用"内嵌 box-shadow ring"贴圆角(动作类才用 outline)。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--ze-space-7);                 /* md = 28px */
+  padding: var(--ze-space-1) var(--ze-space-2);
+  background: var(--ze-surface-sunken);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  color: var(--ze-ink-primary);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  line-height: var(--ze-lh-snug);
+  transition:
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    box-shadow var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+.ze-input::placeholder { color: var(--ze-ink-tertiary); }
+.ze-input:hover { border-color: color-mix(in oklab, var(--ze-ink-tertiary) 30%, transparent); }
+.ze-input:focus,
+.ze-input:focus-visible {
+  outline: none;
+  border-color: var(--ze-accent-500);
+  box-shadow: 0 0 0 2px var(--ze-overlay-accent-wash);
+}
+.ze-input:disabled {
+  color: var(--ze-ink-disabled);
+  background: var(--ze-surface-canvas);
+  cursor: not-allowed;
+}
+.ze-input[aria-invalid="true"] { border-color: var(--ze-semantic-danger); }
+.ze-input[aria-invalid="true"]:focus,
+.ze-input[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ze-semantic-danger) 22%, transparent);
+}
+
+/* ---- 尺寸 ---- */
+.ze-input[data-size="sm"] {
+  min-height: 0;
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+}
+.ze-input[data-size="lg"] {
+  min-height: 0;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  font-size: var(--ze-fs-sm);
+}
+
+.ze-user-picker {
+  display: inline-block;
+  min-width: 0;
+}
+
+.ze-user-picker .ze-input { width: 100%; }
+
+.ze-user-picker__avatar {
+  width: var(--ze-space-5);
+  height: var(--ze-space-5);
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
+  border-radius: var(--ze-radius-pill);
+  background: var(--ze-overlay-soft);
+}
+
+.ze-field-row > .ze-user-picker,
+.ze-param .ze-user-picker,
+.ze-header__acl-add-row .ze-user-picker {
+  width: 100%;
+  min-width: 0;
+}
+
+.ze-header__acl-add-row .ze-user-picker {
+  flex: 1 1 auto;
+}

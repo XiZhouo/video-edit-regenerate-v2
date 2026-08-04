@@ -1,0 +1,53 @@
+/*
+ * app-shell.css — 应用最外层框架(`.ze-app` / `.ze-app__main`)
+ *
+ * `.ze-app` 是装 Header / 中区 / Footer 的最外层布局区,归 04-editors(皮肤的一部分)。
+ * webapp 入口(webapp/src/main.tsx)link 本文件;`.ze-app*` 类的用法在 webapp/src/App.tsx。
+ *
+ * 绝对严格分层(L5 chrome 轮 batch2):本文件零 var(--ze-*)。
+ *   - 全局 reset + body 文档基线(底色/墨色/字体/行高 + box reset + 整页不滚高度链)已迁 L1
+ *     foundation → 见 03-css-rules/01-tokens/base.css(在 tokens.css 后 import)。
+ *   - `.ze-app` / `.ze-app__main` 是 webapp 外壳的纯结构容器(flex/height/overflow,无令牌),留本层。
+ *   - 旧 `.ze-app__welcome*`(无项目欢迎卡)已删:无项目态由 ProjectPicker(03-authentication)承接,
+ *     welcome 卡是 ProjectPicker 之前的遗留死码,全仓零 JSX 消费。
+ */
+
+.ze-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;           /* 链自 #root(=视口);不用 100vh */
+  overflow: hidden;
+  position: relative;   /* 背景画布 .ze-ambient-field(absolute inset:0)的定位祖先 */
+  /* 响应式容器(R6/R-MEDIA):Header/Footer 的 chrome 自适应按本容器宽触发(@container ze-app),
+   * 一律 @container 不用 @media、断点走 canonical 集——与中区 ze-workspace 同范式。container-type/
+   * container-name 是结构声明、无令牌,L4 合法。见 DESIGN-SYSTEM 规则注册表。 */
+  container-type: inline-size;
+  container-name: ze-app;
+}
+
+.ze-app__main {
+  flex: 1;
+  min-height: 0;          /* flex 子项允许收缩 — Footer 展开时主区被挤压 */
+  display: flex;
+  flex-direction: column;  /* 装 LayoutRenderer 的 .ze-layout-root(flex:1 撑满)*/
+  overflow: hidden;        /* 中区结构自管滚动,editor 内部各自滚 */
+  position: relative;      /* 与 Header/Footer 同处 .ze-app 层叠上下文,压在背景画布(z-index:0)之上 */
+  z-index: 1;
+}
+
+/* 背景环境光场(opt-in):带 alpha 的全幅画布,垫在所有玻璃面板之后、压在 body 白底之上。
+ * 纯结构定位、零颜色 token —— 色与动全在 webapp 的 WebGL 组件 AmbientField.tsx。
+ * 仅当 .ze-app 声明 data-ze-ambient="field" 时由 App.tsx 挂载;reduced-motion 直接隐藏(组件内 matchMedia 再兜一道)。 */
+.ze-ambient-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ze-ambient-field { display: none; }
+}

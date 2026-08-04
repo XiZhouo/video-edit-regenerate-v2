@@ -1,0 +1,231 @@
+/*
+ * state-frame.css — UI 对象自身状态口径 (02-atoms / feedback)
+ *
+ * 这不是“空态组件”或“骨架屏组件”。它只定义同一对象在 normal / empty / running /
+ * error / stale / disabled 下怎样显示。数据层把 entity/run 的状态映射到对象自己的
+ * data-ui-state / data-run-phase；CSS 不替对象换盒子，也不改变尺寸。
+ */
+
+.ze-state-frame {
+  --ze-ui-state-fg: var(--ze-state-normal-fg);
+  --ze-ui-state-bg: var(--ze-state-normal-bg);
+  --ze-ui-state-border: var(--ze-state-normal-border);
+
+  position: relative;
+  display: grid;
+  min-block-size: var(--ze-state-min-block);
+  min-inline-size: 0;
+  border: 1px solid var(--ze-ui-state-border);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-ui-state-bg);
+  color: var(--ze-ui-state-fg);
+}
+
+.ze-state-frame__content,
+.ze-state-frame__message {
+  min-width: 0;
+}
+
+.ze-state-frame__message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ze-ui-state-fg);
+  font-size: var(--ze-fs-sm);
+}
+
+.ze-state-frame__indicator {
+  inline-size: var(--ze-state-indicator-size);
+  block-size: var(--ze-state-indicator-size);
+  border-radius: var(--ze-radius-pill);
+  background: currentColor;
+  flex: none;
+}
+
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+) {
+  --ze-ui-state-fg: var(--ze-state-normal-fg);
+  --ze-ui-state-bg: var(--ze-state-normal-bg);
+  --ze-ui-state-border: var(--ze-state-normal-border);
+}
+
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-ui-state="empty"] {
+  --ze-ui-state-fg: var(--ze-state-empty-fg);
+  --ze-ui-state-bg: var(--ze-state-empty-bg);
+  --ze-ui-state-border: var(--ze-state-empty-border);
+}
+
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-ui-state="running"],
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-run-phase="running"],
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-run-phase="pending"] {
+  --ze-ui-state-fg: var(--ze-state-running-fg);
+  --ze-ui-state-bg: var(--ze-state-running-bg);
+  --ze-ui-state-border: var(--ze-state-running-border);
+}
+
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-ui-state="error"],
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-run-phase="error"],
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[aria-invalid="true"] {
+  --ze-ui-state-fg: var(--ze-state-error-fg);
+  --ze-ui-state-bg: var(--ze-state-error-bg);
+  --ze-ui-state-border: var(--ze-state-error-border);
+}
+
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-ui-state="stale"] {
+  --ze-ui-state-fg: var(--ze-state-stale-fg);
+  --ze-ui-state-bg: var(--ze-state-stale-bg);
+  --ze-ui-state-border: var(--ze-state-stale-border);
+}
+
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[data-ui-state="disabled"],
+:where(
+  .ze-state-frame,
+  .ze-card,
+  .ze-thumb,
+  .ze-row-card,
+  .ze-status-tile,
+  .ze-field-row,
+  .ze-menu-item,
+  .ze-entity-frame
+)[aria-disabled="true"] {
+  --ze-ui-state-fg: var(--ze-state-disabled-fg);
+  --ze-ui-state-bg: var(--ze-state-disabled-bg);
+  --ze-ui-state-border: var(--ze-state-disabled-border);
+  opacity: var(--ze-state-disabled-opacity);
+}
+
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-ui-state],
+:where(.ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-run-phase],
+:where(.ze-field-row, .ze-menu-item)[aria-invalid="true"] {
+  border-color: var(--ze-ui-state-border);
+  background: var(--ze-ui-state-bg);
+  color: var(--ze-ui-state-fg);
+}
+
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-ui-state="empty"] {
+  border-style: dashed;
+}
+
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-ui-state="running"],
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-run-phase="running"],
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-run-phase="pending"] {
+  position: relative;
+}
+
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-ui-state="running"]::after,
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-run-phase="running"]::after,
+:where(.ze-state-frame, .ze-card, .ze-thumb, .ze-row-card, .ze-status-tile, .ze-field-row, .ze-menu-item)[data-run-phase="pending"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, transparent, var(--ze-state-running-veil), transparent);
+  transform: translateX(-100%);
+  animation: ze-state-scan var(--ze-dur-breathe) var(--ze-easing-standard) infinite;
+  pointer-events: none;
+}
+
+.ze-table tr[data-ui-state] > *,
+.ze-table tr[data-run-phase] > * {
+  background: var(--ze-ui-state-bg);
+  color: var(--ze-ui-state-fg);
+}
+
+.ze-table tr[data-ui-state="error"] > *:first-child,
+.ze-table tr[data-run-phase="error"] > *:first-child {
+  box-shadow: inset 2px 0 0 var(--ze-ui-state-border);
+}
+
+@keyframes ze-state-scan {
+  to { transform: translateX(100%); }
+}

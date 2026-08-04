@@ -1,0 +1,1107 @@
+{
+  "schema": "ze-editor-manifest.v1",
+  "_comment": "每个编辑器的机器可读声明:功能区/内置交互/可关闭区/行模型/fixture/需求来源。被 scripts/editor_manifest_check.py 校验。status=adopted 的编辑器已采用统一标准(行高系统+功能区+fixture),门禁强校验;pending 的待 Phase 2 逐个翻成 adopted。新增编辑器=加一条;不许 CSS 里有未声明的 .ze-editor--X。functionalZones[].zoneClass 为可选的『结构类』link:声明时须 ∈ 8 结构类闭集(status-area/control-bar/list/field-group/viewport/tree/input/decision-confirm,权威=03-zones/ZONE-CLASS-REGISTRY.md §4 机读 fence),门禁 ZONE_CLASS_UNKNOWN(present-and-invalid→fail / absent→skip);当前零声明=加性零回填即绿,全量回填后续批次。schema 仍 ze-editor-manifest.v1(可选字段、旧消费者忽略未知键=向后兼容)。",
+  "rowUnit": "--ze-row-h",
+  "breakpoints": [
+    320,
+    480,
+    768,
+    1024,
+    1440
+  ],
+  "breakpointHysteresisPx": 16,
+  "editors": [
+    {
+      "id": "table",
+      "class": "table",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--table",
+      "rowModel": "row-h",
+      "rowSelectors": [
+        ".ze-table th",
+        ".ze-table td"
+      ],
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题/计数/搜索/新增",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__tbl-scroll",
+          "purpose": "列表本体:排序/多选/右键/行内删除",
+          "closeable": false
+        },
+        {
+          "id": "statusbar",
+          "selector": ".ze-editor__statusbar",
+          "purpose": "运行/排队计数 + 最近操作 + 取消",
+          "closeable": true
+        }
+      ],
+      "builtinInteractions": [
+        "left-click-select",
+        "cmd-toggle-multi",
+        "shift-range-multi",
+        "sort-by-header",
+        "search-filter",
+        "right-click-menu",
+        "row-delete",
+        "select-all-invert",
+        "clear-selection-esc"
+      ],
+      "plannedInteractions": [
+        "marquee-select",
+        "undo-redo-shortcut"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/table.ts",
+      "needs": "列表型(bigquery 任务/步骤栏、word-cloud 概念表、skill 注册表):多选+批量+排序+筛选+行内状态+框选/全选",
+      "marqueeNote": "列表完整多选=点击+⌘/⇧+⌘A/Esc(标准);行铺满宽度,框选非自然手势,marquee 暂列 planned"
+    },
+    {
+      "id": "form",
+      "class": "form",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--form",
+      "rowModel": "row-h",
+      "rowSelectors": [
+        ".ze-field-row"
+      ],
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 版本/生成进度",
+          "closeable": false
+        },
+        {
+          "id": "actionbar",
+          "selector": ".ze-editor__actionbar",
+          "purpose": "业务动作条(FormAction 闭集:command/confirm/requiresFields/scope;busy 单飞/运行中置灰)",
+          "closeable": true
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__form-body",
+          "purpose": "schema 驱动字段 + x-group 挂载期折叠组;显式 InspectorSectionSpec.id 分区可持久折叠",
+          "closeable": false
+        },
+        {
+          "id": "unit",
+          "selector": ".ze-editor__unit",
+          "purpose": "信息+控制单元(InspectorSectionSpec:信息区[data-role=info]+控制区[data-role=control]固定二分;声明 sections 时 property 渲为 N 个单元,与 actionbar 互斥)",
+          "closeable": false
+        },
+        {
+          "id": "unit-control",
+          "selector": ".ze-editor__unit-control",
+          "purpose": "单元控制区(FormAction 钮组,复用 actionbar 钮渲染;border-top 发丝线作信息↔控制二分边界)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "edit-on-blur",
+        "enum-select",
+        "color-picker",
+        "bounded-slider",
+        "boolean-checkbox",
+        "json-multiline",
+        "group-collapse",
+        "stable-section-collapse-persist",
+        "action-dispatch",
+        "requires-fields-gating",
+        "confirm-guard",
+        "selection-scope-actions",
+        "selection-follow",
+        "multi-aggregate-edit",
+        "batch-update",
+        "info-control-unit"
+      ],
+      "plannedInteractions": [
+        "undo-redo-shortcut",
+        "conditional-fields",
+        "in-slot-type-tabs"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/form.ts",
+      "rowNote": "单行字段统一 row-h、控件居中不撑行;textarea/JSON 挂 data-multiline 是 n×row-h 例外",
+      "needs": "legacy form 实现:低级字段/记录表单能力;公共属性编辑器使用 property alias。schema 驱动+条件字段+滑杆/取色+即时预览;property 可多型槽跟随全局最近选中+多选聚合编辑(entity.batch_update)",
+      "viewState": "actions,actionsByType,sections,sectionsByType,followSelection"
+    },
+    {
+      "id": "property",
+      "class": "property",
+      "status": "adopted",
+      "aliasOf": "form",
+      "rootSelector": ".ze-editor--property",
+      "rowModel": "row-h",
+      "rowSelectors": [
+        ".ze-field-row"
+      ],
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):当前 entity 类型/名称 + 版本/生成态/多选聚合信息",
+          "closeable": false
+        },
+        {
+          "id": "property",
+          "selector": ".ze-editor__form-body",
+          "purpose": "PropertyZone:根据 entity range/selection/schema/sections 自动排版信息区;字段/只读/预览/variants 都是信息",
+          "closeable": false
+        },
+        {
+          "id": "unit",
+          "selector": ".ze-editor__unit",
+          "purpose": "InfoControlUnit:信息区只放数据,控制区只放 command;sections 声明时渲为 N 个单元并以稳定 section.id 记忆折叠",
+          "closeable": false
+        },
+        {
+          "id": "unit-control",
+          "selector": ".ze-editor__unit-control",
+          "purpose": "单元控制区(FormAction 钮组);所有修改和批量动作经 command/operation",
+          "closeable": false
+        },
+        {
+          "id": "tool",
+          "selector": ".ze-editor__actionbar",
+          "purpose": "ToolZone 兼容落点:无 sections 时的动作条;有 sections 时控制进入 unit-control",
+          "closeable": true
+        }
+      ],
+      "builtinInteractions": [
+        "selection-follow",
+        "single-target-resolution",
+        "multi-target-resolution",
+        "cross-type-target-resolution",
+        "mixed-value-rendering",
+        "readonly-info",
+        "editable-fields",
+        "running-state",
+        "provenance-info",
+        "reference-info",
+        "action-dispatch",
+        "selection-scope-actions",
+        "multi-aggregate-edit",
+        "batch-update",
+        "info-control-unit",
+        "stable-section-collapse-persist"
+      ],
+      "plannedInteractions": [
+        "entity-range-tabs",
+        "reference-jump",
+        "provenance-timeline"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/form.ts",
+      "needs": "属性编辑器:不是 form。基于 entity range + selection + command 自动排版信息,支持单选/多选/跨类型/混合值/只读/运行态/引用关系;修改走 command,批量更新走单 Operation 保证一次 undo。",
+      "viewState": "targetTypes,followSelection,sections,sectionsByType,actions,actionsByType,autoSections"
+    },
+    {
+      "id": "gallery",
+      "class": "gallery",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--gallery",
+      "noRawToolbar": true,
+      "sourceFile": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):typeLabel 标题 + 计数/筛选徽记;只读、禁输入控件(搜索下沉 filterbar)",
+          "closeable": false
+        },
+        {
+          "id": "filterbar",
+          "selector": ".ze-editor__zone[data-role=\"filterbar\"]",
+          "purpose": "筛选条(FilterBarZone):缩略图尺寸无级滑杆 + 搜索框 + 排序下拉 + 状态 pill 单选(纯视图态,即时无 confirm,辅助查看)",
+          "closeable": true
+        },
+        {
+          "id": "control",
+          "selector": ".ze-editor__zone[data-role=\"control\"]",
+          "purpose": "控制功能区(flex-fill 占满):选择簇(全选/已选 N/反选/清空,暴露 selectionModel 模式为可见控件)+ 导入入口 + 选区批量(scope:selection 选中>0 才渲,走 confirm)+ 全局命令(scope:global 常驻)",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__gallery-body",
+          "purpose": "缩略卡视图:grid/card-list/compact-list(多选/右键/拖拽重排/运行态)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "left-click-select",
+        "cmd-toggle-multi",
+        "shift-range-multi",
+        "marquee-select",
+        "right-click-menu",
+        "drag-reorder",
+        "adopt",
+        "select-all-invert",
+        "clear-selection-esc",
+        "selection-cluster-visible",
+        "layout-mode-grid",
+        "layout-mode-card-list",
+        "layout-mode-compact-list",
+        "description-field",
+        "summary-fields",
+        "delete-command",
+        "filter-search",
+        "sort-controls",
+        "status-pills",
+        "thumb-size-continuous-slider",
+        "action-zone",
+        "card-size-preset",
+        "visibility-toggle",
+        "lock-toggle",
+        "thumbless-cards"
+      ],
+      "plannedInteractions": [
+        "undo-redo-shortcut"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/gallery.ts",
+      "layoutNote": "卡片视图是 cardlist 的 layoutMode,不是 table list。grid 用于候选缩略图;card-list 用于 Object Library/知识资产/参考包这种图+摘要;compact-list 用于大量媒体资产快速扫读。gallery 仅为 legacy alias;cardlist=通用卡片列表编辑器:缩略图可有可无、眼睛/锁可有可无、cardSize 是 mod 默认尺寸 preset,用户可用明确的缩略图尺寸无级滑杆调本地项目偏好,列数由容器宽度和连续 scale 计算出的 min-width 自适应——PS 图层列表也是它的一个实例(compact-list)。",
+      "viewState": "layoutMode,thumbField,labelField,descriptionField,scoreField,summaryFields,adoptCommand,deleteCommand,reorderCommand,searchFields,filters,sorts,defaultSort,actions,cardSize,visibilityField,lockedField,showThumb,importCommand,acceptedMime,importPayloadField",
+      "zeEvidence": "ZE-seek-find-object-library, ZE-knowledge-base, ZE-reference-pack-builder, ZE-video-export-conformer, ZE-word-cloud-map",
+      "needs": "缩略图/卡片型资产浏览:多选+框选+批量操作+对比+拖拽重排+描述/摘要字段映射"
+    },
+    {
+      "id": "cardlist",
+      "class": "cardlist",
+      "status": "adopted",
+      "aliasOf": "gallery",
+      "rootSelector": ".ze-editor--cardlist",
+      "noRawToolbar": true,
+      "sourceFile": "01-core/04-user-facing/01-layout/03-editor/editors/gallery/GalleryEditor.tsx",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):类型名 + 可见/选中计数;只读",
+          "closeable": false
+        },
+        {
+          "id": "manage",
+          "selector": ".ze-editor__zone[data-function-zone=\"manage\"]",
+          "purpose": "ManageZone:缩略图尺寸无级滑杆、搜索、筛选、排序、选择管理,专注辅助查看和管理当前实体集合",
+          "closeable": true
+        },
+        {
+          "id": "tool",
+          "selector": ".ze-editor__zone[data-function-zone=\"tool\"]",
+          "purpose": "ToolZone:导入、删除、批量 command、全局 command 等对当前对象做什么",
+          "closeable": false
+        },
+        {
+          "id": "cardlist",
+          "selector": ".ze-editor__gallery-body",
+          "purpose": "CardListZone:卡片容器列表;可有图也可无图,固定 label/description/meta/actions/toggles 槽位,容器宽度决定列数",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "left-click-select",
+        "cmd-toggle-multi",
+        "shift-range-multi",
+        "marquee-select",
+        "right-click-menu",
+        "drag-reorder",
+        "select-all-invert",
+        "clear-selection-esc",
+        "selection-cluster-visible",
+        "layout-mode-grid",
+        "layout-mode-card-list",
+        "layout-mode-compact-list",
+        "description-field",
+        "summary-fields",
+        "delete-command",
+        "filter-search",
+        "sort-controls",
+        "status-pills",
+        "thumb-size-continuous-slider",
+        "action-zone",
+        "card-size-preset",
+        "visibility-toggle",
+        "lock-toggle",
+        "thumbless-cards"
+      ],
+      "plannedInteractions": [
+        "undo-redo-shortcut"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/gallery.ts",
+      "layoutNote": "cardlist 是 gallery 的标准新名;gallery 保留 legacy alias。卡片尺寸默认值由 mod preset(cardSize/density)决定;用户运行时通过明确的缩略图尺寸无级滑杆调本地项目偏好,不再提供难懂的 LG/MD/SM 循环钮或离散档位。",
+      "viewState": "layoutMode,density,cardSize,thumbField,labelField,descriptionField,scoreField,summaryFields,adoptCommand,deleteCommand,reorderCommand,searchFields,filters,sorts,defaultSort,actions,visibilityField,lockedField,showThumb,importCommand,acceptedMime,importPayloadField",
+      "zeEvidence": "ZE-seek-find-background-generator, ZE-seek-find-object-generator, ZE-seek-find-object-library, ZE-reference-pack-builder, ZE-video-export-conformer",
+      "needs": "卡片列表编辑器:实体卡片容器,不是单纯缩略图。负责有图/无图卡片浏览、选择全集、筛选搜索排序、批量动作、可见/锁定/重排。"
+    },
+    {
+      "id": "canvas2d",
+      "class": "canvas2d",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--canvas2d",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 可选绘制工具(CanvasToolbar)",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__canvas-body",
+          "purpose": "2D 视口:缩放/平移/拖入;layer/mask/spatial presets 共享工作区",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "wheel-zoom",
+        "wheel-zoom-to-cursor",
+        "middle-button-pan",
+        "drag-pan",
+        "double-click-fit",
+        "drop-import",
+        "layer-stack-composite-from-entities",
+        "layer-select-move",
+        "layer-text-shape-mask-bbox-add",
+        "crop-rect-commit",
+        "composite-export-copy-png",
+        "brush-preview-before-paint",
+        "shift-right-drag-brush-size-hardness",
+        "brush-hud",
+        "hud-add-mask-bbox",
+        "hud-export"
+      ],
+      "plannedInteractions": [
+        "marquee-select",
+        "right-click-menu",
+        "undo-redo-shortcut",
+        "sam-magic-wand-command-ports"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/canvas2d.ts",
+      "frameNote": "统一外框:三路径(spatial/empty/default)都渲染标准 .ze-editor__toolbar,不再依赖 tools 条件渲染",
+      "needs": "统一 PS-lite 2D 画布母体:已落地 viewport/layer/mask/bbox presets、图层栈、mask 画笔、bbox/gizmo、裁切、基础滤镜、导出;后续补 SAM/魔棒 command port 真实算法",
+      "layoutNote": " 1.27.0 纯化:图层列表/属性面板已摘除——图层=layer 实体,flat 列表=cardlist 卡片列表实例(compact-list,眼睛/锁/重排),层级=outline,属性=property;经 L5 layered_canvas 预设组合,活动层=全局 selection[layerType],画布只做合成渲染与绘制(零编辑器直连)。",
+      "viewState": "preset,bgField,layerType,layerAddCommand,pixelLayerField,selectionLayerField,pixelLayerCommand,maskField,rangeMaskField,geometryField,xField,yField,wField,hField,rotationField,tools,features,importCommand,paintCommand,maskCommand,bboxUpdateCommand,exportCommand"
+    },
+    {
+      "id": "scene3d",
+      "class": "scene3d",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--scene3d",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 复位视角/线框开关(仅渲染器挂载时出)",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__canvas-body",
+          "purpose": "渲染器宿主(.ze-scene3d-host)/ 无渲染器空态 / 加载/错误占位",
+          "closeable": false
+        },
+        {
+          "id": "host",
+          "selector": ".ze-scene3d-host",
+          "purpose": "mod 渲染组件(three.js/splat)挂载盒;只定盒,视觉由渲染器内部画",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "reset-view",
+        "wireframe-toggle",
+        "display-mode-envelope",
+        "camera-command-envelope",
+        "camera-persist",
+        "selection-command-envelope",
+        "transform-command-envelope",
+        "renderer-injection",
+        "lazy-renderer-module",
+        "renderer-loading-error-retry"
+      ],
+      "plannedInteractions": [
+        "orbit-camera",
+        "select-in-scene",
+        "transform-gizmo",
+        "material-command-envelope"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/scene3d.ts",
+      "rendererNote": "core 不打包 three.js;渲染器经 renderer prop / rendererModuleId 由 mod 注入。gallery 用无依赖替身(canvas 2D 旋转线框立方体)验证 slot/外框/复位/线框,不引依赖",
+      "viewState": "meshField,rendererModuleId,cameraField,cameraMode,selectionField,displayModeField,transformMode,transformCommand,materialCommand,cameraCommand,selectionCommand,displayModeCommand,displayModes,gizmos",
+      "zeEvidence": "ZE-image-to-3d-asset, ZE-image-to-scene-objects, ZE-image-to-splat-v3, ZE-model-render-studio, ZE-model-retopology, ZE-mesh-scene-blockout, ZE-shader-node-workbench",
+      "needs": "3D 工作区母体:网格/材质/splat 预览+渲染器注入+标准视角/线框入口;重 3D 引擎和雕刻/拓扑语义留 mod"
+    },
+    {
+      "id": "asset",
+      "class": "asset",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--asset",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 变换工具(旋转/翻转)",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__canvas-body",
+          "purpose": "资产视口:图走 CanvasViewport / PDF .ze-asset__pdf(<embed>)/ markdown .ze-asset__doc(prose)/ text .ze-asset__text(<pre>)/ 其余 .ze-asset__file 信息卡",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "wheel-zoom",
+        "drag-pan",
+        "drop-import",
+        "pdf-preview",
+        "text-preview",
+        "markdown-preview"
+      ],
+      "plannedInteractions": [
+        "transform-rotate-flip",
+        "export"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/asset.ts",
+      "needs": "单资产查看:图缩放/平移 + PDF/文本/markdown 内联预览 + 变换工具(yazi 式预览面复用本编辑器)"
+    },
+    {
+      "id": "media",
+      "class": "media",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--media",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__canvas-body",
+          "purpose": "播放器(.ze-media__player:按 mime 选 video/audio)/ 加载/错误占位",
+          "closeable": false
+        },
+        {
+          "id": "transport",
+          "selector": ".ze-media__controls",
+          "purpose": "自定义传输条:播放/暂停 + scrubber + 倍速 + 循环(+ 视频逐帧/标记点)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "play-pause",
+        "scrub-seek",
+        "playback-rate",
+        "loop-toggle",
+        "shared-time-sync"
+      ],
+      "plannedInteractions": [
+        "frame-step",
+        "mark-in-out"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/media.ts",
+      "mediaNote": "transport/scrub/rate/loop 全走原生 media API(经 ref,不 dispatch);标记 in/out 才走 markCommand。C0 共享 currentTime(shared-time-sync):timeUpdate/scrub 提升为 Interaction State 共享游标 / 外部改 currentTime 则 seek(防回环 lib/playhead),装配层未接共享时间轴则退回纯本地播放。gallery 用现构内联 WAV 验证 audio 路径;video 与逐帧/标记点需真实视频资产",
+      "needs": "视频/音频:播放/scrub/速率/标记点"
+    },
+    {
+      "id": "chart",
+      "class": "chart",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--chart",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 字段 + 计数",
+          "closeable": false
+        },
+        {
+          "id": "kpis",
+          "selector": ".ze-chart__kpis",
+          "purpose": "量化摘要 KPI strip(count/sum/mean/min/max)",
+          "closeable": false
+        },
+        {
+          "id": "plot",
+          "selector": ".ze-chart__plot",
+          "purpose": "token 纯 SVG 图(bar/line/area/scatter/histogram/pie)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "hover-crosshair-tooltip",
+        "point-select"
+      ],
+      "plannedInteractions": [
+        "brush-zoom",
+        "legend-filter"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/chart.ts",
+      "needs": "数据图表(data-query/trend):bar/line/area/scatter/pie + KPI + crosshair/tooltip"
+    },
+    {
+      "id": "task",
+      "class": "task",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--task",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 状态筛选",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__task-body",
+          "purpose": "任务行列表(分阶段 pill + 运行/失败态)",
+          "closeable": false
+        },
+        {
+          "id": "statusbar",
+          "selector": ".ze-editor__statusbar",
+          "purpose": "本槽 running/queued 计数 + 取消;可收起到常驻复原把手(SPEC §7 collapsible)",
+          "closeable": true
+        }
+      ],
+      "builtinInteractions": [
+        "row-select",
+        "stage-progress",
+        "run",
+        "retry-on-error",
+        "collapse-statusbar"
+      ],
+      "plannedInteractions": [
+        "multi-select",
+        "cancel-running"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/task.ts",
+      "rowNote": "任务行等高(舒适档 space-9)",
+      "needs": "任务运行台(bigquery Step):步骤列表+进度+失败重试"
+    },
+    {
+      "id": "timeline",
+      "class": "timeline",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--timeline",
+      "rowModel": "row-h",
+      "rowSelectors": [
+        ".ze-timeline__lane"
+      ],
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 片段计数 + 时间缩放",
+          "closeable": false
+        },
+        {
+          "id": "lanes",
+          "selector": ".ze-timeline__lanes",
+          "purpose": "轨道 × 时间:片段块拖动改 start、拖右边改时长、双击空轨新增、播放头",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "clip-select",
+        "clip-move",
+        "clip-resize",
+        "clip-add",
+        "clip-delete",
+        "zoom",
+        "playhead-scrub"
+      ],
+      "plannedInteractions": [
+        "multi-select",
+        "snap-to-clip",
+        "keyframe-rows"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/timeline.ts",
+      "rowNote": "轨道行统一 row-h;片段块在轨内绝对定位、不撑高轨",
+      "needs": "时序编辑(motion-spec / keyframe-batch):轨道+片段 start/duration 拖拽+缩放"
+    },
+    {
+      "id": "keyframe-curve",
+      "class": "keyframe-curve",
+      "status": "candidate",
+      "rootSelector": ".ze-editor--keyframe-curve",
+      "needs": "数值×时间曲线/dope-sheet(skeletal-animation / motion-spec-builder / controlled-image-generate):关键帧 entity 的 time/value 拖拽+插值,与 timeline 并列、共享 currentTime。候选:无真实 v3 消费者,接 UI 后转 adopted+补 fixture"
+    },
+    {
+      "id": "text",
+      "class": "text",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--text",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 字数 + 编辑/预览切换",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-text__body",
+          "purpose": "全高文本域(编辑)/ markdown 阅读视图预览",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "edit-on-blur",
+        "word-count",
+        "preview-toggle",
+        "markdown-render"
+      ],
+      "plannedInteractions": [
+        "find-replace"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/text.ts",
+      "needs": "长文编辑(写作类 / 说明 / 提示词):单字段长文 draft→CAS,预览态"
+    },
+    {
+      "id": "code",
+      "class": "code",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--code",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 语言 + 行数",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-code__body",
+          "purpose": "行号槽 + 等宽代码文本域",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "edit-on-blur",
+        "line-numbers",
+        "lang-label"
+      ],
+      "plannedInteractions": [
+        "syntax-highlight",
+        "lint"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/code.ts",
+      "needs": "结构化文本(配置 / 脚本 / shader 源):等宽 + 行号,语法高亮留 lazyModule"
+    },
+    {
+      "id": "graph",
+      "class": "graph",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--graph",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 节点计数",
+          "closeable": false
+        },
+        {
+          "id": "canvas",
+          "selector": ".ze-graph__canvas",
+          "purpose": "节点(x/y 自由定位)+ deps 连边;拖动/双击新增/Del 删除",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "node-select",
+        "node-move",
+        "node-add",
+        "node-delete",
+        "edge-render"
+      ],
+      "plannedInteractions": [
+        "edge-create-drag",
+        "auto-layout"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/graph.ts",
+      "needs": "节点 DAG(pipeline-graph / shader-node):节点 x/y + 边,拖拽布局"
+    },
+    {
+      "id": "pipeline",
+      "class": "pipeline",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--pipeline",
+      "noRawToolbar": true,
+      "sourceFile": "01-core/04-user-facing/01-layout/03-editor/editors/pipeline/PipelineEditor.tsx",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):固定 pipeline title;只读、禁输入控件(run selector 下沉 control 行)",
+          "closeable": false
+        },
+        {
+          "id": "control",
+          "selector": ".ze-editor__zone[data-role=\"control\"]",
+          "purpose": "控制行(ControlZone):run 生命周期命令(pause/interrupt/resume/cancel/retry_failed,声明式 ToolbarAction→dispatch)+ 只读 notebook 导出(JSON/MD,纯前端);run selector(allowRunSwitch)在前置 toolbar 行",
+          "closeable": false
+        },
+        {
+          "id": "chain",
+          "selector": ".ze-pipeline__chain",
+          "purpose": "链路主视图(view_state.chain):对象组 → command → 对象组。对象组只组合既有展示语言(preview / .ze-kv-list / ThumbnailGrid,不自画黑边卡片);command=信息+控制单元(相位/进度/错误=info、Run/Rerun=control)。声明 chain 时取代 notebook 作默认主视图;无 chain 时回退 cells/matrix(向后兼容)",
+          "closeable": false,
+          "nest": {
+            "unitSelector": ".ze-editor__unit",
+            "infoSelector": ".ze-editor__unit-info[data-role=\"info\"]",
+            "controlSelector": ".ze-editor__unit-control[data-role=\"control\"]"
+          }
+        },
+        {
+          "id": "console",
+          "selector": ".ze-pipeline__cell[data-cell=\"console\"]",
+          "purpose": "操作台(StartConsole):startCommandId 的 params_schema 驱动参数表单 + Run;requires_runtime 结构化缺位呈现。cell=信息+控制单元(参数表单=info、Run=control)",
+          "closeable": true,
+          "nest": {
+            "unitSelector": ".ze-editor__unit",
+            "infoSelector": ".ze-editor__unit-info[data-role=\"info\"]",
+            "controlSelector": ".ze-editor__unit-control[data-role=\"control\"]"
+          }
+        },
+        {
+          "id": "summary",
+          "selector": ".ze-pipeline__summary",
+          "purpose": "entityUi summary + run status/progress/ETA + running animation",
+          "closeable": false
+        },
+        {
+          "id": "matrix",
+          "selector": ".ze-pipeline__matrix",
+          "purpose": "fan-out item × stage overview(chain 模式下属展开详情 notebook,非默认主视图)",
+          "closeable": true
+        },
+        {
+          "id": "cells",
+          "selector": ".ze-pipeline__cells",
+          "purpose": "notebook cells with input/output/log/error snapshots。每 cell=信息+控制单元(快照/日志=info、rerun/run_from 生命周期命令=control,嵌套限一层)。chain 模式下收进展开详情 notebook,非默认主视图",
+          "closeable": false,
+          "nest": {
+            "unitSelector": ".ze-editor__unit",
+            "infoSelector": ".ze-editor__unit-info[data-role=\"info\"]",
+            "controlSelector": ".ze-editor__unit-control[data-role=\"control\"]"
+          }
+        },
+        {
+          "id": "details",
+          "selector": ".ze-pipeline__details",
+          "purpose": "展开详情 notebook 容器(chain 模式):默认折叠,展开后内含 StartConsole / summary / 运行历史 / matrix / 逐 stage cells / 导出。不自带滚动(.ze-pipeline 是唯一纵向滚动 owner)",
+          "closeable": true
+        }
+      ],
+      "builtinInteractions": [
+        "chain-main-view",
+        "chain-object-group",
+        "chain-command-unit",
+        "chain-expand-details",
+        "fixed-pipeline-bind",
+        "optional-run-select",
+        "pause",
+        "interrupt",
+        "continue",
+        "cancel",
+        "retry-failed",
+        "fanout-cell-focus",
+        "rerun-step",
+        "run-from-step",
+        "entity-running-animation",
+        "copy-output",
+        "download-output",
+        "start-console",
+        "requires-runtime-notice",
+        "step-collapse",
+        "export-notebook",
+        "phase-label-alias",
+        "interrupted-resume-hint"
+      ],
+      "plannedInteractions": [],
+      "fixture": "webapp/src/gallery/fixtures/pipeline.ts",
+      "needs": "管线复盘/调度(finalizer / hidden-object fan-out):command cell + 输入输出快照 + 生命周期控制",
+      "viewState": "pipelineId,startCommandId,allowRunSwitch,runIdField,itemIdField,pipelineIdField,resultField,entityUi,startArgs,argsFromSelection,chain"
+    },
+    {
+      "id": "review",
+      "class": "review",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--review",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 状态徽章",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-review__body",
+          "purpose": "approve/reject 动作 + 批注",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "approve",
+        "reject",
+        "note-edit",
+        "status-badge"
+      ],
+      "plannedInteractions": [
+        "multi-reviewer",
+        "inline-annotation"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/review.ts",
+      "needs": "审阅 / 批注(level-audit / QA):状态机 + 批注,皆走命令"
+    },
+    {
+      "id": "compare",
+      "class": "compare",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--compare",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "标题(身份)",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-compare__body",
+          "purpose": "前后对比(并排 / 滑块 / 叠加)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "compare-mode",
+        "slider-drag",
+        "onion-opacity"
+      ],
+      "plannedInteractions": [
+        "synced-zoom"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/compare.ts",
+      "needs": "前后对比 viewer(cleanup/photo-develop/style-transfer/eraser):一等公民,与 review 切清,无审阅决策"
+    },
+    {
+      "id": "outline",
+      "class": "outline",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--outline",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):类型名 + 节点计数;只读",
+          "closeable": false
+        },
+        {
+          "id": "control",
+          "selector": ".ze-editor__zone[data-role=\"control\"]",
+          "purpose": "控制功能区(条件:mod 声明 actions 时渲染层级命令,如新建子节点/删除)",
+          "closeable": true
+        },
+        {
+          "id": "outliner",
+          "selector": ".ze-outliner",
+          "purpose": "层级树本体:深度缩进 + caret 折叠/展开 + 单/多选(选择驱动联动相邻内容编辑器)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "left-click-select",
+        "cmd-toggle-multi",
+        "shift-range-multi",
+        "expand-collapse-toggle",
+        "depth-indent",
+        "icon-field",
+        "thumbnail-field",
+        "badge-field",
+        "visibility-toggle",
+        "lock-toggle",
+        "inline-rename",
+        "duplicate-command",
+        "delete-command",
+        "select-all-invert",
+        "clear-selection-esc",
+        "locked-node-no-drag",
+        "selection-driven-link",
+        "narrow-hide-label",
+        "drag-reparent"
+      ],
+      "plannedInteractions": [
+        "undo-redo-shortcut"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/outline.ts",
+      "consumers": [],
+      "consumerNote": "净新类闭 G-C(outliner 角色 + ze.field.parent@1 此前无消费编辑器)。命名候选待迁:reading-library / structured-wiki / skeletal / blockout / longform / scene-concept-manager 树。drag-reparent UI 已接通(HTML5 DnD:拖到目标行 上/中/下 区 = before/inside/after → treeModel.computeReparent → entity.batch_update 单 Operation;落点指示 data-drop 零令牌 currentColor)。本批增强为通用 layer tree:眼睛/锁/缩略图/badge/重命名/复制/删除/锁定源禁拖。",
+      "needs": "层级/大纲(单父树,非 DAG):2D 图层树 / 3D 节点树 / 文档大纲 / 知识库目录 —— 选择驱动 + 展开折叠 + 行控件 + 拖拽改父",
+      "viewState": "parentField,orderField,labelField,iconField,thumbField,badgeField,visibilityField,lockedField,renameField,deleteCommand,duplicateCommand,actions"
+    },
+    {
+      "id": "document",
+      "class": "document",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--document",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):类型名 + 块计数;只读",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-document__body",
+          "purpose": "块文档正文:block 实体按 order 渲成文档流(每块经块注册表→L2 prose)+ 逐块内联编辑 + 新增条",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "block-render",
+        "left-click-select",
+        "inline-edit-commit",
+        "block-add",
+        "block-delete",
+        "drag-reorder"
+      ],
+      "plannedInteractions": [
+        "tab-indent",
+        "slash-menu",
+        "type-change",
+        "toggle-collapse",
+        "rich-inline-wysiwyg",
+        "md-import-export"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/document.ts",
+      "consumers": [],
+      "consumerNote": "块 = L2 atom = 实体(Notion/Obsidian/飞书 式)。命名候选待迁:文化区域旅游百科 / 猫猫大百科正文 / reading-library / structured-wiki / longform。M0=渲块流+选择+逐块内联编辑+增删;M1=拖拽重排/缩进/4 块种/slash;M2=行内富标记+md↔blocks。",
+      "needs": "块级 WYSIWYG 文档(块=L2 atom 实体):markdown 块流 + 逐块内联编辑 + 增/删 —— 与 outline(目录)/ property(块属性)经 selection[block] 组合成百科页"
+    },
+    {
+      "id": "html",
+      "class": "html",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--html",
+      "functionalZones": [
+        {
+          "id": "toolbar",
+          "selector": ".ze-editor__toolbar",
+          "purpose": "标题 + 生成态 + 预览/源码切换(ToolRowZone)",
+          "closeable": false
+        },
+        {
+          "id": "body",
+          "selector": ".ze-editor__content",
+          "purpose": "沙盒 iframe 预览(allow-scripts,核心画死)/ HTML 源码 textarea(blur 写回 CAS)",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "preview-toggle",
+        "sandboxed-iframe",
+        "edit-on-blur",
+        "external-change-no-clobber"
+      ],
+      "plannedInteractions": [
+        "format-html",
+        "run-command"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/html.ts",
+      "consumerNote": "promote chat-canvas-studio webPreview 为 core 类;命名候选 tutorial-writer 图文产物预览。沙盒策略论据独立成立(XSS 隔离归受管 core)。",
+      "needs": "HTML 产物预览/源码(AI 生成页面/组件、教程图文):沙盒 iframe 隔离 + 源码 CAS 写回"
+    },
+    {
+      "id": "dialog",
+      "class": "dialog",
+      "status": "adopted",
+      "rootSelector": ".ze-editor--dialog",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):对话类型名 + 消息数/生成态;只读",
+          "closeable": false
+        },
+        {
+          "id": "transcript",
+          "selector": ".ze-dialog__transcript",
+          "purpose": "对话流:message 实体按 order 渲气泡(role 驱动左右/配色,发送方靠右 accent),可滚",
+          "closeable": false
+        },
+        {
+          "id": "composer",
+          "selector": ".ze-dialog__composer",
+          "purpose": "发送区:输入框 + 发送(Enter 发送)→ entity.add user 消息 + 可选 replyCommand",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "render-transcript",
+        "role-bubble-align",
+        "send-message",
+        "enter-to-send",
+        "scroll-to-latest",
+        "pending-placeholder"
+      ],
+      "plannedInteractions": [
+        "reverse-ask-answer",
+        "terminal-subpane"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/dialog.ts",
+      "consumerNote": "promote chat-canvas-studio chatPane 为 core 类。反问双向协议(question 实体+dialog.answer 暂挂续跑)+ 终端 PTY-over-WS 子面是后续(需 supervisor/WS 后端)。",
+      "needs": "AI 对话(chat-canvas / 任何浏览器内驱动 AI 的 skill):transcript 气泡流 + 发送 + 回复回流"
+    },
+    {
+      "id": "conversation",
+      "class": "conversation",
+      "status": "adopted",
+      "aliasOf": "dialog",
+      "rootSelector": ".ze-editor--conversation",
+      "functionalZones": [
+        {
+          "id": "header",
+          "selector": ".ze-editor__header",
+          "purpose": "身份行(HeaderZone):对话类型名 + 消息数/等待/生成态;只读",
+          "closeable": false
+        },
+        {
+          "id": "conversation",
+          "selector": ".ze-dialog__transcript",
+          "purpose": "ConversationZone:message/question/assistant/tool 等实体按顺序渲染为对话流",
+          "closeable": false
+        },
+        {
+          "id": "tool",
+          "selector": ".ze-dialog__composer",
+          "purpose": "ToolZone:用户输入、发送、回答 pending question;terminal-profile 后续接 PTY 输出",
+          "closeable": false
+        }
+      ],
+      "builtinInteractions": [
+        "render-transcript",
+        "role-bubble-align",
+        "send-message",
+        "enter-to-send",
+        "scroll-to-latest",
+        "pending-placeholder"
+      ],
+      "plannedInteractions": [
+        "question-answer-resume",
+        "terminal-profile",
+        "tool-call-stream"
+      ],
+      "fixture": "webapp/src/gallery/fixtures/dialog.ts",
+      "consumerNote": "conversation 是 AI 对话编辑器标准名;dialog 保留 legacy alias。terminal 不是独立 editor,后续作为 conversation 的 terminal-profile。",
+      "needs": "AI 对话编辑器:提问人、等待回答、agent 运行、消息回流、后续 PTY profile;用于 chat-canvas-studio 等工具。"
+    }
+  ]
+}

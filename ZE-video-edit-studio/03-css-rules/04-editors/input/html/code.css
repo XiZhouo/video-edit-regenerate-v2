@@ -1,0 +1,16 @@
+/*
+ * html.css — html 编辑器内容视觉 (04-editors)
+ *
+ * 消费: 01-core 的 HtmlEditor(.ze-editor--html)。预览态 = 沙盒 iframe(.ze-editor__html-frame),
+ *   源码态 = 复用 .ze-code__textarea(等宽,见 input/code)。基座在 editor.css。
+ *
+ * 绝对严格分层(css_layer_guard:L2 以上禁直接用 L1 令牌):本文件 **零令牌**,只留无令牌结构
+ *   —— iframe 填满内容区 + 去默认边框(几何字面量)。沙盒属性(allow-scripts)由 React 画死,
+ *   不在 CSS(安全策略归 core 组件)。
+ */
+.ze-editor__html-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+}

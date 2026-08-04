@@ -1,0 +1,25 @@
+{
+  "schema": "ze.video_domain_registry.v1",
+  "consumers": {
+    "ZE-video-edit-studio": {
+      "domain_version": "0.11.3",
+      "checksum": "87582c1a058d6a9031e2e48c710dcbab0146eb040b811671cc6147ffe7357a2b",
+      "synced_at": "2026-07-29T07:00:20.646387+00:00"
+    },
+    "ZE-batch-video-foundry": {
+      "domain_version": "0.10.0",
+      "checksum": "c4e403cd1f9e4d9a0e75d8a338443d0699d9a6ae6c64ab305cf0286c5eb9608f",
+      "synced_at": "2026-07-26T16:53:41.289662+00:00"
+    },
+    "ZE-video-timeline-editor": {
+      "domain_version": "0.10.0",
+      "checksum": "c4e403cd1f9e4d9a0e75d8a338443d0699d9a6ae6c64ab305cf0286c5eb9608f",
+      "synced_at": "2026-07-26T16:53:41.321615+00:00"
+    },
+    "ZE-video-generation-timeline": {
+      "domain_version": "0.10.0",
+      "checksum": "c4e403cd1f9e4d9a0e75d8a338443d0699d9a6ae6c64ab305cf0286c5eb9608f",
+      "synced_at": "2026-07-26T16:53:41.352419+00:00"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+/*
+ * popover.css — ze-popover 组件视觉 (02-atoms) — CSS-only shell
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 / §2.4
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: 对齐 v3 header 的 menu-popover —— elev-2 深投影 + 1px overlay-soft 边 + lg 圆角。
+ *   data-placement 只画箭头朝向(视觉);**锚定定位算法 / 开合 = React 交互层(运行时),本批不做**。
+ *   popover 按内容定宽,无 data-size。
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ */
+
+.ze-popover {
+  position: absolute;
+  min-width: 184px;
+  max-width: 320px;
+  padding: var(--ze-space-2);
+  /* [浮层瓷盘] 实底(R-FLOAT):景深靠阴影+edge-highlight,不靠透明 */
+  background: var(--ze-surface-float);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  box-shadow: var(--ze-edge-highlight), var(--ze-shadow-floating);
+  color: var(--ze-ink-primary);
+  font-size: var(--ze-fs-sm);
+  z-index: var(--ze-z-popover);
+}
+
+.ze-popover:not([open]):not([data-open="true"]) { display: none; }
+.ze-popover[data-elevation="floating"] { box-shadow: var(--ze-shadow-floating); }
+
+/* 右键菜单:fixed 锚定到鼠标点(left/top 内联),滚动随视口固定;窄一点更像菜单 */
+.ze-popover[data-context="true"] { position: fixed; min-width: 160px; padding: var(--ze-space-1); }
+
+/* ---- 箭头(视觉朝向)---- */
+.ze-popover__arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: var(--ze-surface-float);
+  border: 1px solid var(--ze-overlay-soft);
+}
+.ze-popover[data-placement="bottom"] .ze-popover__arrow { top: -4px; border-bottom: 0; border-right: 0; }
+.ze-popover[data-placement="top"] .ze-popover__arrow { bottom: -4px; border-top: 0; border-left: 0; }
+
+/* ---- parts ---- */
+.ze-popover__title { font-weight: var(--ze-fw-semibold); margin-bottom: var(--ze-space-1); }
+.ze-popover__body { color: var(--ze-ink-secondary); line-height: var(--ze-lh-snug); }

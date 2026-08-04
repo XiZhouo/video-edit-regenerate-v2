@@ -1,0 +1,331 @@
+/*
+ * ZE Design Tokens — 「精密瓷釉 Precision Porcelain」(v4)
+ *
+ * 晴空瓷釉的精密化修订:同一气质(玻璃面板 / 冷调乳灰 / 通电 accent),但更精密、清晰、简洁、有逻辑。
+ *
+ * 与 v3 的差异(MAJOR):
+ *   1. 系统色全手工设计 —— 表面6 + 墨5 + 线3 + 语义8 + 数据8,每色一个固定职责;
+ *      强调组是「主题色插槽」:36 个工具主题色在 01-tokens/themes.css(每工具占一色,
+ *      规范全同、仅主题色不同);wash/tint/glow 由 accent-500 相对色派生,换主题自动跟随。
+ *   2. 新增「线」组:结构性边线一律实色三档(soft/mid/strong);alpha 叠色(--ze-overlay-soft)
+ *      只留给 hover/交互底 —— 边界清晰是精密感的来源。
+ *   3. 几何收紧:行高 28→26 · 字阶 -1pt(默认 12px)· 圆角 5/8/10 · 阴影减半 ·
+ *      玻璃更实(blur 14→10,透明度 0.66→0.82)。
+ *
+ * 命名:`--ze-<group>-<key>`。主题:light(:root)+ dark([data-theme="dark"])。
+ * 用法:Web 入口一次性 import 本文件;所有 `.ze-*` 引 `var(--ze-*)`,不写字面量。
+ */
+
+:root {
+  /* ============================================================
+   * 系统色 · ① 表面 ×6(按"海拔"选)
+   * ============================================================ */
+  --ze-surface-canvas:  oklch(94% 0.005 250);          /* 01 工作台环境底 */
+  --ze-surface-glass:   oklch(99% 0.002 250 / 0.82);   /* 02 玻璃面板(贴边 chrome:Header/Footer/编辑器壳——底下是画布,blur 成立)*/
+  --ze-surface-raised:  oklch(99.3% 0.002 250);        /* 03 实底乳釉(卡片/行卡/菜单内胆)*/
+  --ze-surface-float:   oklch(99.6% 0.002 250);        /* 03b 浮层瓷盘(菜单/popover/dialog/toast——盖在任意内容上,**完全实底**,景深靠阴影;玻璃只属于贴边 chrome,内容浮层透明会让下层文字鬼影干扰阅读)*/
+  --ze-surface-sunken:  oklch(30% 0.014 250 / 0.05);   /* 04 凹陷墨晕(input/code/画布内衬)*/
+  --ze-surface-inverse: oklch(21% 0.012 252);          /* 05 反色面(toast/媒体底)*/
+  --ze-overlay-strong:  oklch(12% 0.01 250 / 0.45);    /* 06 modal 背板纱/强描边 */
+
+  /* ============================================================
+   * 系统色 · ② 墨 ×5(按"信息优先级"选)
+   * ============================================================ */
+  --ze-ink-primary:   oklch(22% 0.014 252);   /* 07 正文/主标题 */
+  --ze-ink-secondary: oklch(38% 0.013 252);   /* 08 标签/次要文字 */
+  --ze-ink-tertiary:  oklch(50% 0.012 252);   /* 09 占位/计数/元数据 */
+  --ze-ink-disabled:  oklch(70% 0.008 252);   /* 10 禁用 */
+  --ze-ink-inverse:   oklch(97.5% 0.003 250); /* 11 反色底上的文字 */
+
+  /* ============================================================
+   * 系统色 · ③ 线 ×3(新组 — 结构边线,实色)
+   * ============================================================ */
+  --ze-line-soft:   oklch(90% 0.006 250);   /* 12 面内分隔(toolbar 下缘/行分隔/卡内)*/
+  --ze-line-mid:    oklch(84.5% 0.008 250); /* 13 面板描边(header/footer/editor/弹层外缘)*/
+  --ze-line-strong: oklch(70% 0.01 250);    /* 14 强调描边(把手/拖拽/高对比)*/
+
+  /* ============================================================
+   * 主题色插槽 · 强调 ×6(出厂值 = 26 海蓝;36 工具主题色见 themes.css)
+   * ============================================================ */
+  --ze-accent-500: oklch(54% 0.165 252);                  /* 15 主品牌(主按钮/选中/焦点)*/
+  --ze-accent-700: oklch(46% 0.15 252);                   /* 16 hover/按下 */
+  --ze-accent-200: oklch(86% 0.06 252);                   /* 17 浅边/浅块 */
+  --ze-overlay-accent-wash: oklch(from var(--ze-accent-500) l c h / 0.1);  /* 18 选中行淡底(随主题色)*/
+  --ze-accent-tint: oklch(from var(--ze-accent-500) l c h / 0.17);          /* 19 选中行强底/拖拽落点(随主题色)*/
+  --ze-accent-soft: oklch(90% 0.035 252);                 /* 20 大面积浅强调底 */
+
+  /* ============================================================
+   * 引导精灵 · 变形体 v2(设计真源《ZE精灵变形体视觉设计-20260718》;oklch 从 accent 派生,
+   *   换主题/明暗自动跟随)。材质语言 = 白芯蓝边 + accent 单相发光,不引第二套色种。
+   * ============================================================ */
+  --ze-guide-fill:     oklch(from var(--ze-accent-500) 0.98 0.004 h);        /* 实体白芯(球/光标/环带) */
+  --ze-guide-veil:     oklch(from var(--ze-accent-500) 0.30 0.014 h / 0.10); /* 圈选环外压暗(浅色=淡墨纱) */
+  --ze-guide-wash:     oklch(from var(--ze-accent-500) l c h / 0.06);        /* 圈选环内轻洗色 */
+  --ze-guide-trail-hi: oklch(from var(--ze-accent-500) 0.70 0.12 h);         /* 余晖亮芯(accent 提亮相) */
+  --ze-guide-shadow:     drop-shadow(0 1px 3px oklch(0% 0 0 / 0.35));        /* 实体基础投影(filter 值) */
+  --ze-guide-frame-glow: drop-shadow(0 0 8.5px oklch(from var(--ze-accent-500) l c h / 0.45)); /* 圈选沿环发光(=10×0.45+4px) */
+  /* ── 已废弃(旧 Siri 四层美术;20.0 起无消费者,保留待 G1 列车日落)── */
+  --ze-orb-a: oklch(from var(--ze-accent-500) l c h);          /* @deprecated 20.0 */
+  --ze-orb-b: oklch(from var(--ze-accent-500) l c calc(h + 28)); /* @deprecated 20.0 */
+  --ze-orb-c: oklch(from var(--ze-accent-500) l c calc(h - 28)); /* @deprecated 20.0 */
+  --ze-guide-aura:    oklch(from var(--ze-accent-500) l c h / 0.5);          /* @deprecated 20.0 */
+  --ze-guide-core-hi: oklch(from var(--ze-accent-500) calc(l + 0.14) c h);   /* @deprecated 20.0 */
+  --ze-guide-spark:   oklch(from var(--ze-accent-500) 0.97 0.03 h / 0.9);    /* @deprecated 20.0 */
+  --ze-guide-edge:    oklch(from var(--ze-accent-500) l c h / 0.7);          /* @deprecated 20.0 */
+
+  /* ============================================================
+   * 滚动条 · 轻量可见,不抢编辑器主体
+   * ============================================================ */
+  --ze-scrollbar-size: 6px;
+  --ze-scrollbar-track: transparent;
+  --ze-scrollbar-thumb: color-mix(in oklab, var(--ze-ink-primary) 22%, transparent);
+  --ze-scrollbar-thumb-hover: color-mix(in oklab, var(--ze-ink-primary) 34%, transparent);
+
+  /* ============================================================
+   * 系统色 · ④ 语义 ×8(4 色 + 4 wash;info 与主题蓝相距 ≥25°)
+   * ============================================================ */
+  --ze-semantic-success: oklch(60% 0.135 152);             /* 21 成功/完成/在线 */
+  --ze-semantic-success-wash: oklch(60% 0.135 152 / 0.12); /* 22 */
+  --ze-semantic-info:    oklch(58% 0.085 225);             /* 23 运行中/信息(青石蓝)*/
+  --ze-semantic-info-wash: oklch(58% 0.085 225 / 0.12);    /* 24 */
+  --ze-semantic-warn:    oklch(70% 0.135 78);              /* 25 警告/排队/重试 */
+  --ze-semantic-warn-wash: oklch(70% 0.135 78 / 0.14);     /* 26 */
+  --ze-semantic-danger:  oklch(54% 0.18 26);               /* 27 错误/删除/不可逆 */
+  --ze-semantic-danger-wash: oklch(54% 0.18 26 / 0.12);    /* 28 */
+
+  /* ============================================================
+   * 系统色 · ⑤ 数据 ×8(图表/标记序列,等明度配平)
+   * ============================================================ */
+  --ze-data-1: oklch(54% 0.165 252);  /* 29 蓝(与 accent 同源)*/
+  --ze-data-2: oklch(58% 0.12 195);   /* 30 青 */
+  --ze-data-3: oklch(60% 0.12 145);   /* 31 绿 */
+  --ze-data-4: oklch(72% 0.13 85);    /* 32 琥珀 */
+  --ze-data-5: oklch(58% 0.15 35);    /* 33 锈红 */
+  --ze-data-6: oklch(56% 0.13 315);   /* 34 紫 */
+  --ze-data-7: oklch(62% 0.07 250);   /* 35 石板(中性序列)*/
+  --ze-data-8: oklch(48% 0.1 275);    /* 36 靛 */
+
+  /* ── 兼容别名(旧 CSS 引用;取值 = 上方设计值,不再参与推导)── */
+  --ze-accent-h: 252;
+  --ze-accent-c: 0.165;
+  --ze-focus-ring: var(--ze-accent-500);
+  --ze-overlay-soft: oklch(35% 0.015 250 / 0.07);  /* 仅 hover/交互叠底;边线请用 --ze-line-* */
+
+  /* ============================================================
+   * 状态 · entity / ui lifecycle(从数据事实映射,不是单独空态组件)
+   * ============================================================ */
+  --ze-state-normal-fg: var(--ze-ink-primary);
+  --ze-state-normal-bg: var(--ze-surface-raised);
+  --ze-state-normal-border: var(--ze-line-mid);
+
+  --ze-state-empty-fg: var(--ze-ink-tertiary);
+  --ze-state-empty-bg: var(--ze-surface-sunken);
+  --ze-state-empty-border: var(--ze-line-soft);
+
+  --ze-state-running-fg: var(--ze-semantic-info);
+  --ze-state-running-bg: var(--ze-semantic-info-wash);
+  --ze-state-running-border: color-mix(in oklab, var(--ze-semantic-info) 46%, var(--ze-line-mid));
+  --ze-state-running-veil: color-mix(in oklab, var(--ze-semantic-info-wash) 70%, transparent);
+
+  --ze-state-error-fg: var(--ze-semantic-danger);
+  --ze-state-error-bg: var(--ze-semantic-danger-wash);
+  --ze-state-error-border: color-mix(in oklab, var(--ze-semantic-danger) 50%, var(--ze-line-mid));
+
+  --ze-state-stale-fg: var(--ze-semantic-warn);
+  --ze-state-stale-bg: var(--ze-semantic-warn-wash);
+  --ze-state-stale-border: color-mix(in oklab, var(--ze-semantic-warn) 48%, var(--ze-line-mid));
+
+  --ze-state-disabled-fg: var(--ze-ink-disabled);
+  --ze-state-disabled-bg: var(--ze-surface-raised);
+  --ze-state-disabled-border: var(--ze-line-soft);
+  --ze-state-disabled-opacity: 0.56;
+
+  --ze-state-min-block: var(--ze-row-h);
+  --ze-state-slot-min-block: var(--ze-min-slot-h);
+  --ze-state-indicator-size: var(--ze-space-2);
+
+  /* ============================================================
+   * typography · 字体族(Geist 身份不变)
+   * ============================================================ */
+  --ze-font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  --ze-font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  /* 品牌字标衬线栈(单一角色:header 左段字标,header-v2)。零外部字体:
+   * mac=宋体/思源宋体,Windows 回落 Georgia/Times。 */
+  --ze-font-display: 'Lora', Georgia, 'Times New Roman', 'Songti SC', 'STSong', 'Noto Serif SC', serif;
+
+  /* ============================================================
+   * typography · 字阶(整体 -1pt:更密、更稳)
+   * ============================================================ */
+  --ze-fs-2xs: 9px;     /* 微徽标/极小计数;只能用于 badge/count/arrow 这类辅助信息 */
+  --ze-fs-xs:  10.5px;  /* 角标/计数/trace/微标签 */
+  --ze-fs-sm:  12px;    /* 默认 UI 字号 */
+  --ze-fs-lg:  15px;    /* 区块/面板标题 */
+  --ze-fs-xl:  18px;    /* 对话框/页面主标题 */
+  --ze-fs-2xl: 22px;    /* 超大展示 */
+
+  --ze-lh-tight:  1.2;
+  --ze-lh-snug:   1.4;
+  --ze-lh-normal: 1.5;
+  --ze-lh-loose:  1.65;  /* T2(19.9):CJK 说明性段落/多行文本专用;单行 UI 仍 tight */
+
+  /* T3(19.9):字距唯一例外 —— caps 角色(9px/600/uppercase 分组锚点)的可读性补偿;
+     其余场景 letter-spacing 仍钉 0(门禁 R3 修订随批3)。 */
+  --ze-tracking-caps: 0.06em;
+
+  --ze-fw-regular:  400;
+  --ze-fw-medium:   500;
+  --ze-fw-semibold: 600;
+  --ze-fw-bold:     700;
+
+  /* ============================================================
+   * space · 间距(4px 基准,档位不变)
+   * ============================================================ */
+  --ze-space-0-5: 2px;
+  --ze-space-1:  4px;
+  --ze-space-2:  8px;
+  --ze-space-3:  12px;
+  --ze-space-4:  16px;
+  --ze-space-5:  20px;
+  --ze-space-6:  24px;
+  --ze-space-7:  28px;
+  --ze-space-8:  32px;
+  --ze-space-12: 48px;
+  --ze-space-16: 64px;
+  --ze-workspace-gutter: var(--ze-space-1); /* 工作台外圈/分屏空气缝:Header/Main/Footer 同源 */
+
+  /* ============================================================
+   * size · 命名尺寸(行高 28→26:chrome 更薄)
+   * ============================================================ */
+  --ze-row-h: 26px;
+  --ze-control-h:    28px;   /* 控件标准高(md 按钮/输入;与间距令牌 space-* 解耦,各自演化) */
+  --ze-control-h-sm: 24px;   /* 紧凑控件高(功能区/工具行内控件,≤row-h 不撑行) */
+  --ze-field-label-w: 112px;
+  --ze-size-panel-w:  240px;
+  --ze-stack-pane-h:  60svh;
+  /* 自适应横条(data-layout=flex-fill)子项几何:基准宽 = 理想宽(剩余宽按 flex-grow 比例摊),
+   * min = 换行阈值(缩到此即换行 → 每行项数/行数随条宽动态涌现,纯 CSS 无 JS 量算)。 */
+  --ze-bar-item-basis: 120px;
+  --ze-bar-item-min:   88px;
+  --ze-min-slot-w:    240px;   /* 编辑器槽最小可用宽(=LayoutRenderer MIN_SLOT_W,落 CSS 防塌 0) */
+  --ze-min-slot-h:    160px;   /* 编辑器槽最小可用高(=MIN_SLOT_H) */
+  /* C3 视口类显示模式尺寸(多屏预览:竖屏/自由;消费见 02-atoms/utility .ze-viewport + ZONE-CLASS-REGISTRY §C3) */
+  --ze-viewport-phone-aspect: 9 / 16;   /* 竖屏试玩画幅比例 */
+  --ze-viewport-phone-max-w:  100%;     /* 竖屏最大宽(不超容器) */
+  --ze-viewport-free-min-h:   320px;    /* 自由模式视口最小高(防塌) */
+
+  /* ============================================================
+   * radius · 圆角(6/10/14 → 5/8/10:方正一档 = 精密)
+   * ============================================================ */
+  --ze-radius-none: 0;
+  --ze-radius-sm:   5px;
+  --ze-radius-md:   8px;
+  --ze-radius-lg:   10px;
+  --ze-radius-pill: 999px;
+
+  /* ============================================================
+   * shadow · 海拔(双层弥散收紧:泛光半径约减半)
+   * ============================================================ */
+  --ze-shadow-flat:     none;
+  --ze-shadow-raised:   0 1px 1px oklch(28% 0.01 250 / 0.05), 0 4px 10px -6px oklch(28% 0.015 250 / 0.12);
+  --ze-shadow-panel:    0 1px 1px oklch(28% 0.01 250 / 0.04), 0 8px 20px -14px oklch(28% 0.02 250 / 0.2);
+  --ze-shadow-floating: 0 1px 2px oklch(28% 0.01 250 / 0.06), 0 12px 28px -12px oklch(28% 0.02 250 / 0.26);
+  --ze-shadow-overlay:  0 2px 4px oklch(28% 0.01 250 / 0.07), 0 24px 56px -20px oklch(28% 0.02 250 / 0.34);
+  --ze-edge-highlight:  inset 0 1px 0 oklch(100% 0 0 / 0.55);
+  --ze-glow-accent:     0 1px 6px -1px oklch(from var(--ze-accent-500) l c h / 0.3);
+
+  /* ============================================================
+   * blur · 玻璃(更实、更清)
+   * ============================================================ */
+  --ze-glass-blur:     10px;
+  --ze-glass-saturate: 1.1;
+
+  /* ============================================================
+   * motion · 动效(easing-standard 不变;+--ze-spring 回弹,拍板#9 收编上游)
+   * ============================================================ */
+  --ze-dur-fast:    120ms;
+  --ze-dur-exit:    160ms;  /* T7(19.9):消失/收起 —— 退场快于入场(iOS 惯例) */
+  --ze-dur-enter:   240ms;  /* T7(19.9):面板/卡片/浮层入场 */
+  --ze-dur-slow:    400ms;
+  --ze-dur-grow:    520ms;  /* W1-1:助手面板从精灵撑开(0721 §3.2 阶段③定的 520ms 回弹段) */
+  --ze-dur-breathe: 2.4s;
+  --ze-dur-breathe-fast: 1.4s;    /* thinking 变体呼吸(精灵/copilot busy;定稿 §5-1) */
+
+  /* T4(19.9,取值已拍板):卡片内距闭集对齐 iOS 基线(12→10;card atom 改值随批2 列车,
+     先落 token 供审计与新代码取用)。 */
+  --ze-card-pad: 10px;
+  --ze-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ze-spring:          cubic-bezier(0.34, 1.42, 0.5, 1);  /* iOS overshoot 回弹;通用上游 motion token(精灵/入场/滑杆) */
+
+  /* ============================================================
+   * z-index · 层级(不变)
+   * ============================================================ */
+  --ze-z-sticky:   100;
+  --ze-z-dropdown: 200;
+  --ze-z-modal:    300;
+  --ze-z-guide:    350;   /* 引导层(W2e 系统4):压过 modal 让精灵/取景框/spotlight 盖工具,低于 popover 不遮菜单 */
+  --ze-z-popover:  400;
+  --ze-z-tooltip:  500;
+  --ze-z-toast:    600;
+}
+
+
+/*
+ * dark · 石墨蓝玻璃:同一逻辑,墨与光对调。36 色逐一重设计(非公式翻转)。
+ */
+[data-theme="dark"] {
+  --ze-surface-canvas:  oklch(16.5% 0.012 256);
+  --ze-surface-glass:   oklch(23% 0.014 254 / 0.78);
+  --ze-surface-raised:  oklch(25.5% 0.014 255);
+  --ze-surface-float:   oklch(27% 0.014 255);
+  --ze-surface-sunken:  oklch(0% 0 0 / 0.26);
+  --ze-surface-inverse: oklch(97% 0.004 250);
+  --ze-overlay-strong:  oklch(0% 0 0 / 0.6);
+
+  --ze-ink-primary:   oklch(95.5% 0.006 250);
+  --ze-ink-secondary: oklch(81% 0.009 250);
+  --ze-ink-tertiary:  oklch(65% 0.011 250);
+  --ze-ink-disabled:  oklch(42% 0.008 250);
+  --ze-ink-inverse:   oklch(19% 0.014 254);
+
+  --ze-line-soft:   oklch(30% 0.01 254);
+  --ze-line-mid:    oklch(36% 0.012 254);
+  --ze-line-strong: oklch(50% 0.014 254);
+
+  --ze-accent-500: oklch(72% 0.14 252);
+  --ze-accent-700: oklch(79% 0.12 252);
+  --ze-accent-200: oklch(42% 0.11 252);
+  --ze-overlay-accent-wash: oklch(from var(--ze-accent-500) l c h / 0.14);
+  --ze-accent-tint: oklch(from var(--ze-accent-500) l c h / 0.22);
+  --ze-accent-soft: oklch(34% 0.06 252);
+
+  --ze-semantic-success: oklch(70% 0.125 152);
+  --ze-semantic-success-wash: oklch(70% 0.125 152 / 0.16);
+  --ze-semantic-info:    oklch(72% 0.08 225);
+  --ze-semantic-info-wash: oklch(72% 0.08 225 / 0.16);
+  --ze-semantic-warn:    oklch(76% 0.125 78);
+  --ze-semantic-warn-wash: oklch(76% 0.125 78 / 0.18);
+  --ze-semantic-danger:  oklch(64% 0.16 26);
+  --ze-semantic-danger-wash: oklch(64% 0.16 26 / 0.16);
+
+  --ze-data-1: oklch(72% 0.14 252);
+  --ze-data-2: oklch(72% 0.11 195);
+  --ze-data-3: oklch(72% 0.11 145);
+  --ze-data-4: oklch(78% 0.12 85);
+  --ze-data-5: oklch(68% 0.13 35);
+  --ze-data-6: oklch(68% 0.12 315);
+  --ze-data-7: oklch(70% 0.06 250);
+  --ze-data-8: oklch(62% 0.1 275);
+
+  --ze-overlay-soft: oklch(92% 0.01 250 / 0.08);
+
+  --ze-shadow-raised:   0 1px 1px oklch(0% 0 0 / 0.3), 0 5px 12px -8px oklch(0% 0 0 / 0.4);
+  --ze-shadow-panel:    0 1px 1px oklch(0% 0 0 / 0.28), 0 10px 24px -16px oklch(0% 0 0 / 0.5);
+  --ze-shadow-floating: 0 1px 2px oklch(0% 0 0 / 0.34), 0 16px 36px -14px oklch(0% 0 0 / 0.55);
+  --ze-shadow-overlay:  0 2px 4px oklch(0% 0 0 / 0.4), 0 28px 64px -22px oklch(0% 0 0 / 0.66);
+  --ze-edge-highlight:  inset 0 1px 0 oklch(100% 0 0 / 0.06);
+  --ze-glow-accent:     0 1px 8px -1px oklch(from var(--ze-accent-500) l c h / 0.4);
+
+  /* 引导精灵 · 变形体 v2(暗色):压暗用画布色重纱;余晖亮芯提亮档随暗色 accent */
+  --ze-guide-veil:     oklch(from var(--ze-surface-canvas) l c h / 0.6);
+  --ze-guide-trail-hi: oklch(from var(--ze-accent-500) 0.88 0.08 h);
+}

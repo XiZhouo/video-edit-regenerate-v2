@@ -1,0 +1,49 @@
+/*
+ * form.css — form 编辑器自有结构(04-editors)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ * 消费: FormEditor / FormZone —— schema 驱动表单内容区外壳(.ze-editor__form-body)。
+ *       字段行 primitive(.ze-field-row* —— FormZone + ParamPanel 复用,承载行高系统/多行例外/
+ *       run-phase 骨架/响应式)是框架级共享组件,其令牌样式已上移 L2(02-atoms/field-row.css)。
+ *
+ * 绝对严格分层(P4 batch10):本层零 var(--ze-*)。body 的内距/行间距由 React 贴 L2 原子
+ * (.ze-pad/.ze-gap)承接;本文件只留 flex 列流与附着状态结构。
+ */
+.ze-editor__form-body {
+  flex: 1;
+  min-height: 0;          /* flex 链收缩:无此项内容撑破父级而非内部滚动(契约 SPEC §2.10)*/
+  overflow: auto;
+  display: flex;
+  flex-direction: column;  /* 内距/行间距走 .ze-pad+.ze-gap */
+}
+.ze-editor__form-status { flex: none; }
+
+/* ---- 业务动作条(actionbar zone):钮组换行;视觉走 .ze-button,内距/间距走原子 ---- */
+.ze-editor__actionbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex: none;            /* 不抢 form-body 高度(gallery filterbar 同款)*/
+  min-width: 0;          /* 容器R2:flex 链允许横向收缩 */
+}
+
+/* ---- preview kind 单元:只读图片预览(位置示意/修饰图);本层只留结构,无可视令牌 ----
+ * 220px 上限=BIF 真机实证值(≈L2 asset-input 的 3×row-h+space-4 上限);L4 禁令牌,结构 px 合法。 */
+.ze-editor__unit-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-height: 220px;
+  overflow: hidden;
+}
+.ze-editor__unit-preview > * { grid-area: 1 / 1; }
+.ze-editor__unit-preview-run { align-self: start; justify-self: end; }
+.ze-editor__unit-preview img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}

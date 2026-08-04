@@ -1,0 +1,118 @@
+{
+  "schema": "ze.dependency-manifest.v1",
+  "skill_id": "ZE-video-edit-studio",
+  "status": "draft",
+  "generated_by": "ZE-skill-build",
+  "environments": [
+    {
+      "environment_id": "python-runtime",
+      "ecosystem": "python",
+      "purposes": [
+        "development",
+        "runtime",
+        "test"
+      ],
+      "artifact_roles": [
+        "runtime",
+        "server"
+      ],
+      "working_directory": ".",
+      "descriptor": {
+        "path": "requirements.txt",
+        "digest": "sha256:529395e0c45d0fdb5401ea90d8f1736b0e290d0a921700f0b77c802d47de668b",
+        "format": "python-requirements"
+      },
+      "runtime": {
+        "family": "python",
+        "version_constraint": ">=3.9"
+      },
+      "platform": {
+        "os": [
+          "darwin",
+          "linux",
+          "windows"
+        ],
+        "architecture": [
+          "arm64",
+          "x86_64"
+        ],
+        "accelerator": "none"
+      },
+      "materialization": {
+        "strategy": "adapter-selected",
+        "supported_strategies": [
+          "content-addressed-link",
+          "provider-bundled",
+          "target-managed"
+        ],
+        "cacheable": true,
+        "link_path": ".venv"
+      },
+      "install_policy": {
+        "network_on_cache_miss": true,
+        "lifecycle_scripts": false,
+        "integrity": "descriptor-only",
+        "dependency_scope": "all"
+      },
+      "retention_class": "large"
+    },
+    {
+      "environment_id": "webapp-node",
+      "ecosystem": "node",
+      "purposes": [
+        "build",
+        "development",
+        "test"
+      ],
+      "artifact_roles": [
+        "client",
+        "runtime",
+        "server"
+      ],
+      "working_directory": "webapp",
+      "descriptor": {
+        "path": "webapp/package.json",
+        "digest": "sha256:7f09aca046498fae0493f10e4eb62b689d37d66ad59b44fd1445a8f9cdd5e628",
+        "format": "package-json"
+      },
+      "runtime": {
+        "family": "node",
+        "version_constraint": ">=20"
+      },
+      "platform": {
+        "os": [
+          "darwin",
+          "linux",
+          "windows"
+        ],
+        "architecture": [
+          "arm64",
+          "x86_64"
+        ],
+        "accelerator": "none"
+      },
+      "materialization": {
+        "strategy": "adapter-selected",
+        "supported_strategies": [
+          "content-addressed-link",
+          "provider-bundled",
+          "target-managed"
+        ],
+        "cacheable": true,
+        "link_path": "webapp/node_modules"
+      },
+      "install_policy": {
+        "network_on_cache_miss": true,
+        "lifecycle_scripts": false,
+        "integrity": "lockfile",
+        "dependency_scope": "all"
+      },
+      "retention_class": "large",
+      "lock": {
+        "path": "webapp/package-lock.json",
+        "digest": "sha256:70390f81760d98a987a87f644c0b03e559ad4a23faf4ed27b7b6717c9dd34d2d",
+        "format": "npm-package-lock"
+      }
+    }
+  ]
+}

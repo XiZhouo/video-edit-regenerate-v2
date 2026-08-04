@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ze.local/contracts/artifact/ze.series-overlay.v1.schema.json",
+  "title": "ZE scoped offline catalog and theme overlay v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "scope", "skill_uid", "current_skill_id",
+    "base_artifact_digest", "catalog_snapshot", "catalog"
+  ],
+  "properties": {
+    "schema": {"const": "ze.series-overlay.v1"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "skill_uid": {"$ref": "#/$defs/skill_uid"},
+    "current_skill_id": {"$ref": "#/$defs/skill_id"},
+    "base_artifact_digest": {"$ref": "#/$defs/digest"},
+    "catalog_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot_id", "etag", "digest"],
+      "properties": {
+        "snapshot_id": {"type": "string", "minLength": 1, "maxLength": 160},
+        "etag": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "catalog": {"$ref": "#/$defs/catalog_item"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "skill_uid": {"type": "string", "pattern": "^skill_[0-9a-f]{32}$"},
+    "skill_id": {
+      "type": "string", "maxLength": 128,
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,127}$"
+    },
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["series_id", "organization_id", "target_id"],
+      "properties": {
+        "series_id": {"$ref": "#/$defs/id"},
+        "organization_id": {"$ref": "#/$defs/id"},
+        "target_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "color": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+    "theme_tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary", "accent", "surface", "surface_muted", "text",
+        "text_muted", "border", "focus", "success", "warning", "danger"
+      ],
+      "properties": {
+        "primary": {"$ref": "#/$defs/color"},
+        "accent": {"$ref": "#/$defs/color"},
+        "surface": {"$ref": "#/$defs/color"},
+        "surface_muted": {"$ref": "#/$defs/color"},
+        "text": {"$ref": "#/$defs/color"},
+        "text_muted": {"$ref": "#/$defs/color"},
+        "border": {"$ref": "#/$defs/color"},
+        "focus": {"$ref": "#/$defs/color"},
+        "success": {"$ref": "#/$defs/color"},
+        "warning": {"$ref": "#/$defs/color"},
+        "danger": {"$ref": "#/$defs/color"}
+      }
+    },
+    "catalog_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_uid", "skill_id", "display_name", "visibility", "enabled",
+        "surfaces", "audiences", "theme", "update_policy", "authorization"
+      ],
+      "properties": {
+        "skill_uid": {"$ref": "#/$defs/skill_uid"},
+        "skill_id": {"$ref": "#/$defs/skill_id"},
+        "display_name": {"type": "string", "minLength": 1, "maxLength": 128},
+        "description": {"type": "string", "maxLength": 1024},
+        "icon_asset_ref": {"$ref": "#/$defs/digest"},
+        "visibility": {"enum": ["listed", "unlisted", "hidden"]},
+        "enabled": {"type": "boolean"},
+        "surfaces": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["launcher", "portal", "company", "admin"]}
+        },
+        "audiences": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["member", "admin", "beta", "internal"]}
+        },
+        "theme": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["theme_ref", "tokens"],
+          "properties": {
+            "theme_ref": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{0,63}@[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+            },
+            "tokens": {"$ref": "#/$defs/theme_tokens"}
+          }
+        },
+        "update_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["channel", "user_choice"],
+          "properties": {
+            "channel": {"enum": ["stable", "beta", "pinned"]},
+            "user_choice": {"enum": ["prompt", "automatic", "manual-only"]},
+            "pinned_version": {"$ref": "#/$defs/version"}
+          }
+        },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "evaluation"],
+          "properties": {
+            "required": {"const": true},
+            "evaluation": {"const": "runtime-check-required"}
+          }
+        }
+      }
+    }
+  }
+}

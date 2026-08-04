@@ -1,0 +1,283 @@
+/*
+ * utility.css — ze-* 视觉实用原子族 (02-atoms / L2 实用原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么有它:绝对严格分层(除 L2 外不碰令牌)落到 L4 编辑器 / L5 chrome 后,这些层的 .css
+ * 不准再直接写 var(--ze-overlay-soft) 画边框、var(--ze-radius-*) 倒角、var(--ze-accent-*) 上色、
+ * var(--ze-dur-*) 做过渡。本族把"边框 / 倒角 / 底色 / 内距 / 色调 / 过渡 / 阴影"这些**可贴任意
+ * 元素**的视觉动作封成 L2 实用原子(Tailwind 式 utility,但走 ZE 的 data-* 闭集约定),令牌消费
+ * 收敛到本层。布局动作见 layout.css,角色文字见 text.css —— 三者合成完整 L2 实用层。
+ *
+ * 参数全走 data-* 闭集(对齐 layout/text 原子约定)。全部值引令牌(var(--ze-*)),禁字面量。
+ * 扩展规则:新增枚举只在本文件加 data-* 分支;上层禁止为视觉再写裸 var()。
+ */
+
+/* ── .ze-edge:分隔边框(line-soft 1px;data-edge 选边)────────────────
+ * 高频场景:工具条/状态条/控件条与画布的分隔线、卡片描边。可贴任意元素。 */
+.ze-edge[data-edge="top"]    { border-top:    1px solid var(--ze-line-soft); }
+.ze-edge[data-edge="bottom"] { border-bottom: 1px solid var(--ze-line-soft); }
+.ze-edge[data-edge="left"]   { border-left:   1px solid var(--ze-line-soft); }
+.ze-edge[data-edge="right"]  { border-right:  1px solid var(--ze-line-soft); }
+.ze-edge[data-edge="all"]    { border:        1px solid var(--ze-line-soft); }
+/* 加重描边(line-strong):弹层/浮动面板外缘 */
+.ze-edge[data-tone="strong"] { border-color: var(--ze-line-strong); }
+/* 中等描边(line-mid):详情卡 / 信息控制单元等需比 soft 明确一档的块边界 */
+.ze-edge[data-tone="mid"] { border-color: var(--ze-line-mid); }
+
+/* ── .ze-round:倒角(data-radius 闭集)──────────────────────────────── */
+.ze-round[data-radius="sm"]   { border-radius: var(--ze-radius-sm); }
+.ze-round[data-radius="md"]   { border-radius: var(--ze-radius-md); }
+.ze-round[data-radius="lg"]   { border-radius: var(--ze-radius-lg); }
+.ze-round[data-radius="pill"] { border-radius: var(--ze-radius-pill); }
+
+/* ── .ze-surface:底色(可贴任意元素;补 layout 原子的 data-surface)──────
+ * 闭集:raised(升起,chrome)/ sunken(凹陷,输入/画布)/ canvas(最底)/ inverse(反相,
+ * 媒体/3D 视口背景)。data-tone=accent-wash 给"选中/激活"淡强调底。 */
+.ze-surface[data-surface="raised"]  { background: var(--ze-surface-raised); }
+.ze-surface[data-surface="sunken"]  { background: var(--ze-surface-sunken); }
+.ze-surface[data-surface="canvas"]  { background: var(--ze-surface-canvas); }
+.ze-surface[data-surface="inverse"] { background: var(--ze-surface-inverse); }
+.ze-surface[data-surface="accent-wash"] { background: var(--ze-overlay-accent-wash); }
+.ze-surface[data-surface="overlay"] { background: var(--ze-overlay-soft); }
+.ze-surface[data-surface="strong"]  { background: var(--ze-overlay-strong); }  /* 浮层标签底(对比图元 tag 等)*/
+
+/* ── .ze-gap:flex/grid 间距(贴在已自带 display 的容器上,只补 gap;值 = 空间令牌档 key)──────
+ * 与 .ze-row/.ze-stack 的 data-gap 区别:那两个连 display 一起给;.ze-gap 只给 gap,不动 display。 */
+.ze-gap[data-gap="0-5"] { gap: var(--ze-space-0-5); }
+.ze-gap[data-gap="1"]   { gap: var(--ze-space-1); }
+.ze-gap[data-gap="2"]   { gap: var(--ze-space-2); }
+.ze-gap[data-gap="3"]   { gap: var(--ze-space-3); }
+
+/* ── .ze-pad:内距(p 四向 / px 横 / py 纵;值 = 空间令牌档 key)────────────
+ * 可贴任意元素(不止 layout 原子)。layout.css 的 data-pad 是便捷别名,二者同义。 */
+.ze-pad[data-p="0-5"] { padding: var(--ze-space-0-5); }
+.ze-pad[data-p="1"]   { padding: var(--ze-space-1); }
+.ze-pad[data-p="2"]   { padding: var(--ze-space-2); }
+.ze-pad[data-p="3"]   { padding: var(--ze-space-3); }
+.ze-pad[data-p="4"]   { padding: var(--ze-space-4); }
+.ze-pad[data-p="6"]   { padding: var(--ze-space-6); }
+.ze-pad[data-px="1"]  { padding-inline: var(--ze-space-1); }
+.ze-pad[data-px="2"]  { padding-inline: var(--ze-space-2); }
+.ze-pad[data-px="3"]  { padding-inline: var(--ze-space-3); }
+.ze-pad[data-py="0-5"]{ padding-block: var(--ze-space-0-5); }
+.ze-pad[data-py="1"]  { padding-block: var(--ze-space-1); }
+.ze-pad[data-py="2"]  { padding-block: var(--ze-space-2); }
+
+/* ── .ze-elevate:阴影(base=浮动弹层/拖拽;data-elev=sm 给节点/卡片的细微 1px 投影)────── */
+.ze-elevate { box-shadow: var(--ze-shadow-floating); }
+.ze-elevate[data-elev="sm"] { box-shadow: 0 1px 2px var(--ze-overlay-soft); }
+
+/* ── .ze-dotgrid:点阵画布底(空间编辑器 graph/timeline/spatial 的网格背景)────────────── */
+.ze-dotgrid {
+  background-color: var(--ze-surface-canvas);
+  background-image: radial-gradient(var(--ze-overlay-soft) 1px, transparent 1px);
+  background-size: var(--ze-space-6) var(--ze-space-6);
+}
+
+/* ── .ze-selectable:可选中元素的"选中"描边(节点/片段/卡片;data-selected 驱动,不 dispatch)── */
+.ze-selectable[data-selected="true"] { outline: 2px solid var(--ze-semantic-info); outline-offset: -1px; z-index: 1; }
+
+/* ── .ze-runstate:实体运行态视觉(data-run-phase 驱动;生成中淡出、失败描红)────────────
+ * 与 .ze-editor__canvas-body 等的 data-run-phase 同源,但 .ze-runstate 可贴任意可运行元素。 */
+.ze-runstate[data-run-phase="pending"],
+.ze-runstate[data-run-phase="running"] { opacity: 0.55; }
+.ze-runstate[data-run-phase="error"] { outline: 2px solid var(--ze-semantic-danger); outline-offset: -1px; }
+
+/* ── .ze-size:尺寸(把空间令牌当宽/高/最小高/最大宽;空间编辑器刻度条/行/手柄/标签等固定尺寸)── */
+.ze-size[data-minh="8"] { min-height: var(--ze-space-8); }
+.ze-size[data-maxw="16"] { max-width: var(--ze-space-16); }
+.ze-size[data-w="6"] { width: var(--ze-space-6); }   /* 滑块手柄等定尺方块 */
+.ze-size[data-h="6"] { height: var(--ze-space-6); }
+
+/* ── .ze-inset:绝对定位偏移(把空间令牌当 top/left/right 偏移;只补偏移、不设 position,
+ * 由消费元素自带 position:absolute)。浮层标签 / HUD / 角标等贴角元素用。────────────── */
+.ze-inset[data-top="2"]   { top: var(--ze-space-2); }
+.ze-inset[data-left="2"]  { left: var(--ze-space-2); }
+.ze-inset[data-right="2"] { right: var(--ze-space-2); }
+
+/* ── .ze-viewport:C3 视口类显示模式尺寸约束(多屏预览:phone 竖屏 / free 自由)──────────
+ * custom scene/canvas renderer 的视口主体贴此类 + data-display-mode 声明式选档,替代内联
+ * aspectRatio/minHeight(见 03-zones/ZONE-CLASS-REGISTRY.md §C3)。位置/溢出/底色等仍由消费元素
+ * 自带(结构性内联 + .ze-surface)。data-safe-area 是业务视口态,框架只留 hook、不定 padding。 */
+.ze-viewport[data-display-mode="phone"] {
+  aspect-ratio: var(--ze-viewport-phone-aspect);
+  max-width: var(--ze-viewport-phone-max-w);
+}
+.ze-viewport[data-display-mode="free"] {
+  min-height: var(--ze-viewport-free-min-h);
+}
+
+/* ── .ze-scroll-fade:软滚动提示(状态化,非装饰)────────────────────────────────
+ * 用 mask 做边缘淡入淡出,表达"这个方向后面还有内容",避免卡片/表单/日志在无硬边界处被生切。
+ * **状态由 useScrollAffordance hook 实测后写 data-scroll-y/x ∈ {none,start,middle,end}**:
+ *   none   → 不画(不可滚 / 没接 hook)   start → 只画尾端(在首端,后面还有)
+ *   end    → 只画首端(在尾端,前面还有) middle → 两端都画
+ * 裸类**不声明 mask**(故未接 hook / none 时既不淡出、也不与下游自有 mask 抢层叠)。
+ * 只改可视裁切,不创建新边框;滚动归属仍由消费元素自己的 overflow/min-height 决定。 */
+.ze-scroll-fade-y[data-scroll-y="start"] {
+  -webkit-mask-image: linear-gradient(to bottom, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to bottom, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-scroll-fade-y[data-scroll-y="middle"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-scroll-fade-y[data-scroll-y="end"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4));
+  mask-image: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4));
+}
+.ze-scroll-fade-x[data-scroll-x="start"] {
+  -webkit-mask-image: linear-gradient(to right, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to right, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-scroll-fade-x[data-scroll-x="middle"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+  mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent);
+}
+.ze-scroll-fade-x[data-scroll-x="end"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4));
+  mask-image: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4));
+}
+/* 双向(表格类):两轴各一 mask 层 + intersect 合成。缺轴回退为整条不透明 gradient
+ * (非 no-layer,否则 intersect 把元素整块抹空);某轴 none/未写变体 → 该层保持不透明 = 不裁。 */
+.ze-scroll-fade-both {
+  --ze-fade-y: linear-gradient(var(--ze-ink-primary), var(--ze-ink-primary));
+  --ze-fade-x: linear-gradient(var(--ze-ink-primary), var(--ze-ink-primary));
+  -webkit-mask-image: var(--ze-fade-y), var(--ze-fade-x);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--ze-fade-y), var(--ze-fade-x);
+  mask-composite: intersect;
+}
+.ze-scroll-fade-both[data-scroll-y="start"]  { --ze-fade-y: linear-gradient(to bottom, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent); }
+.ze-scroll-fade-both[data-scroll-y="middle"] { --ze-fade-y: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent); }
+.ze-scroll-fade-both[data-scroll-y="end"]    { --ze-fade-y: linear-gradient(to bottom, transparent, var(--ze-ink-primary) var(--ze-space-4)); }
+.ze-scroll-fade-both[data-scroll-x="start"]  { --ze-fade-x: linear-gradient(to right, var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent); }
+.ze-scroll-fade-both[data-scroll-x="middle"] { --ze-fade-x: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4), var(--ze-ink-primary) calc(100% - var(--ze-space-4)), transparent); }
+.ze-scroll-fade-both[data-scroll-x="end"]    { --ze-fade-x: linear-gradient(to right, transparent, var(--ze-ink-primary) var(--ze-space-4)); }
+
+/* ── .ze-scrollbar:统一滚动条视觉(薄、低对比、hover 可见)────────────────
+ * 自动覆盖 build-v3 已知滚动容器;新滚动容器可显式叠 .ze-scrollbar。
+ * 内容流仍按 ze-scroll-fade-* 表达软边,滚动条只解决控件厚重度。 */
+:where(
+  .ze-scrollbar,
+  .ze-scroll,
+  .ze-scroll-fade-y,
+  .ze-scroll-fade-x,
+  .ze-scroll-fade-both,
+  .ze-dialog__body,
+  .ze-editor__content[data-content-scroll="true"],
+  .ze-editor__zone[data-layout="hug-scroll"],
+  .ze-editor__zone[data-layout="wrap-cluster"],
+  .ze-editor__zone-actions,
+  .ze-footer__pipeline-detail,
+  .ze-footer__pipeline-log,
+  .ze-footer__section-body,
+  .ze-header__file-list,
+  .ze-project-picker,
+  .ze-share-card__list
+) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ze-scrollbar-thumb) var(--ze-scrollbar-track);
+}
+
+:where(
+  .ze-scrollbar,
+  .ze-scroll,
+  .ze-scroll-fade-y,
+  .ze-scroll-fade-x,
+  .ze-scroll-fade-both,
+  .ze-dialog__body,
+  .ze-editor__content[data-content-scroll="true"],
+  .ze-editor__zone[data-layout="hug-scroll"],
+  .ze-editor__zone[data-layout="wrap-cluster"],
+  .ze-editor__zone-actions,
+  .ze-footer__pipeline-detail,
+  .ze-footer__pipeline-log,
+  .ze-footer__section-body,
+  .ze-header__file-list,
+  .ze-project-picker,
+  .ze-share-card__list
+)::-webkit-scrollbar {
+  width: var(--ze-scrollbar-size);
+  height: var(--ze-scrollbar-size);
+}
+
+:where(
+  .ze-scrollbar,
+  .ze-scroll,
+  .ze-scroll-fade-y,
+  .ze-scroll-fade-x,
+  .ze-scroll-fade-both,
+  .ze-dialog__body,
+  .ze-editor__content[data-content-scroll="true"],
+  .ze-editor__zone[data-layout="hug-scroll"],
+  .ze-editor__zone[data-layout="wrap-cluster"],
+  .ze-editor__zone-actions,
+  .ze-footer__pipeline-detail,
+  .ze-footer__pipeline-log,
+  .ze-footer__section-body,
+  .ze-header__file-list,
+  .ze-project-picker,
+  .ze-share-card__list
+)::-webkit-scrollbar-track {
+  background: var(--ze-scrollbar-track);
+}
+
+:where(
+  .ze-scrollbar,
+  .ze-scroll,
+  .ze-scroll-fade-y,
+  .ze-scroll-fade-x,
+  .ze-scroll-fade-both,
+  .ze-dialog__body,
+  .ze-editor__content[data-content-scroll="true"],
+  .ze-editor__zone[data-layout="hug-scroll"],
+  .ze-editor__zone[data-layout="wrap-cluster"],
+  .ze-editor__zone-actions,
+  .ze-footer__pipeline-detail,
+  .ze-footer__pipeline-log,
+  .ze-footer__section-body,
+  .ze-header__file-list,
+  .ze-project-picker,
+  .ze-share-card__list
+)::-webkit-scrollbar-thumb {
+  background: var(--ze-scrollbar-thumb);
+  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: var(--ze-radius-pill);
+}
+
+:where(
+  .ze-scrollbar,
+  .ze-scroll,
+  .ze-scroll-fade-y,
+  .ze-scroll-fade-x,
+  .ze-scroll-fade-both,
+  .ze-dialog__body,
+  .ze-editor__content[data-content-scroll="true"],
+  .ze-editor__zone[data-layout="hug-scroll"],
+  .ze-editor__zone[data-layout="wrap-cluster"],
+  .ze-editor__zone-actions,
+  .ze-footer__pipeline-detail,
+  .ze-footer__pipeline-log,
+  .ze-footer__section-body,
+  .ze-header__file-list,
+  .ze-project-picker,
+  .ze-share-card__list
+):hover::-webkit-scrollbar-thumb {
+  background: var(--ze-scrollbar-thumb-hover);
+  background-clip: content-box;
+}
+
+/* ── .ze-row-card:带边框的可选中/可悬停行卡(任务行/卡片行;选中描边换强调色、失败换危险色)──
+ * 底色由叠加的 .ze-surface 给;本原子只管边框 + hover + 选中/失败的边框色态(data-selected/data-status 驱动)。
+ * 置于 .ze-surface 之后,使 :hover 底色能盖过常态底色。 */
+.ze-row-card { border: 1px solid var(--ze-line-soft); cursor: pointer; }
+.ze-row-card:hover { background: var(--ze-overlay-soft); }
+.ze-row-card[data-selected="true"] { border-color: var(--ze-accent-500); }
+.ze-row-card[data-status="error"] { border-color: color-mix(in oklab, var(--ze-semantic-danger) 40%, transparent); }
+
+/* 说明:标准过渡(.ze-transition)在消费它的转换批次(editor.css 状态条 hover)随用随加 ——
+ * 本族遵守"零消费原子即死码"不变量(dead_atom_report),不预置未被引用的 class。 */

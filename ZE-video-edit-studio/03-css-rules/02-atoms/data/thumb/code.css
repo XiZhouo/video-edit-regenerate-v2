@@ -1,0 +1,273 @@
+/*
+ * thumb.css — ze-thumb 缩略图网格组件原子 (02-atoms / L2 组件原子)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md · 总纲 ../../DESIGN-SYSTEM.md(§3 L2)
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 为什么在 L2:`.ze-thumb*` / `.ze-thumb-grid` / `.ze-marquee` 是框架级共享 primitive
+ * (ThumbnailGrid / ThumbnailCard,被 cardlist(legacy gallery) / asset / task 三编辑器复用 —— 见
+ * 01-core/.../primitives/ThumbnailGrid.tsx)。其卡片视觉天然是状态化的:选中 / 多选 /
+ * 错误 / 拖拽 / 落点插入线,全靠 data-* 属性选择器在同一张卡上分支(同 .ze-card / .ze-table
+ * 的组件原子模式)。这类「整组件的令牌样式」无法降成 L4 无令牌结构(它本就需要 accent /
+ * surface / shadow 令牌),故收成 L2 组件原子;令牌消费合法收敛于此,L4 gallery.css 只剩
+ * 编辑器自有的 .ze-editor__* 无令牌结构。原 04-editors/gallery.css 迁来(P4 batch8)。
+ *
+ * 全部值引 令牌(var(--ze-*)),禁字面量(@container 列宽/断点 px 为结构,非令牌)。
+ */
+
+/* ── 网格容器:自适应列数(@container 响应,非 viewport)+ 框选定位上下文 ───────────── */
+.ze-thumb-grid {
+  --ze-thumb-card-min-w: 140px;
+  --ze-thumb-list-media-w: var(--ze-space-16);
+  --ze-thumb-compact-media-w: var(--ze-space-12);
+  position: relative;   /* 框选橡皮筋(.ze-marquee)的定位上下文 */
+  width: 100%;          /* 作 flex 子项时锁满宽:居中父容器(asset-input frame 等)里 shrink-to-fit 会缩成 min-content 窄条 */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ze-thumb-card-min-w)), 1fr));
+  gap: var(--ze-space-3);
+  align-items: start;   /* 行内卡不互相拉伸:真实比例卡(card-list)高度各异时保持各自内容高 */
+}
+@container (max-width: 320px) {
+  .ze-thumb-grid:not([data-thumb-fluid="true"]):not([data-thumb-size="xs"]):not([data-thumb-size="sm"]) { grid-template-columns: 1fr; }
+}
+@container (min-width: 1024px) {
+  .ze-thumb-grid:not([data-thumb-fluid="true"]):not([data-thumb-size]) { --ze-thumb-card-min-w: 160px; }
+}
+
+.ze-thumb-grid[data-layout="card-list"],
+.ze-thumb-grid[data-layout="compact-list"] {
+  grid-template-columns: 1fr;
+  /* 纵向单列卡片流=紧凑档:卡自带边框已是分隔,卡间 space-1 即可读——space-3 是图墙(多列
+   * 缩略网格)的档,单列流沿用即间距浪费(审计工具一屏卡数减半)。 */
+  gap: var(--ze-space-1);
+}
+
+/* ── 缩略图尺寸:Gallery 走 data-thumb-fluid + 内联变量;data-thumb-size 为旧调用点兼容 ───── */
+.ze-thumb-grid[data-thumb-size="xs"] {
+  --ze-thumb-card-min-w: 72px;
+  --ze-thumb-list-media-w: var(--ze-space-8);
+  --ze-thumb-compact-media-w: var(--ze-space-6);
+  gap: var(--ze-space-2);
+}
+.ze-thumb-grid[data-thumb-size="sm"] {
+  --ze-thumb-card-min-w: 96px;
+  --ze-thumb-list-media-w: var(--ze-space-12);
+  --ze-thumb-compact-media-w: var(--ze-space-8);
+}
+.ze-thumb-grid[data-thumb-size="md"] {
+  --ze-thumb-card-min-w: 140px;
+  --ze-thumb-list-media-w: var(--ze-space-16);
+  --ze-thumb-compact-media-w: var(--ze-space-12);
+}
+.ze-thumb-grid[data-thumb-size="lg"] {
+  --ze-thumb-card-min-w: 220px;
+  --ze-thumb-list-media-w: calc(var(--ze-space-16) + var(--ze-space-8));
+  --ze-thumb-compact-media-w: var(--ze-space-16);
+}
+.ze-thumb-grid[data-thumb-size="xl"] {
+  --ze-thumb-card-min-w: 9999px;
+  --ze-thumb-list-media-w: calc(var(--ze-space-16) + var(--ze-space-16));
+  --ze-thumb-compact-media-w: calc(var(--ze-space-16) + var(--ze-space-4));
+}
+
+/* ── 无媒体区一等公民(showThumb=false):纯文本卡,列表两模式收掉媒体列 ───────────── */
+.ze-thumb-grid[data-media="none"][data-layout="card-list"] .ze-thumb,
+.ze-thumb-grid[data-media="none"][data-layout="compact-list"] .ze-thumb {
+  grid-template-columns: auto minmax(0, 1fr) auto;   /* 首列=内联 toggles(无则自动塌缩) */
+}
+
+/* ── 框选橡皮筋:浅 accent 底 + accent 虚线(对齐 spatial 的 marquee 视觉语言)──────── */
+.ze-marquee {
+  position: absolute;
+  z-index: var(--ze-z-sticky);
+  background: var(--ze-overlay-accent-wash);
+  border: 1px dashed var(--ze-accent-500);
+  border-radius: var(--ze-radius-sm);
+  pointer-events: none;
+}
+
+/* ── 缩略卡:raised 底 + 1px 边,选中/多选/错误/拖拽态由 data-* 分支 ─────────────── */
+.ze-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ze-space-1);
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-md);
+  background: var(--ze-surface-raised);
+  padding: var(--ze-space-1);
+  cursor: pointer;
+  transition: border-color var(--ze-dur-fast) var(--ze-easing-standard),
+              box-shadow var(--ze-dur-fast) var(--ze-easing-standard);
+}
+.ze-thumb:hover { border-color: var(--ze-overlay-accent-wash); box-shadow: var(--ze-edge-highlight), var(--ze-shadow-raised); }
+.ze-thumb[data-selected="true"] { border-color: var(--ze-accent-500); background: var(--ze-overlay-accent-wash); box-shadow: var(--ze-glow-accent); }
+.ze-thumb[data-multi-selected="true"] { border-color: var(--ze-accent-500); box-shadow: inset 0 0 0 1px var(--ze-accent-500); }
+.ze-thumb[data-status="error"] { border-color: color-mix(in oklab, var(--ze-semantic-danger) 40%, transparent); }
+/* 拖拽重排:被拖卡半透明,落点卡左侧出强调插入线 */
+.ze-thumb[data-dragging="true"] { opacity: 0.4; }
+.ze-thumb[data-drag-over="true"] { box-shadow: -3px 0 0 0 var(--ze-accent-500); }
+
+.ze-thumb__media {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  overflow: hidden;
+}
+/* contain 非 cover:生产工具靠缩略图判断生成结果,cover 裁边即误导(inpaint/outpaint 边缘恰在被裁处);
+ * 绝对定位铺满媒体盒,混合比例图在 sunken 底上留白降级,信息无损。 */
+.ze-thumb__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.ze-thumb__preview-button {
+  position: absolute;
+  top: var(--ze-space-1);
+  right: var(--ze-space-1);
+  background: var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+}
+.ze-thumb__placeholder { color: var(--ze-ink-tertiary); font-size: var(--ze-fs-2xl); }
+.ze-thumb__loading { display: grid; place-items: center; }
+.ze-thumb__score { position: absolute; top: var(--ze-space-1); right: var(--ze-space-1); }
+.ze-thumb__error { min-width: 0; }
+.ze-thumb__label {
+  font-size: var(--ze-fs-xs);
+  color: var(--ze-ink-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 0 var(--ze-space-0-5);
+  /* 始终预留一行高度:骨架卡(loading)与真卡同 footprint,零 reflow */
+  min-height: var(--ze-space-4);
+  display: flex;
+  align-items: center;
+}
+.ze-thumb__label .ze-skeleton[data-variant="text"] { width: 70%; }
+.ze-thumb__description {
+  font-size: var(--ze-fs-xs);
+  line-height: var(--ze-lh-tight);
+  color: var(--ze-ink-tertiary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding: 0 var(--ze-space-0-5);
+}
+.ze-thumb__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ze-space-1);
+  padding: 0 var(--ze-space-0-5);
+  min-width: 0;
+}
+.ze-thumb__meta span {
+  display: inline-flex;
+  gap: var(--ze-space-0-5);
+  max-width: 100%;
+  min-width: 0;
+  align-items: center;
+  border: 1px solid var(--ze-overlay-soft);
+  border-radius: var(--ze-radius-sm);
+  background: var(--ze-surface-sunken);
+  color: var(--ze-ink-tertiary);
+  font-size: var(--ze-fs-xs);
+  line-height: var(--ze-lh-tight);
+  padding: var(--ze-space-0-5) var(--ze-space-1);
+}
+.ze-thumb__meta b {
+  color: var(--ze-ink-secondary);
+  font-weight: var(--ze-fw-medium);
+}
+.ze-thumb__actions { display: flex; gap: var(--ze-space-1); justify-content: flex-end; }
+
+/* ── 逐卡显隐/锁定钮(卡片列表抽象):媒体卡贴媒体区左上角;无媒体卡行首内联 ──────── */
+.ze-thumb__toggles {
+  display: inline-flex;
+  gap: var(--ze-space-0-5);
+  align-items: center;
+}
+.ze-thumb__media .ze-thumb__toggles {
+  position: absolute;
+  top: var(--ze-space-1);
+  left: var(--ze-space-1);
+}
+.ze-thumb__media .ze-thumb__toggles .ze-icon-button {
+  background: var(--ze-surface-raised);
+  box-shadow: var(--ze-shadow-raised);
+}
+/* 隐藏态压暗整卡(媒体+文字),钮区不压(还要点回来) */
+.ze-thumb[data-hidden="true"] .ze-thumb__media > :not(.ze-thumb__toggles),
+.ze-thumb[data-hidden="true"] .ze-thumb__label,
+.ze-thumb[data-hidden="true"] .ze-thumb__description,
+.ze-thumb[data-hidden="true"] .ze-thumb__meta { opacity: 0.35; }
+/* 锁定态:左缘锁条提示 + 不可拖(draggable 由组件移除,这里只给视觉) */
+.ze-thumb[data-locked="true"] { box-shadow: inset 2px 0 0 0 var(--ze-overlay-strong); }
+
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb {
+  display: grid;
+  grid-template-columns: minmax(var(--ze-thumb-list-media-w), 0.42fr) minmax(0, 1fr) auto;
+  align-items: start;
+  /* 卡内紧凑档:列/行间 space-1(高密度列表;space-2 在双行卡上放大出松散观感)。 */
+  gap: var(--ze-space-1);
+}
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb__media {
+  /* span 2(label+description)而非 span 4:meta 缺席时 span 4 强制生成空行,
+   * 每个空行白吃一个 row-gap(实测卡底 ~17px 纯空)。 */
+  grid-row: 1 / span 2;
+  /* 结果浏览场景=真实比例:--ze-thumb-media-ratio 由 ThumbnailGrid 声明或 img onLoad 自然比回写;
+   * 缺省回退 1(方盒)。grid(参考图管理)与 compact-list(定行高扫读)不消费此变量。 */
+  aspect-ratio: var(--ze-thumb-media-ratio, 1);
+}
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb__label {
+  align-self: end;
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-semibold);
+}
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb__description,
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb__meta {
+  grid-column: 2;
+}
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb__actions {
+  grid-column: 3;
+  grid-row: 1 / span 2;   /* 同 media:span 4 会强制生成空行白吃 row-gap */
+  align-self: start;
+}
+.ze-thumb-grid[data-layout="card-list"] .ze-thumb__error,
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb__error { grid-column: 2 / -1; }
+
+.ze-thumb-grid[data-layout="compact-list"] {
+  gap: var(--ze-space-1);
+}
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb {
+  display: grid;
+  grid-template-columns: var(--ze-thumb-compact-media-w) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ze-space-2);
+  padding: var(--ze-space-1);
+}
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb__media {
+  aspect-ratio: 1;
+  border-radius: var(--ze-radius-sm);
+}
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb__label {
+  color: var(--ze-ink-primary);
+  font-weight: var(--ze-fw-medium);
+}
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb__description,
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb__meta {
+  display: none;
+}
+.ze-thumb-grid[data-layout="compact-list"] .ze-thumb__actions {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+
+/* [v4 · 精密瓷釉] 缩略卡:实线细边;选中 = 1.5px 精确内描边(去外发光) */
+.ze-thumb { border-color: var(--ze-line-soft); }
+.ze-thumb[data-selected="true"] { box-shadow: inset 0 0 0 1.5px var(--ze-accent-500); }

@@ -1,0 +1,15 @@
+/*
+ * footer.css — 工作台底部固定栏视觉(04-editors · 已迁空 stub)
+ *
+ * 协议:03-css-rules 契约。
+ *
+ * 绝对严格分层(L5 chrome 轮 batch5,收官):底部栏(.ze-footer* 块)是框架级工作台 shell chrome
+ * (FooterShell + CollapsedBar / DetailsTabs / OpLogPanel / PipelineList),含状态化 hover、大量
+ * data-state / data-source / data-level 选择器、脉冲动画、把手 / resizer / section 竖条边界,
+ * 令牌样式无法降为 L4 无令牌结构,已整组上移 L2 组件原子 →
+ * 见 03-css-rules/02-atoms/footer-shell.css(经 index.css @import)。
+ *
+ * 本文件无残留(全是该底栏 shell),清空为指针 stub:零规则、零 var(--ze-*)。FooterShell.tsx
+ * 保留 import 本文件不牵连;类名 / 消费方无变化(02-atoms/index.css 已全局提供 footer-shell 样式)。
+ * 注意 .ze-editor-footer*(03-zones,L3)是不同 block,不在此。
+ */

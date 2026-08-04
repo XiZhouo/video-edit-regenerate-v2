@@ -1,0 +1,8 @@
+{
+  "schema": "ze.interface_lock.v2",
+  "layer": "css",
+  "framework": "ZE-skill-build",
+  "interface_version": "20.2.0",
+  "checksum": "5dd98b462520e223f0edf60148458def10bad5e724ddb2c643f3ff52054ac5ff",
+  "locked_at": "2026-07-29T05:21:28.572308+00:00"
+}

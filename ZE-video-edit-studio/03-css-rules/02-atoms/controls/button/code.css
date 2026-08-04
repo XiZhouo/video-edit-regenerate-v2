@@ -1,0 +1,131 @@
+/*
+ * button.css — ze-button 组件视觉 (02-atoms)
+ *
+ * 协议: 03-css-rules/02-atoms/SPEC.md §2.3 命名规范 + §2.4 状态矩阵
+ * 入口: @ze/css/02-atoms/index.css → @import
+ *
+ * 视觉 DNA: transparent base + overlay-soft hover + accent press,跟 Header/Footer 一致。
+ *   - 变体走 data-variant(primary/secondary/ghost/danger);尺寸走 data-size(sm/md/lg)
+ * 全部走 令牌 (var(--ze-*));禁止字面量 hex;主题切换仅靠 token。
+ * loading spinner 引用 feedback.css 的 @keyframes ze-spin。
+ */
+
+.ze-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ze-space-1);
+  min-height: var(--ze-control-h);               /* md = 28px(控件高令牌,与 space 解耦) */
+  padding: var(--ze-space-1) var(--ze-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--ze-radius-sm);
+  background: transparent;
+  color: var(--ze-ink-primary);
+  font-family: inherit;
+  font-size: var(--ze-fs-sm);
+  font-weight: var(--ze-fw-medium);
+  line-height: var(--ze-lh-tight);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background var(--ze-dur-fast) var(--ze-easing-standard),
+    border-color var(--ze-dur-fast) var(--ze-easing-standard),
+    color var(--ze-dur-fast) var(--ze-easing-standard),
+    transform var(--ze-dur-fast) var(--ze-easing-standard);
+}
+
+/* default(中性 ghost-with-fill,工作台默认按钮)*/
+.ze-button:hover { background: var(--ze-overlay-soft); color: var(--ze-ink-primary); }
+.ze-button:active { background: var(--ze-overlay-soft); transform: translateY(0.5px); }
+.ze-button:focus-visible { outline: 2px solid var(--ze-focus-ring); outline-offset: 1px; }
+.ze-button:disabled,
+.ze-button[aria-disabled="true"] {
+  color: var(--ze-ink-disabled);
+  background: transparent;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---- 变体 (data-variant) ---- */
+.ze-button[data-variant="primary"] {
+  background: var(--ze-accent-500);
+  color: var(--ze-ink-inverse);
+  border-color: transparent;
+  /* 「通电」感:主操作带 accent 辉光 */
+  box-shadow: var(--ze-glow-accent);
+}
+.ze-button[data-variant="primary"]:hover { background: var(--ze-accent-700); box-shadow: var(--ze-glow-accent); }
+.ze-button[data-variant="primary"]:active { background: var(--ze-accent-700); transform: translateY(0.5px); }
+
+.ze-button[data-variant="secondary"] {
+  /* 静止可见轮廓走 line-*(实线);overlay-* 是 hover 叠底通道,不作静止边线(v4 alpha 虚边已废) */
+  border-color: var(--ze-line-mid);
+  background: var(--ze-surface-raised);
+  color: var(--ze-ink-primary);
+  box-shadow: var(--ze-shadow-flat);
+}
+.ze-button[data-variant="secondary"]:hover { background: var(--ze-surface-raised); border-color: var(--ze-line-strong); box-shadow: var(--ze-shadow-raised); }
+
+.ze-button[data-variant="ghost"] { border-color: transparent; color: var(--ze-ink-secondary); }
+.ze-button[data-variant="ghost"]:hover { background: var(--ze-overlay-soft); color: var(--ze-ink-primary); }
+
+/* toggle 选中态(与 icon-button / menu-item 一致:accent-wash 底 + accent 字)。
+ * 让 button 也能当可切换工具(工具条 tool / 视图开关),无需上层自造 active 视觉。 */
+.ze-button[data-active="true"] { background: var(--ze-overlay-accent-wash); color: var(--ze-accent-500); }
+.ze-button[data-active="true"]:hover { background: var(--ze-overlay-accent-wash); color: var(--ze-accent-500); }
+
+.ze-button[data-variant="danger"] {
+  background: var(--ze-semantic-danger);
+  color: var(--ze-ink-inverse);
+}
+.ze-button[data-variant="danger"]:hover { background: var(--ze-semantic-danger); filter: brightness(0.92); }
+.ze-button[data-variant="danger"]:active { filter: brightness(0.86); transform: translateY(0.5px); }
+
+/* ---- 尺寸 (data-size) ---- */
+.ze-button[data-size="sm"] {
+  min-height: 0;
+  padding: var(--ze-space-0-5) var(--ze-space-2);
+  font-size: var(--ze-fs-xs);
+}
+.ze-button[data-size="lg"] {
+  min-height: 0;
+  padding: var(--ze-space-2) var(--ze-space-3);
+  font-size: var(--ze-fs-sm);
+  border-radius: var(--ze-radius-md);
+}
+
+/* ---- loading ---- */
+.ze-button[data-loading="true"] {
+  position: relative;
+  pointer-events: none;
+  color: transparent;
+}
+.ze-button[data-loading="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--ze-radius-pill);
+  color: var(--ze-ink-inverse);
+  animation: ze-spin var(--ze-dur-slow) linear infinite;
+}
+/* 非实底变体:spinner 用次级 ink(因为背景是透明的)*/
+.ze-button[data-loading="true"]:not([data-variant="primary"]):not([data-variant="danger"])::after {
+  color: var(--ze-ink-secondary);
+}
+
+/* ---- parts ---- */
+.ze-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.ze-button__label { display: inline-flex; }

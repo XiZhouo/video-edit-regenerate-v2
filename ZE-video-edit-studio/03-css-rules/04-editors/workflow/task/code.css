@@ -1,0 +1,20 @@
+/*
+ * task.css — task 编辑器看板行视觉:TaskRow (04-editors)
+ *
+ * SPEC: 01-core/04-user-facing/01-layout/03-editor/SPEC.md
+ * 消费: 01-core 的 TaskEditor → ListZone(.ze-editor--task)。进度环/徽章/错误占位用 02-atoms。
+ *
+ * 绝对严格分层(P4 去令牌):本文件 **零令牌**。行卡边框/底色/倒角/内距/间距/最小高/选中态 =
+ * `.ze-row-card`+`.ze-surface`+`.ze-round`+`.ze-pad`+`.ze-gap`+`.ze-size`;字号/字重/色 = `.ze-text`;
+ * 阶段 pill = `.ze-round[pill]`+`.ze-surface[sunken]`+`.ze-text[data-tone]`。本层只留无令牌结构
+ * (flex 容器骨架 / 省略 / 行高 1)。
+ */
+.ze-editor__task-body { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
+.ze-task-row { display: flex; align-items: center; }
+.ze-task-row__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ze-task-row__stages { display: flex; align-items: center; flex-wrap: wrap; min-width: 0; }
+.ze-task-row__stage-pill { display: inline-flex; align-items: center; }
+.ze-task-row__stage-dot { line-height: 1; }
+.ze-task-row__stage-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 状态筛选段控:toolbar 内一组小按钮;不换行,外层 toolbar actions 负责横向收敛。 */
+.ze-editor__taskfilter { display: flex; flex-wrap: nowrap; }

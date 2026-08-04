@@ -1,0 +1,8 @@
+{
+  "schema": "ze.video_domain_lock.v1",
+  "source_repo": "ZE-video-timeline-domain",
+  "domain_version": "0.11.3",
+  "checksum": "87582c1a058d6a9031e2e48c710dcbab0146eb040b811671cc6147ffe7357a2b",
+  "synced_at": "2026-07-29T07:00:20.646032+00:00",
+  "note": "Managed layer — do not hand-edit. Changes must reflow to ZE-video-timeline-domain then re-sync (受管层必回流上游)."
+}
